@@ -9,14 +9,14 @@ export default function GoogleLogin() {
 
   // Initialize Google Identity Services client once
   useEffect(() => {
-    if (!window.google) {
-      setError("Google Identity Services SDK not loaded.");
-      return;
-    }
-    if (user) return;
+    // if (!window.google) {
+    //   setError("Google Identity Services SDK not loaded.");
+    //   return;
+    // // }
+    // if (user) return;
 
     window.google.accounts.id.initialize({
-      client_id: '711989652397-3j5ejqbgm0a1o3hte713e6r7u876h2ci.apps.googleusercontent.com',
+      client_id: "711989652397-ffcq8cuqec6o2hlr4p7tqc5f8t78aa6c.apps.googleusercontent.com",
       callback: handleCredentialResponse,
       auto_select: false,
       cancel_on_tap_outside: false,
@@ -33,7 +33,7 @@ export default function GoogleLogin() {
     setError(null);
     try {
       const googleIdToken = response.credential;
-      const res = await fetch(`${BACKEND_URL}/user/auth/google`, {
+      const res = await fetch(`${BACKEND_URL}/user/auth/web/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: googleIdToken }),
