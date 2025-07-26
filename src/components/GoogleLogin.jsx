@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const BACKEND_URL = 'http://localhost:8000';
 
@@ -6,6 +7,7 @@ export default function GoogleLogin() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Initialize Google Identity Services client once
   useEffect(() => {
@@ -48,6 +50,7 @@ export default function GoogleLogin() {
       localStorage.setItem('user', JSON.stringify(backendUser));
       localStorage.setItem('token', appJwt);
       setUser(backendUser);
+      navigate('/workspace');
     } catch (err) {
       setError(err.message);
       setUser(null);
