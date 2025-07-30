@@ -1,3 +1,24 @@
+
+@import url('https://rsms.me/inter/inter.css'); 
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  font-family: 'Geist Sans', 'Inter', system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background: transparent; 
+}
+
+::selection {
+  background-color: rgba(52, 211, 153, 0.3); 
+}
