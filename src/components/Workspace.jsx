@@ -1,10 +1,24 @@
-import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import themeConfig from './themeConfig';
+import WorkspaceNavbar from './WorkspaceNavbar';
+import WorkspaceFooter from './WorkspaceFooter';
+import Library from './Library';
+import LectureHall from './LectureHall';
+import NotesDashboard from './NotesDashboard';
 
-export default function Workspace() {
+export default function Workspace({ theme, toggleTheme }) {
+  const cfg = themeConfig[theme];
   return (
-    <div className="max-w-3xl mx-auto px-4 py-16">
-      <h2 className="text-3xl font-semibold mb-4">Workspace</h2>
-      <p className="text-gray-700">Welcome to your workspace!</p>
+    <div className={cfg.root}>
+      <WorkspaceNavbar theme={theme} toggleTheme={toggleTheme} />
+      <main className="min-h-screen px-4 py-6">
+        <Routes>
+          <Route index element={<NotesDashboard />} />
+          <Route path="library" element={<Library />} />
+          <Route path="lecturehall" element={<LectureHall />} />
+        </Routes>
+      </main>
+      <WorkspaceFooter theme={theme} />
     </div>
   );
 }

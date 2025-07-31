@@ -26,10 +26,9 @@
 // }
 
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 
 import LandingPage from './components/LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -44,30 +43,52 @@ import {landingContent} from './components/landingContent';
 
 export default function App() {
   const [theme, setTheme] = useState('light');
-  const toggleTheme = () => setTheme( prev => ( prev  === 'light' ? 'dark' : 'light'));
-
-  const isLoggedIn = () => Boolean(localStorage.getItem('token'));
-
-  const { navigation, footer } = landingContent;
+  const toggleTheme = () =>
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
 
   return (
     <BrowserRouter>
-      <Navbar
-        theme={theme}
-        toggleTheme={toggleTheme}
-        navigation={navigation}
-      />
+      <AppRoutes theme={theme} toggleTheme={toggleTheme} />
+    </BrowserRouter>
+  );
+}
 
+function AppRoutes({ theme, toggleTheme }) {
+  const isLoggedIn = () => Boolean(localStorage.getItem('token'));
+  const { navigation } = landingContent;
+  const location = useLocation();
+  const isWorkspace = location.pathname.startsWith('/workspace');
+
+  return (
+    <>
+      {!isWorkspace && (
+        <Navbar
+          theme={theme}
+          toggleTheme={toggleTheme}
+          navigation={navigation}
+        />
+      )}
       <Routes>
         <Route
           path="/"
-          element={isLoggedIn() ? <Navigate to="/workspace" replace /> : <LandingPage theme={theme} />}
+          element={
+            isLoggedIn() ? (
+              <Navigate to="/workspace" replace />
+            ) : (
+              <LandingPage theme={theme} />
+            )
+          }
         />
         <Route
           path="login"
-          element={isLoggedIn() ? <Navigate to="/workspace" replace /> : <GoogleLogin />}
+          element={
+            isLoggedIn() ? <Navigate to="/workspace" replace /> : <GoogleLogin />
+          }
         />
-        <Route path="workspace" element={<Workspace />} />
+        <Route
+          path="workspace/*"
+          element={<Workspace theme={theme} toggleTheme={toggleTheme} />}
+        />
         <Route path="error" element={<ErrorPage />} />
         <Route path="privacy" element={<PrivacyPolicy />} />
         <Route path="cookies" element={<CookiePolicy />} />
@@ -75,8 +96,6 @@ export default function App() {
         <Route path="gdpr" element={<GDPRCompliance />} />
         <Route path="*" element={<p>404 Not Found</p>} />
       </Routes>
-
-    
-    </BrowserRouter>
+    </>
   );
 }
