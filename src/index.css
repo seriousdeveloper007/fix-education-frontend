@@ -22,3 +22,7 @@ body {
 ::selection {
   background-color: rgba(52, 211, 153, 0.3); 
 }
+
+html {
+  scroll-behavior: smooth;
+}

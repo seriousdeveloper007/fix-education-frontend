@@ -1,78 +1,172 @@
+// export default LandingPage;
 import React from 'react';
-import { motion } from 'framer-motion';
-import { landingContent } from './landingContent';
-
-import Footer from './Footer';
+import { Download } from 'lucide-react';
 import themeConfig from './themeConfig';
-import { PlayCircle, Layers3, MonitorPlay, Share2, MoveUpRight } from 'lucide-react';
+import { landingContent  } from './landingContent';
+import { useNavigate } from 'react-router-dom';
 
-// Frosted-glass card
-const FrostCard = ({ children, theme, className = '' }) => (
-  <div className={`relative rounded-3xl shadow-lg backdrop-blur-xl backdrop-saturate-150 transition ${themeConfig[theme].cardBg} ${className}`}> {children} </div>
-);
 
-const LandingPage = ({ theme }) => {
-  const cfg = themeConfig[theme];
-  const { hero, howItWorks, pricing, footer } = landingContent;
+const LandingPage = () => {
+  const cfg = themeConfig.website;
+  const { useCases, faqs } = landingContent;
+  const navigate = useNavigate();
+
 
   return (
-    <div className={cfg.root}>
+    <div className="bg-white min-h-screen font-fraunces">
+      <div
+        id="hero"
+        className="bg-[#ffe9cc] shadow-md px-4 sm:px-6 md:px-[100px] pt-20 pb-16"
+      >
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug">
+          Stop passively watching,
+          <br className="hidden sm:block" />
+          Start interactive learning on YouTube.
+        </h1>
 
-      {/* HERO */}
-      <section className="relative pt-28 pb-32 px-6 text-center overflow-hidden">
-        <div className="absolute -left-56 -top-40 w-[40rem] h-[40rem] bg-emerald-300/20 blur-[120px] rounded-full" />
-        <div className="absolute right-0 top-1/3 w-[28rem] h-[28rem] bg-indigo-300/20 blur-[100px] rounded-full" />
+        <p className="mt-3 text-base sm:text-lg text-slate-700 max-w-2xl">
+          Ask doubts while watching, answer ilon AI questions in every 5–10 mins, and auto-organize your notes.
+        </p>
 
-        <motion.h1 initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="mx-auto max-w-5xl text-6xl font-extrabold tracking-tight leading-tight bg-gradient-to-r from-emerald-600 to-indigo-600 bg-clip-text text-transparent">
-          {hero.headline}
-        </motion.h1>
-        <p className={`mt-6 mx-auto max-w-xl text-lg ${cfg.text}`}>{hero.subheadline}</p>
-        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-          <button className={`px-8 py-4 rounded-lg font-semibold shadow-xl transition ${cfg.primaryBtn}`}>{hero.primaryCTA}</button>
-          <button className={`flex gap-2 items-center px-8 py-4 rounded-lg transition ${cfg.secondaryBtn}`}>
-            <PlayCircle size={20} className={theme === 'light' ? 'text-emerald-600' : ''} /> {hero.secondaryCTA}
-          </button>
+        <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 mt-6">
+        <button
+          onClick={() => navigate('/login')}
+          className={`${cfg.primaryBtn} transition font-medium px-4 py-3 sm:py-3.5 text-sm sm:text-base`}
+        >
+          Start learning for Free
+        </button>
+
+        <button
+          className={`hidden sm:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-3 sm:py-3.5 font-medium transition`}
+        >
+          <Download size={16} />
+          Chrome Extension
+        </button>
         </div>
-        {hero.statsText && <p className={`mt-4 ${cfg.statText}`}>{hero.statsText}</p>}
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section id="how-it-works" className="px-6 py-24">
-        <h2 className="text-center text-4xl font-bold mb-4">{howItWorks.title}</h2>
-        <p className={`text-center mb-12 text-lg ${cfg.text}`}>{howItWorks.subtitle}</p>
-        <div className="grid gap-10 md:grid-cols-3 max-w-6xl mx-auto">
-          {howItWorks.steps.map(({ step, title, description }, i) => {
-            const Icon = [Layers3, MonitorPlay, Share2][i] || Layers3;
+        <div id="how-to-use" className="mt-10 border-2 border-dashed border-gray-400 rounded-xl bg-white flex items-center justify-center text-gray-600 text-base sm:text-lg 
+          h-[300px] sm:h-[400px] md:h-[500px]">
+          How to use — there will be a video here in future
+        </div>
+      </div>
+      <div
+        id="usecase"
+        className="px-4 sm:px-6 md:px-[100px] py-16 bg-white"
+      >
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug text-center mb-12">
+          Why use ilon ai?
+        </h2>
+        <div className="flex flex-col gap-16">
+          {useCases.map((useCase, index) => {
+            const Icon = useCase.icon;
             return (
-              <FrostCard key={step} theme={theme} className="p-8">
-                <div className="flex items-baseline gap-2 text-sm font-semibold mb-2"><span className={cfg.primaryBtn.split(' ')[0]}>{step}</span></div>
-                <Icon size={32} className="mb-6" />
-                <h3 className="text-xl font-semibold mb-3">{title}</h3>
-                <p className={cfg.text}>{description}</p>
-              </FrostCard>
+              <div
+                key={index}
+                className="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-12 mt-16"
+              >
+                {/* Left: Icon + Text Section */}
+                <div className="flex-1 flex items-start gap-4">
+                  {/* Icon */}
+                  <div className="mt-1">
+                    <div className="p-2 rounded-lg bg-[#ffe9cc] inline-flex items-center justify-center">
+                      <Icon className="w-8 h-8 text-[#f2542d]" />
+                    </div>
+                  </div>
+                  {/* Text */}
+                  <div className="text-left max-w-[600px]">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
+                      {useCase.title}
+                    </h3>
+                    <p className="text-base sm:text-lg text-slate-700">
+                      {useCase.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right: Image Section */}
+                <div className="w-full md:w-auto md:flex-shrink-0 md:self-start md:ml-auto">
+                  <img
+                    src={useCase.image}
+                    alt={useCase.title}
+                    className="w-full max-w-md rounded-xl md:w-[400px] md:max-w-none md:rounded-xl"
+                  />
+                </div>
+              </div>
             );
           })}
         </div>
-      </section>
+      </div>
+      <div
+        id="pricing"
+        className="px-4 sm:px-6 md:px-[100px] py-16 bg-[#d6f3fc]"
+      >
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug text-center mb-6">
+          Pricing
+        </h2>
+        <p className="text-center mx-auto text-lg sm:text-xl md:text-2xl text-black">
+          ilon ai is completely free to use — no subscriptions, no hidden fees.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6">
+        <button
+          onClick={() => navigate('/login')}
+          className={`${cfg.primaryBtn} transition font-medium px-4 py-3 sm:py-3.5 text-sm sm:text-base`}
+        >
+          Start learning for Free
+        </button>
 
-      {/* SPLIT DEMO */}
-      <section className={`relative backdrop-blur-md py-24 ${theme === 'light' ? 'bg-white/50' : 'bg-white/5'}`}>
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 px-6 items-center">
-          <motion.div whileHover={{ scale: 1.03 }} className="rounded-3xl overflow-hidden shadow-xl ring-1 ring-white/10"><video autoPlay muted loop playsInline src="https://cdn.edunote.ai/demo-trim.mp4" className="w-full h-full object-cover" /></motion.div>
-          <div><h2 className="text-3xl font-bold mb-6">See your notes evolve in real time.</h2><ul className="space-y-4"><li className="flex gap-3 items-start"><Layers3 className="mt-1" /> AI detects headings & converts lists automatically.</li><li className="flex gap-3 items-start"><MonitorPlay className="mt-1" /> Timestamp links let you jump back to exact moments.</li><li className="flex gap-3 items-start"><Share2 className="mt-1" /> Export to Notion, Obsidian or markdown in one click.</li></ul></div>
+        <button
+          className={`hidden sm:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-3 sm:py-3.5 font-medium transition`}
+        >
+          <Download size={16} />
+          Chrome Extension
+        </button>
         </div>
-      </section>
 
-      {/* PRICING */}
-      <section id="pricing" className="px-6 py-28"><h2 className="text-center text-4xl font-bold mb-4">{pricing.title}</h2><p className={`text-center mb-12 text-lg ${cfg.text}`}>{pricing.subtitle}</p><div className="grid max-w-4xl mx-auto md:grid-cols-3 gap-10">{pricing.plans.map(plan => (<FrostCard key={plan.name} theme={theme} className="p-10"><h3 className="text-2xl font-semibold mb-2">{plan.name}</h3><p className="text-4xl font-bold mb-6">{plan.price} <span className="text-lg font-normal">/{plan.period}</span></p><ul className="space-y-3 mb-8">{plan.features.map(f => (<li key={f} className="flex gap-2 items-start"><MoveUpRight size={18} className="mt-1" />{f}</li>))}</ul><button className={`w-full rounded-full py-3 font-semibold transition ${plan.popular ? cfg.primaryBtn : cfg.secondaryBtn}`}>{plan.cta}</button></FrostCard>))}</div></section>
 
-      {/* <Footer footer={footer} /> */}
-      <Footer
-        footer={footer}
-        theme={theme}
-      />
+      </div>
+      <div
+      id="faqs"
+      className="px-4 sm:px-6 md:px-[100px] py-16 bg-white"
+    >
+      <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug text-center mb-12">
+        Frequently Asked Questions
+      </h2>
+      <div className="max-w-3xl mx-auto space-y-6">
+        {faqs.map((faq, index) => (
+          <div
+            key={index}
+            className="border border-slate-200 rounded-lg shadow-sm overflow-hidden"
+          >
+            <details className="group">
+              <summary className="cursor-pointer px-6 py-4 font-semibold text-slate-900 bg-[#f9fafb] hover:bg-[#f3f4f6] transition">
+                {faq.question}
+              </summary>
+              <div className="px-6 py-4 text-slate-700 text-base sm:text-lg bg-white border-t border-slate-200">
+                {faq.answer}
+              </div>
+            </details>
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6">
+        <button
+          onClick={() => navigate('/login')}
+          className={`${cfg.primaryBtn} transition font-medium px-4 py-3 sm:py-3.5 text-sm sm:text-base`}
+        >
+          Start learning for Free
+        </button>
+
+        <button
+          className={`hidden sm:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-3 sm:py-3.5 font-medium transition`}
+        >
+          <Download size={16} />
+          Chrome Extension
+        </button>
+        </div>
+    </div>
     </div>
   );
 };
 
 export default LandingPage;
+
+
