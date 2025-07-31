@@ -142,17 +142,15 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Sparkles,
-  Sun,
-  Moon,
   ChevronDown,
   Menu,
 } from 'lucide-react';
 
 import themeConfig from './themeConfig';
 
-const Navbar = ({ theme, toggleTheme, navigation }) => {
+const Navbar = ({ navigation }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const cfg = themeConfig[theme];
+  const cfg = themeConfig.website;
 
   return (
     <header
@@ -204,13 +202,6 @@ const Navbar = ({ theme, toggleTheme, navigation }) => {
             aria-label="Toggle menu"
           >
             <Menu size={24} />
-          </button>
-          <button
-            onClick={toggleTheme}
-            className={`p-2 rounded-full transition ${cfg.icon}`}
-            aria-label="Toggle theme"
-          >
-            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
           <Link
             to="/login"

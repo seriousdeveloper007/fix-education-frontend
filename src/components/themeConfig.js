@@ -1,7 +1,6 @@
 export default {
-  light: {
+  website: {
     root: 'min-h-screen bg-gradient-to-br from-white via-slate-50 to-emerald-50/50 text-slate-900 selection:bg-emerald-300/30',
-    // headerBg: 'bg-white/70 ring-slate-200/50 text-slate-900',
     navLink: 'text-slate-700 hover:text-emerald-600',
     primaryBtn: 'bg-emerald-500 hover:bg-emerald-600 text-white',
     secondaryBtn: 'border border-slate-300 hover:border-emerald-500 bg-white/30 text-slate-900',
@@ -12,19 +11,5 @@ export default {
     headerBg: 'bg-white/70 backdrop-blur-lg shadow-md',
     headerBorder: 'border-slate-200/50',
     borderTop: 'border-t border-slate-200/50',
-  },
-  dark: {
-    root: 'min-h-screen bg-gradient-to-br from-[#10141f] via-[#0c1424] to-[#05080f] text-white selection:bg-emerald-400/30',
-    //headerBg: 'bg-white/5 ring-white/10 text-white',
-    navLink: 'text-white hover:text-emerald-400',
-    primaryBtn: 'bg-emerald-400 hover:bg-emerald-300 text-slate-900',
-    secondaryBtn: 'border border-white/20 hover:border-emerald-400 backdrop-blur-sm text-white',
-    cardBg: 'bg-white/10 ring-white/10',
-    text: 'text-slate-300',
-    statText: 'text-sm text-slate-300',
-    icon: 'text-white hover:text-emerald-400',
-    headerBg: 'bg-[#0c1424]/70 backdrop-blur-lg shadow-md',
-    headerBorder: 'border-white/10',
-    borderTop: 'border-t border-white/10',
   },
 };

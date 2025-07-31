@@ -25,7 +25,7 @@
 //   );
 // }
 
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
@@ -42,18 +42,14 @@ import ErrorPage from './components/ErrorPage';
 import {landingContent} from './components/landingContent'; 
 
 export default function App() {
-  const [theme, setTheme] = useState('light');
-  const toggleTheme = () =>
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
-
   return (
     <BrowserRouter>
-      <AppRoutes theme={theme} toggleTheme={toggleTheme} />
+      <AppRoutes />
     </BrowserRouter>
   );
 }
 
-function AppRoutes({ theme, toggleTheme }) {
+function AppRoutes() {
   const isLoggedIn = () => Boolean(localStorage.getItem('token'));
   const { navigation } = landingContent;
   const location = useLocation();
@@ -61,13 +57,7 @@ function AppRoutes({ theme, toggleTheme }) {
 
   return (
     <>
-      {!isWorkspace && (
-        <Navbar
-          theme={theme}
-          toggleTheme={toggleTheme}
-          navigation={navigation}
-        />
-      )}
+      {!isWorkspace && <Navbar navigation={navigation} />}
       <Routes>
         <Route
           path="/"
@@ -75,7 +65,7 @@ function AppRoutes({ theme, toggleTheme }) {
             isLoggedIn() ? (
               <Navigate to="/platform" replace />
             ) : (
-              <LandingPage theme={theme} />
+              <LandingPage />
             )
           }
         />
@@ -87,7 +77,7 @@ function AppRoutes({ theme, toggleTheme }) {
         />
         <Route
           path="platform/*"
-          element={<Workspace theme={theme} toggleTheme={toggleTheme} />}
+          element={<Workspace />}
         />
         <Route path="error" element={<ErrorPage />} />
         <Route path="privacy" element={<PrivacyPolicy />} />

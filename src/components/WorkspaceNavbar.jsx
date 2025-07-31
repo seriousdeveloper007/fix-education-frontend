@@ -1,10 +1,10 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Sun, Moon, BookOpen, GraduationCap, UserCircle, LogOut, Mic } from 'lucide-react';
+import { BookOpen, GraduationCap, UserCircle, LogOut, Mic } from 'lucide-react';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
 
-export default function WorkspaceNavbar({ theme, toggleTheme }) {
-  const cfg = themeConfig[theme];
+export default function WorkspaceNavbar() {
+  const cfg = themeConfig.website;
   const { isRecording } = useAudioRecorder();
   const navigate = useNavigate();
   let username = 'User';
@@ -42,9 +42,6 @@ export default function WorkspaceNavbar({ theme, toggleTheme }) {
         </NavLink>
       </nav>
       <div className="flex items-center gap-4">
-        <button onClick={toggleTheme} aria-label="Toggle theme" className={cfg.icon}>
-          {theme === 'light' ? <Moon size={18}/> : <Sun size={18}/>}
-        </button>
         {isRecording && <Mic size={18} className="text-red-500" />}
         <div className="flex items-center gap-2">
           <UserCircle size={20} className={cfg.icon} />

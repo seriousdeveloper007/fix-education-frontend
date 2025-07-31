@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield } from 'lucide-react';
-import themeConfig from './themeConfig'; 
+import themeConfig from './themeConfig';
 import Navbar from './Navbar';
 
-const PrivacyPolicy = ({ theme = 'light' }) => {
-  const cfg = themeConfig[theme];
+const PrivacyPolicy = () => {
+  const cfg = themeConfig.website;
 
   return (
     <>

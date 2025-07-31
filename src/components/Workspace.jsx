@@ -6,19 +6,19 @@ import Library from './Library';
 import LectureHall from './LectureHall';
 import WorkspaceLanding from './WorkspaceLanding';
 
-export default function Workspace({ theme, toggleTheme }) {
-  const cfg = themeConfig[theme];
+export default function Workspace() {
+  const cfg = themeConfig.website;
   return (
     <div className={cfg.root}>
-      <WorkspaceNavbar theme={theme} toggleTheme={toggleTheme} />
+      <WorkspaceNavbar />
       <main className="min-h-screen px-4 py-6">
         <Routes>
-          <Route index element={<WorkspaceLanding theme={theme} />} />
+          <Route index element={<WorkspaceLanding />} />
           <Route path="library" element={<Library />} />
-          <Route path="lecturehall" element={<LectureHall theme={theme} />} />
+          <Route path="lecturehall" element={<LectureHall />} />
         </Routes>
       </main>
-      <WorkspaceFooter theme={theme} />
+      <WorkspaceFooter />
     </div>
   );
 }

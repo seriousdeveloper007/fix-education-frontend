@@ -16,12 +16,12 @@ function extractId(url) {
   }
 }
 
-export default function LectureHall({ theme }) {
+export default function LectureHall() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const videoUrl = params.get('video');
   const videoId = extractId(videoUrl);
-  const cfg = themeConfig[theme];
+  const cfg = themeConfig.website;
   const { stop } = useAudioRecorder();
   const [activePanel, setActivePanel] = useState(null);
   const iframeRef = useRef(null);
@@ -95,7 +95,7 @@ export default function LectureHall({ theme }) {
           </div>
         </div>
         <aside
-          className={`fixed top-0 right-0 w-96 max-w-full h-full shadow-xl transition-transform transform ${activePanel ? 'translate-x-0' : 'translate-x-full'} ${theme === 'light' ? 'bg-white' : 'bg-[#0c1424]'}`}
+          className={`fixed top-0 right-0 w-96 max-w-full h-full shadow-xl transition-transform transform ${activePanel ? 'translate-x-0' : 'translate-x-full'} bg-white`}
         >
           <div className="flex items-center justify-between p-4 border-b border-slate-200/50">
             <h2 className="font-semibold capitalize">{activePanel ? activePanel : ''}</h2>

@@ -16,11 +16,11 @@ function isValidYouTubeUrl(url) {
   }
 }
 
-export default function WorkspaceLanding({ theme }) {
+export default function WorkspaceLanding() {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const cfg = themeConfig[theme];
+  const cfg = themeConfig.website;
   const { start } = useAudioRecorder();
 
   const handleSubmit = (e) => {
@@ -49,7 +49,7 @@ export default function WorkspaceLanding({ theme }) {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           autoFocus
-          className="w-full px-4 py-3 rounded-lg focus:outline-none bg-transparent border border-slate-300 dark:border-white/20"
+          className="w-full px-4 py-3 rounded-lg focus:outline-none bg-transparent border border-slate-300"
         />
         {error && (
           <p className="text-sm text-red-500 flex items-center gap-1">
