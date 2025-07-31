@@ -36,7 +36,7 @@ import CookiePolicy from './components/CookiePolicy';
 import TermsOfService from './components/TermsOfService';
 import GDPRCompliance from './components/GDPRCompliance';
 import GoogleLogin from './components/GoogleLogin';
-import Workspace from './components/Workspace';
+import Platform from './components/Platform';
 import ErrorPage from './components/ErrorPage';
 
 import {landingContent} from './components/landingContent'; 
@@ -57,11 +57,11 @@ function AppRoutes({ theme, toggleTheme }) {
   const isLoggedIn = () => Boolean(localStorage.getItem('token'));
   const { navigation } = landingContent;
   const location = useLocation();
-  const isWorkspace = location.pathname.startsWith('/platform');
+  const isPlatform = location.pathname.startsWith('/platform');
 
   return (
     <>
-      {!isWorkspace && (
+      {!isPlatform && (
         <Navbar
           theme={theme}
           toggleTheme={toggleTheme}
@@ -87,7 +87,7 @@ function AppRoutes({ theme, toggleTheme }) {
         />
         <Route
           path="platform/*"
-          element={<Workspace theme={theme} toggleTheme={toggleTheme} />}
+          element={<Platform theme={theme} toggleTheme={toggleTheme} />}
         />
         <Route path="error" element={<ErrorPage />} />
         <Route path="privacy" element={<PrivacyPolicy />} />
