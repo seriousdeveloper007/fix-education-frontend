@@ -29,13 +29,14 @@ export function AudioRecorderProvider({ children }) {
     if (isRecording) return;
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
+        video: false,
         audio: true,
       });
       const audioStream = new MediaStream(stream.getAudioTracks());
       mediaRecorderRef.current = new MediaRecorder(audioStream);
       mediaRecorderRef.current.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) {
+          console.log('Captured chunk', e.data);
           setChunks((prev) => [...prev, e.data]);
         }
       };
@@ -47,6 +48,17 @@ export function AudioRecorderProvider({ children }) {
     }
   };
 
+  async function processChunks() {
+    console.log('Processing recorded chunks', chunks);
+    if (!chunks.length) return;
+    const blob = new Blob(chunks, { type: 'audio/webm' });
+    // Placeholder transcription implementation
+    const text = '[Transcription unavailable in demo]';
+    console.log('Generated transcript:', text);
+    setTranscript(text);
+    window.currentTranscript = text;
+  }
+
   const stop = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
@@ -55,6 +67,9 @@ export function AudioRecorderProvider({ children }) {
     }
     setIsRecording(false);
     setFavicon(false);
+    if (!transcript) {
+      processChunks();
+    }
   };
 
   return (

@@ -28,8 +28,10 @@ export default function WorkspaceLanding({ theme }) {
     if (isValidYouTubeUrl(url)) {
       setError('');
       if (window.currentTranscript) {
+        console.log('Existing transcript found:', window.currentTranscript);
         setTranscript(window.currentTranscript);
       } else {
+        console.log('No transcript found, starting recording');
         start();
       }
       navigate(`/workspace/lecturehall?video=${encodeURIComponent(url)}`);
@@ -50,6 +52,7 @@ export default function WorkspaceLanding({ theme }) {
           placeholder="https://www.youtube.com/watch?v=..."
           value={url}
           onChange={(e) => setUrl(e.target.value)}
+          autoFocus
           className="w-full px-4 py-3 rounded-lg focus:outline-none bg-transparent border border-slate-300 dark:border-white/20"
         />
         {error && (
