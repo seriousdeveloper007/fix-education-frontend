@@ -53,16 +53,16 @@ export default function LectureHall() {
   };
 
   return (
-    <div className="p-6">
+    <div className="relative p-6 pt-14">
       <button
         onClick={handleBack}
-        className={`flex items-center gap-2 px-4 py-2 rounded-full mb-4 ${cfg.secondaryBtn}`}
+        className={`absolute top-4 left-4 flex items-center gap-2 px-4 py-2 rounded-full ${cfg.secondaryBtn}`}
       >
         <ArrowLeft size={18} /> Back
       </button>
       {videoId ? (
         <>
-        <div className="space-y-6 max-w-5xl mx-auto">
+        <div className="space-y-8 max-w-6xl mx-auto">
           <div className="rounded-2xl overflow-hidden shadow-lg aspect-video">
             <iframe
               ref={iframeRef}
@@ -73,7 +73,7 @@ export default function LectureHall() {
               allowFullScreen
             />
           </div>
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-6">
             <button
               onClick={() => openPanel('doubt')}
               className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.primaryBtn}`}
@@ -95,7 +95,7 @@ export default function LectureHall() {
           </div>
         </div>
         <aside
-          className={`fixed top-0 right-0 w-96 max-w-full h-full shadow-xl transition-transform transform ${activePanel ? 'translate-x-0' : 'translate-x-full'} bg-white`}
+          className={`fixed top-0 right-0 w-[30rem] max-w-full h-full shadow-xl transition-transform transform ${activePanel ? 'translate-x-0' : 'translate-x-full'} bg-white`}
         >
           <div className="flex items-center justify-between p-4 border-b border-slate-200/50">
             <h2 className="font-semibold capitalize">{activePanel ? activePanel : ''}</h2>
@@ -111,14 +111,6 @@ export default function LectureHall() {
             {activePanel === 'test' && (
               <p>Test yourself with quizzes coming soon!</p>
             )}
-          </div>
-          <div className="p-4 border-t border-slate-200/50">
-            <button
-              onClick={closePanel}
-              className={`w-full py-2 rounded ${cfg.secondaryBtn}`}
-            >
-              Close
-            </button>
           </div>
         </aside>
         </>
