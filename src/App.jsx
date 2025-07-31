@@ -26,7 +26,7 @@
 // }
 
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -46,6 +46,8 @@ export default function App() {
   const [theme, setTheme] = useState('light');
   const toggleTheme = () => setTheme( prev => ( prev  === 'light' ? 'dark' : 'light'));
 
+  const isLoggedIn = () => Boolean(localStorage.getItem('token'));
+
   const { navigation, footer } = landingContent;
 
   return (
@@ -57,8 +59,14 @@ export default function App() {
       />
 
       <Routes>
-        <Route path="/" element={<LandingPage theme={theme} />} />
-        <Route path="login" element={<GoogleLogin />} />
+        <Route
+          path="/"
+          element={isLoggedIn() ? <Navigate to="/workspace" replace /> : <LandingPage theme={theme} />}
+        />
+        <Route
+          path="login"
+          element={isLoggedIn() ? <Navigate to="/workspace" replace /> : <GoogleLogin />}
+        />
         <Route path="workspace" element={<Workspace />} />
         <Route path="error" element={<ErrorPage />} />
         <Route path="privacy" element={<PrivacyPolicy />} />
