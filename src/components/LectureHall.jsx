@@ -1,8 +1,54 @@
-export default function LectureHall() {
+import React from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { HelpCircle, PencilLine, ClipboardList } from 'lucide-react';
+import themeConfig from './themeConfig';
+
+function extractId(url) {
+  try {
+    const u = new URL(url);
+    if (u.hostname === 'youtu.be') {
+      return u.pathname.slice(1);
+    }
+    return u.searchParams.get('v');
+  } catch {
+    return null;
+  }
+}
+
+export default function LectureHall({ theme }) {
+  const [params] = useSearchParams();
+  const videoUrl = params.get('video');
+  const videoId = extractId(videoUrl);
+  const cfg = themeConfig[theme];
+
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-4">Lecture Hall</h2>
-      <p>Join live sessions and watch lectures here.</p>
+      {videoId ? (
+        <div className="space-y-6 max-w-4xl mx-auto">
+          <div className="rounded-2xl overflow-hidden shadow-lg aspect-video">
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}`}
+              title="YouTube video"
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+          <div className="flex justify-center gap-4">
+            <button className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.primaryBtn}`}>
+              <HelpCircle size={18} /> Ask Doubt
+            </button>
+            <button className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.secondaryBtn}`}>
+              <PencilLine size={18} /> Write Notes
+            </button>
+            <button className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.secondaryBtn}`}>
+              <ClipboardList size={18} /> Test Yourself
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="text-center">No video selected.</p>
+      )}
     </div>
   );
 }
