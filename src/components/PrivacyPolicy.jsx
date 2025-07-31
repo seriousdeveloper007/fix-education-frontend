@@ -4,7 +4,7 @@ import { Shield } from 'lucide-react';
 import themeConfig from './themeConfig'; 
 import Navbar from './Navbar';
 
-const PrivacyPolicy = ({ theme = 'light' }) => {
+const PrivacyPolicy = ({ theme = 'website' }) => {
   const cfg = themeConfig[theme];
 
   return (
