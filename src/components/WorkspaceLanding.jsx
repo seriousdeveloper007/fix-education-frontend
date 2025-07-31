@@ -25,11 +25,12 @@ export default function WorkspaceLanding({ theme }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isValidYouTubeUrl(url)) {
+    const trimmed = url.trim();
+    if (isValidYouTubeUrl(trimmed)) {
       setError('');
       console.log('Starting recording');
       start();
-      navigate(`/workspace/lecturehall?video=${encodeURIComponent(url)}`);
+      navigate(`/platform/lecturehall?video=${encodeURIComponent(trimmed)}`);
     } else {
       setError('Please enter a valid YouTube URL');
     }

@@ -50,7 +50,7 @@ export default function GoogleLogin() {
       localStorage.setItem('user', JSON.stringify(backendUser));
       localStorage.setItem('token', appJwt);
       setUser(backendUser);
-      navigate('/workspace');
+      navigate('/platform');
     } catch (err) {
       setError(err.message);
       setUser(null);
