@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import themeConfig from './themeConfig';
 import { Download } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 
 const Navbar = () => {
   const cfg = themeConfig.website;
@@ -56,6 +58,7 @@ const Navbar = () => {
               Chrome Extension
             </button>
             <button
+              onClick={() => navigate('/login')}
               className={`${cfg.primaryBtn} transition font-medium px-3 md:px-5 py-1.5 md:py-2 text-sm md:text-base`}
             >
               Start for Free

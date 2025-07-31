@@ -3,11 +3,13 @@ import React from 'react';
 import { Download } from 'lucide-react';
 import themeConfig from './themeConfig';
 import { landingContent  } from './landingContent';
+import { useNavigate } from 'react-router-dom';
 
 
 const LandingPage = () => {
   const cfg = themeConfig.website;
   const { useCases, faqs } = landingContent;
+  const navigate = useNavigate();
 
 
   return (
@@ -28,6 +30,7 @@ const LandingPage = () => {
 
         <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 mt-6">
         <button
+          onClick={() => navigate('/login')}
           className={`${cfg.primaryBtn} transition font-medium px-4 py-3 sm:py-3.5 text-sm sm:text-base`}
         >
           Start learning for Free
@@ -104,6 +107,7 @@ const LandingPage = () => {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6">
         <button
+          onClick={() => navigate('/login')}
           className={`${cfg.primaryBtn} transition font-medium px-4 py-3 sm:py-3.5 text-sm sm:text-base`}
         >
           Start learning for Free
@@ -143,6 +147,21 @@ const LandingPage = () => {
           </div>
         ))}
       </div>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6">
+        <button
+          onClick={() => navigate('/login')}
+          className={`${cfg.primaryBtn} transition font-medium px-4 py-3 sm:py-3.5 text-sm sm:text-base`}
+        >
+          Start learning for Free
+        </button>
+
+        <button
+          className={`hidden sm:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-3 sm:py-3.5 font-medium transition`}
+        >
+          <Download size={16} />
+          Chrome Extension
+        </button>
+        </div>
     </div>
     </div>
   );
