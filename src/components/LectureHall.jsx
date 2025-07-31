@@ -1,6 +1,6 @@
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { HelpCircle, PencilLine, ClipboardList } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { HelpCircle, PencilLine, ClipboardList, ArrowLeft } from 'lucide-react';
 import themeConfig from './themeConfig';
 
 function extractId(url) {
@@ -17,12 +17,23 @@ function extractId(url) {
 
 export default function LectureHall({ theme }) {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const videoUrl = params.get('video');
   const videoId = extractId(videoUrl);
   const cfg = themeConfig[theme];
 
+  const handleBack = () => {
+    navigate('/workspace');
+  };
+
   return (
     <div className="p-6">
+      <button
+        onClick={handleBack}
+        className={`flex items-center gap-2 px-4 py-2 rounded-full mb-4 ${cfg.secondaryBtn}`}
+      >
+        <ArrowLeft size={18} /> Back
+      </button>
       {videoId ? (
         <div className="space-y-6 max-w-4xl mx-auto">
           <div className="rounded-2xl overflow-hidden shadow-lg aspect-video">
