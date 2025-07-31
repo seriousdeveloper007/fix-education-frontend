@@ -117,7 +117,7 @@ import React from 'react';
 import * as Icons from 'lucide-react';
 import themeConfig from './themeConfig';
 
-const Footer = ({ footer, theme = 'light' }) => {
+const Footer = ({ footer, theme = 'website' }) => {
   const cfg = themeConfig[theme];
 
   return (
