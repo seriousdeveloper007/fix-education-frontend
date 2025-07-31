@@ -1,10 +1,12 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Sun, Moon, BookOpen, GraduationCap, UserCircle, LogOut, Mic } from 'lucide-react';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
 
 export default function PlatformNavbar() {
   const cfg = themeConfig.website;
+  const [scrolled, setScrolled] = useState(false);
   const { isRecording } = useAudioRecorder();
   const navigate = useNavigate();
   let username = 'User';
@@ -18,6 +20,14 @@ export default function PlatformNavbar() {
     }
   }
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -28,16 +38,30 @@ export default function PlatformNavbar() {
   };
 
   return (
-    <header className={`flex items-center justify-between px-4 py-3 border-b ${cfg.headerBorder} ${cfg.headerBg}`}> 
+    <header
+      className={`sticky top-0 z-40 flex items-center justify-between px-4 py-3 transition-all duration-300 ${
+        scrolled ? 'bg-white shadow-sm border-b border-gray-200' : cfg.navbarBg
+      } ${cfg.headerBorder}`}
+    >
       <Link to="/platform" className="flex items-center gap-2 font-semibold">
         <BookOpen size={20} className={cfg.icon} />
         <span>EduNote</span>
       </Link>
       <nav className="flex items-center gap-4 text-sm">
-        <NavLink to="/platform/library" className={({isActive}) => isActive ? 'font-semibold' : cfg.navLink }>
+        <NavLink
+          to="/platform/library"
+          className={({ isActive }) =>
+            `${cfg.TextHoverEffect} ${isActive ? 'font-bold' : 'font-semibold'}`
+          }
+        >
           Library
         </NavLink>
-        <NavLink to="/platform/lecturehall" className={({isActive}) => isActive ? 'font-semibold' : cfg.navLink }>
+        <NavLink
+          to="/platform/lecturehall"
+          className={({ isActive }) =>
+            `${cfg.TextHoverEffect} ${isActive ? 'font-bold' : 'font-semibold'}`
+          }
+        >
           Lecture Hall
         </NavLink>
       </nav>
