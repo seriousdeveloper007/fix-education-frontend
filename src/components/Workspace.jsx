@@ -4,7 +4,6 @@ import WorkspaceNavbar from './WorkspaceNavbar';
 import WorkspaceFooter from './WorkspaceFooter';
 import Library from './Library';
 import LectureHall from './LectureHall';
-import NotesDashboard from './NotesDashboard';
 
 export default function Workspace({ theme, toggleTheme }) {
   const cfg = themeConfig[theme];
@@ -13,7 +12,6 @@ export default function Workspace({ theme, toggleTheme }) {
       <WorkspaceNavbar theme={theme} toggleTheme={toggleTheme} />
       <main className="min-h-screen px-4 py-6">
         <Routes>
-          <Route index element={<NotesDashboard />} />
           <Route path="library" element={<Library />} />
           <Route path="lecturehall" element={<LectureHall />} />
         </Routes>
