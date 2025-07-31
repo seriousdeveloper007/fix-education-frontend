@@ -29,15 +29,15 @@ export default function WorkspaceNavbar({ theme, toggleTheme }) {
 
   return (
     <header className={`flex items-center justify-between px-4 py-3 border-b ${cfg.headerBorder} ${cfg.headerBg}`}> 
-      <Link to="/workspace" className="flex items-center gap-2 font-semibold">
+      <Link to="/platform" className="flex items-center gap-2 font-semibold">
         <BookOpen size={20} className={cfg.icon} />
         <span>EduNote</span>
       </Link>
       <nav className="flex items-center gap-4 text-sm">
-        <NavLink to="/workspace/library" className={({isActive}) => isActive ? 'font-semibold' : cfg.navLink }>
+        <NavLink to="/platform/library" className={({isActive}) => isActive ? 'font-semibold' : cfg.navLink }>
           Library
         </NavLink>
-        <NavLink to="/workspace/lecturehall" className={({isActive}) => isActive ? 'font-semibold' : cfg.navLink }>
+        <NavLink to="/platform/lecturehall" className={({isActive}) => isActive ? 'font-semibold' : cfg.navLink }>
           Lecture Hall
         </NavLink>
       </nav>
