@@ -5,10 +5,23 @@ import themeConfig from './themeConfig';
 export default function WorkspaceNavbar({ theme, toggleTheme }) {
   const cfg = themeConfig[theme];
   const navigate = useNavigate();
-  const username = localStorage.getItem('userName') || 'User';
+  let username = 'User';
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    try {
+      const userObj = JSON.parse(storedUser);
+      username = userObj.name || userObj.username || 'User';
+    } catch (e) {
+      // ignore parse errors and use default username
+    }
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    if (window.google?.accounts?.id?.disableAutoSelect) {
+      window.google.accounts.id.disableAutoSelect();
+    }
     navigate('/');
   };
 
