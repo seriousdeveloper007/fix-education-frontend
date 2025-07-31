@@ -82,13 +82,13 @@ export default function LectureHall() {
             </button>
             <button
               onClick={() => openPanel('notes')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.secondaryBtn}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.primaryBtn}`}
             >
               <PencilLine size={18} /> Write Notes
             </button>
             <button
               onClick={() => openPanel('test')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.secondaryBtn}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.primaryBtn}`}
             >
               <ClipboardList size={18} /> Test Yourself
             </button>
