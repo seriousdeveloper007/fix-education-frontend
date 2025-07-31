@@ -139,6 +139,7 @@
 // export default Navbar;
 // Navbar.jsx
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Sparkles,
   Sun,
@@ -211,9 +212,12 @@ const Navbar = ({ theme, toggleTheme, navigation }) => {
           >
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
-          <button className={`rounded-full px-5 py-2 text-sm font-semibold shadow-md transition ${cfg.primaryBtn}`}>
+          <Link
+            to="/login"
+            className={`rounded-full px-5 py-2 text-sm font-semibold shadow-md transition ${cfg.primaryBtn}`}
+          >
             {navigation.ctaButton}
-          </button>
+          </Link>
         </div>
       </div>
 
