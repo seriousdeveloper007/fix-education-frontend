@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAudioRecorder } from './AudioRecorderContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, PlayCircle } from 'lucide-react';
 import themeConfig from './themeConfig';
@@ -20,11 +21,17 @@ export default function WorkspaceLanding({ theme }) {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const cfg = themeConfig[theme];
+  const { start, setTranscript } = useAudioRecorder();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isValidYouTubeUrl(url)) {
       setError('');
+      if (window.currentTranscript) {
+        setTranscript(window.currentTranscript);
+      } else {
+        start();
+      }
       navigate(`/workspace/lecturehall?video=${encodeURIComponent(url)}`);
     } else {
       setError('Please enter a valid YouTube URL');
