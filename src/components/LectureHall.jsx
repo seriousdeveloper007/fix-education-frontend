@@ -49,7 +49,7 @@ export default function LectureHall({ theme }) {
   }, [stop]);
 
   const handleBack = () => {
-    navigate('/workspace');
+    navigate('/platform');
   };
 
   return (

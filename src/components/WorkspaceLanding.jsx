@@ -21,20 +21,16 @@ export default function WorkspaceLanding({ theme }) {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const cfg = themeConfig[theme];
-  const { start, setTranscript } = useAudioRecorder();
+  const { start } = useAudioRecorder();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isValidYouTubeUrl(url)) {
+    const trimmed = url.trim();
+    if (isValidYouTubeUrl(trimmed)) {
       setError('');
-      if (window.currentTranscript) {
-        console.log('Existing transcript found:', window.currentTranscript);
-        setTranscript(window.currentTranscript);
-      } else {
-        console.log('No transcript found, starting recording');
-        start();
-      }
-      navigate(`/workspace/lecturehall?video=${encodeURIComponent(url)}`);
+      console.log('Starting recording');
+      start();
+      navigate(`/platform/lecturehall?video=${encodeURIComponent(trimmed)}`);
     } else {
       setError('Please enter a valid YouTube URL');
     }

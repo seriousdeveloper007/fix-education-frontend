@@ -30,7 +30,7 @@ function AppRoutes({ theme, toggleTheme }) {
   const isLoggedIn = () => Boolean(localStorage.getItem('token'));
   const { navigation } = landingContent;
   const location = useLocation();
-  const isWorkspace = location.pathname.startsWith('/workspace');
+  const isWorkspace = location.pathname.startsWith('/platform');
 
   return (
     <>
@@ -43,7 +43,7 @@ function AppRoutes({ theme, toggleTheme }) {
           path="/"
           element={
             isLoggedIn() ? (
-              <Navigate to="/workspace" replace />
+              <Navigate to="/platform" replace />
             ) : (
               <LandingPage/>
             )
@@ -52,11 +52,11 @@ function AppRoutes({ theme, toggleTheme }) {
         <Route
           path="login"
           element={
-            isLoggedIn() ? <Navigate to="/workspace" replace /> : <GoogleLogin />
+            isLoggedIn() ? <Navigate to="/platform" replace /> : <GoogleLogin />
           }
         />
         <Route
-          path="workspace/*"
+          path="platform/*"
           element={<Workspace theme={theme} toggleTheme={toggleTheme} />}
         />
         <Route path="error" element={<ErrorPage />} />
