@@ -56,6 +56,7 @@ export default function GoogleLogin() {
       setUser(null);
       localStorage.removeItem('user');
       localStorage.removeItem('token');
+      navigate('/error');
     } finally {
       setLoading(false);
     }

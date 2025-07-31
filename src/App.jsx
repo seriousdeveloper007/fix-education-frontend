@@ -31,11 +31,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
-import LandingPage     from './components/LandingPage';
-import PrivacyPolicy   from './components/PrivacyPolicy';
-import CookiePolicy    from './components/CookiePolicy';
-import TermsOfService  from './components/TermsOfService';
-import GDPRCompliance  from './components/GDPRCompliance';
+import LandingPage from './components/LandingPage';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import CookiePolicy from './components/CookiePolicy';
+import TermsOfService from './components/TermsOfService';
+import GDPRCompliance from './components/GDPRCompliance';
+import GoogleLogin from './components/GoogleLogin';
+import Workspace from './components/Workspace';
+import ErrorPage from './components/ErrorPage';
 
 import {landingContent} from './components/landingContent'; 
 
@@ -54,12 +57,15 @@ export default function App() {
       />
 
       <Routes>
-        <Route path="/"       element={<LandingPage theme ={theme} />} />
+        <Route path="/" element={<LandingPage theme={theme} />} />
+        <Route path="login" element={<GoogleLogin />} />
+        <Route path="workspace" element={<Workspace />} />
+        <Route path="error" element={<ErrorPage />} />
         <Route path="privacy" element={<PrivacyPolicy />} />
         <Route path="cookies" element={<CookiePolicy />} />
-        <Route path="terms"   element={<TermsOfService />} />
-        <Route path="gdpr"    element={<GDPRCompliance />} />
-        <Route path="*"       element={<p>404 Not Found</p>} />
+        <Route path="terms" element={<TermsOfService />} />
+        <Route path="gdpr" element={<GDPRCompliance />} />
+        <Route path="*" element={<p>404 Not Found</p>} />
       </Routes>
 
     
