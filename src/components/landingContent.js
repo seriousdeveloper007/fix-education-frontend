@@ -4,7 +4,7 @@ export const landingContent = {
   hero: {
     headline: "Transform Passive YouTube Watching into Active Learning",
     subheadline: "Generate real-time questions, resolve doubts, and auto-enhance notes—all while you watch your favorite educational videos.",
-    primaryCTA: " Launch iLON Now",
+    primaryCTA: "Get Started",
     secondaryCTA: "Watch Demo",
     statsText: "Join 1,000+ learners who've boosted retention by 40%"
   },
@@ -172,7 +172,7 @@ export const landingContent = {
   finalCTA: {
     title: "Ready to Transform Your Learning?",
     subtitle: "Join thousands of students who've already upgraded their YouTube learning experience",
-    primaryCTA: "Launch Ilon",
+    primaryCTA: "Get Started",
     secondaryCTA: "Watch Demo Video",
     trustText: "Free to install • Works with any YouTube video • No credit card required"
   },
@@ -243,7 +243,7 @@ export const landingContent = {
         ]
       }
     ],
-    ctaButton: "Launch iLON Now"
+    ctaButton: "Get Started"
 
   },
 
