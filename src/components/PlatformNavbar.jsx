@@ -3,7 +3,7 @@ import { Sun, Moon, BookOpen, GraduationCap, UserCircle, LogOut, Mic } from 'luc
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
 
-export default function WorkspaceNavbar({ theme, toggleTheme }) {
+export default function PlatformNavbar({ theme, toggleTheme }) {
   const cfg = themeConfig[theme];
   const { isRecording } = useAudioRecorder();
   const navigate = useNavigate();

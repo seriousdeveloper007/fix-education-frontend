@@ -16,7 +16,7 @@ function isValidYouTubeUrl(url) {
   }
 }
 
-export default function WorkspaceLanding({ theme }) {
+export default function PlatformLanding({ theme }) {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
