@@ -1,6 +1,6 @@
 import themeConfig from './themeConfig';
 
-export default function WorkspaceFooter({ theme }) {
+export default function PlatformFooter({ theme }) {
   const cfg = themeConfig[theme];
   return (
     <footer className={`text-center py-4 ${cfg.cardBg} ${cfg.borderTop}`}> 
