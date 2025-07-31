@@ -43,7 +43,7 @@ export default function WorkspaceNavbar({ theme, toggleTheme }) {
       </nav>
       <div className="flex items-center gap-4">
         <button onClick={toggleTheme} aria-label="Toggle theme" className={cfg.icon}>
-          <Sun size={18} />
+          {theme === 'light' ? <Moon size={18}/> : <Sun size={18}/>}
         </button>
         {isRecording && <Mic size={18} className="text-red-500" />}
         <div className="flex items-center gap-2">

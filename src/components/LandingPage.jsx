@@ -29,9 +29,9 @@ const LandingPage = ({ theme }) => {
         <p className={`mt-6 mx-auto max-w-xl text-lg ${cfg.text}`}>{hero.subheadline}</p>
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
           <button className={`px-8 py-4 rounded-lg font-semibold shadow-xl transition ${cfg.primaryBtn}`}>{hero.primaryCTA}</button>
-            <button className={`flex gap-2 items-center px-8 py-4 rounded-lg transition ${cfg.secondaryBtn}`}>
-              <PlayCircle size={20} className="text-emerald-600" /> {hero.secondaryCTA}
-            </button>
+          <button className={`flex gap-2 items-center px-8 py-4 rounded-lg transition ${cfg.secondaryBtn}`}>
+            <PlayCircle size={20} className={theme === 'light' ? 'text-emerald-600' : ''} /> {hero.secondaryCTA}
+          </button>
         </div>
         {hero.statsText && <p className={`mt-4 ${cfg.statText}`}>{hero.statsText}</p>}
       </section>
@@ -56,7 +56,7 @@ const LandingPage = ({ theme }) => {
       </section>
 
       {/* SPLIT DEMO */}
-      <section className="relative backdrop-blur-md py-24 bg-white/50">
+      <section className={`relative backdrop-blur-md py-24 ${theme === 'light' ? 'bg-white/50' : 'bg-white/5'}`}>
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 px-6 items-center">
           <motion.div whileHover={{ scale: 1.03 }} className="rounded-3xl overflow-hidden shadow-xl ring-1 ring-white/10"><video autoPlay muted loop playsInline src="https://cdn.edunote.ai/demo-trim.mp4" className="w-full h-full object-cover" /></motion.div>
           <div><h2 className="text-3xl font-bold mb-6">See your notes evolve in real time.</h2><ul className="space-y-4"><li className="flex gap-3 items-start"><Layers3 className="mt-1" /> AI detects headings & converts lists automatically.</li><li className="flex gap-3 items-start"><MonitorPlay className="mt-1" /> Timestamp links let you jump back to exact moments.</li><li className="flex gap-3 items-start"><Share2 className="mt-1" /> Export to Notion, Obsidian or markdown in one click.</li></ul></div>
