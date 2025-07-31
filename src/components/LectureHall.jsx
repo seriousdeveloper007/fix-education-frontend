@@ -37,7 +37,7 @@ export default function LectureHall({ theme }) {
 
   const openPanel = (panel) => {
     pauseVideo();
-    setActivePanel(panel);
+    setActivePanel((prev) => (prev === panel ? null : panel));
   };
 
   const closePanel = () => setActivePanel(null);
@@ -95,7 +95,7 @@ export default function LectureHall({ theme }) {
           </div>
         </div>
         <aside
-          className={`fixed top-0 right-0 w-80 max-w-full h-full shadow-xl transition-transform transform ${activePanel ? 'translate-x-0' : 'translate-x-full'} ${theme === 'light' ? 'bg-white' : 'bg-[#0c1424]'}`}
+          className={`fixed top-0 right-0 w-96 max-w-full h-full shadow-xl transition-transform transform ${activePanel ? 'translate-x-0' : 'translate-x-full'} ${theme === 'light' ? 'bg-white' : 'bg-[#0c1424]'}`}
         >
           <div className="flex items-center justify-between p-4 border-b border-slate-200/50">
             <h2 className="font-semibold capitalize">{activePanel ? activePanel : ''}</h2>
@@ -111,6 +111,14 @@ export default function LectureHall({ theme }) {
             {activePanel === 'test' && (
               <p>Test yourself with quizzes coming soon!</p>
             )}
+          </div>
+          <div className="p-4 border-t border-slate-200/50">
+            <button
+              onClick={closePanel}
+              className={`w-full py-2 rounded ${cfg.secondaryBtn}`}
+            >
+              Close
+            </button>
           </div>
         </aside>
         </>
