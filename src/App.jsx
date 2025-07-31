@@ -42,8 +42,9 @@ import ErrorPage from './components/ErrorPage';
 import {landingContent} from './components/landingContent'; 
 
 export default function App() {
-  const [theme, setTheme] = useState('website');
-  const toggleTheme = () => setTheme('website');
+  const [theme, setTheme] = useState('light');
+  const toggleTheme = () =>
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
 
   return (
     <BrowserRouter>

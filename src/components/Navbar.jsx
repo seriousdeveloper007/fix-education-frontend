@@ -210,7 +210,7 @@ const Navbar = ({ theme, toggleTheme, navigation }) => {
             className={`p-2 rounded-full transition ${cfg.icon}`}
             aria-label="Toggle theme"
           >
-            <Sun size={20} />
+            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
           <Link
             to="/login"
