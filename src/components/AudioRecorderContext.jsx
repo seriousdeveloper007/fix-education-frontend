@@ -3,7 +3,6 @@ import React, { createContext, useContext, useRef, useState } from 'react';
 const RecordingContext = createContext({
   isRecording: false,
   chunks: [],
-  transcript: null,
   start: () => {},
   stop: () => {}
 });
@@ -22,7 +21,6 @@ function setFavicon(recording) {
 export function AudioRecorderProvider({ children }) {
   const [isRecording, setIsRecording] = useState(false);
   const [chunks, setChunks] = useState([]);
-  const [transcript, setTranscript] = useState(null);
   const mediaRecorderRef = useRef(null);
 
   const start = async () => {
@@ -48,16 +46,6 @@ export function AudioRecorderProvider({ children }) {
     }
   };
 
-  async function processChunks() {
-    console.log('Processing recorded chunks', chunks);
-    if (!chunks.length) return;
-    const blob = new Blob(chunks, { type: 'audio/webm' });
-    // Placeholder transcription implementation
-    const text = '[Transcription unavailable in demo]';
-    console.log('Generated transcript:', text);
-    setTranscript(text);
-    window.currentTranscript = text;
-  }
 
   const stop = () => {
     if (mediaRecorderRef.current) {
@@ -67,13 +55,10 @@ export function AudioRecorderProvider({ children }) {
     }
     setIsRecording(false);
     setFavicon(false);
-    if (!transcript) {
-      processChunks();
-    }
   };
 
   return (
-    <RecordingContext.Provider value={{ isRecording, chunks, transcript, setTranscript, start, stop }}>
+    <RecordingContext.Provider value={{ isRecording, chunks, start, stop }}>
       {children}
     </RecordingContext.Provider>
   );
