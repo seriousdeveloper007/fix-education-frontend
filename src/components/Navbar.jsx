@@ -1,261 +1,83 @@
-
-// import { useState } from 'react';
-// import {
-//   Sparkles,
-//   Sun,
-//   Moon,
-//   ChevronDown,
-//   Menu,
-// } from 'lucide-react';
-
-// import themeConfig from './themeConfig';
-
-
-// const Navbar = ({ theme, toggleTheme, navigation }) => {
-//   const [isOpen, setIsOpen] = useState(false);
-//   const cfg = themeConfig[theme];
-//   console.log(theme)
-//   console.log(cfg)
-
-//   return (
-//     <header
-//       className={`sticky top-0 z-50  ${cfg.headerBg} border-b ${cfg.headerBorder}
-//         }`}
-//     >
-//       <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-//         <span className="font-bold text-xl flex items-center gap-2">
-//           <Sparkles
-//             size={22}
-//             className={cfg.icon}
-//           />
-//           {navigation.logo}
-//         </span>
-
-//         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-//           {navigation.menuItems.map((item) => {
-//             const hasChildren = item.children && item.children.length > 0;
-//             const defaultHref = `/#${item.label.toLowerCase().replace(/\s+/g, '-')}`;
-
-//             return hasChildren ? (
-//               <div key={item.label} className="relative group">
-//                 <span
-//                   className={`${cfg.navLink} cursor-pointer flex items-center gap-1 transition-colors`}
-//                 >
-//                   {item.label}
-//                   <ChevronDown size={16} />
-//                 </span>
-//                 <ul
-//                   className={`absolute left-0 mt-2 w-48 rounded-md shadow-lg py-1 ${cfg.cardBg} hidden group-hover:block`}
-//                 >
-//                   {item.children.map((child) => (
-//                     <li key={child.label}>
-//                       <a
-//                         href={child.href}
-//                         className={`${cfg.navLink} block px-4 py-2 text-sm transition-colors`}
-//                       >
-//                         {child.label}
-//                       </a>
-//                     </li>
-//                   ))}
-//                 </ul>
-//               </div>
-//             ) : (
-//               <a
-//                 key={item.label}
-//                 href={defaultHref}
-//                 className={`${cfg.navLink} transition-colors`}
-//               >
-//                 {item.label}
-//               </a>
-//             );
-//           })}
-//         </nav>
-
-//         <div className="flex items-center gap-4">
-//           <button
-//             onClick={() => setIsOpen(!isOpen)}
-//             className={`md:hidden p-1 rounded transition ${cfg.icon}`}
-//             aria-label="Toggle menu"
-//           >
-//             <Menu size={24} />
-//           </button>
-//           <button
-//             onClick={toggleTheme}
-//             className={`p-2 rounded-full transition ${cfg.icon}`}
-//             aria-label="Toggle theme"
-//           >
-//             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-//           </button>
-//           <button
-//             className={`rounded-full px-5 py-2 text-sm font-semibold shadow-md transition ${cfg.primaryBtn}`}
-//           >
-//             {navigation.ctaButton}
-//           </button>
-//         </div>
-//       </div>
-
-//       {isOpen && (
-//         <div
-//           className={`md:hidden border-t ${theme === 'light' ? 'border-slate-200/50' : 'border-white/10'} ${cfg.cardBg}`}
-//         >
-//           {navigation.menuItems.map((item) => {
-//             const hasChildren = item.children && item.children.length > 0;
-//             const defaultHref = `/#${item.label.toLowerCase().replace(/\s+/g, '-')}`;
-
-//             return (
-//               <div key={item.label}>
-//                 {hasChildren ? (
-//                   <>
-//                     <div className={`px-6 py-3 font-medium ${cfg.text}`}>
-//                       {item.label}
-//                     </div>
-//                     {item.children.map((child) => (
-//                       <a
-//                         key={child.label}
-//                         href={child.href}
-//                         className={`${cfg.navLink} block px-10 py-2 text-sm transition-colors`}
-//                       >
-//                         {child.label}
-//                       </a>
-//                     ))}
-//                   </>
-//                 ) : (
-//                   <a
-//                     href={defaultHref}
-//                     className={`${cfg.navLink} block px-6 py-3 font-medium transition-colors`}
-//                   >
-//                     {item.label}
-//                   </a>
-//                 )}
-//               </div>
-//             );
-//           })}
-//         </div>
-//       )}
-//     </header>
-//   );
-// };
-
-// export default Navbar;
-// Navbar.jsx
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Sparkles,
-  Sun,
-  Moon,
-  ChevronDown,
-  Menu,
-} from 'lucide-react';
-
+import React, { useEffect, useState } from 'react';
 import themeConfig from './themeConfig';
+import { Download } from 'lucide-react';
 
-const Navbar = ({ theme, toggleTheme, navigation }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const cfg = themeConfig[theme];
+const Navbar = () => {
+  const cfg = themeConfig.website;
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header
-      className={`
-        sticky top-0 z-50
-        ${cfg.headerBg}
-        border-b ${cfg.headerBorder}
-      `}
-    >
-      <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-        <span className="font-bold text-xl flex items-center gap-2">
-          <Sparkles size={22} className={cfg.icon} />
-          {navigation.logo}
-        </span>
+    <>
+      {/* Top Navbar */}
+      <header
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+          scrolled ? 'bg-white shadow-sm border-b border-gray-200' : cfg.navbarBg
+        } ${cfg.headerBorder}`}
+      >
+        <div
+          className={`flex items-center justify-between h-[80px] transition-all duration-300 ${
+            scrolled ? 'px-2 md:px-[100px]' : 'px-4 md:px-[100px]'
+          } font-fraunces`}
+        >
+          {/* Left: Logo */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-300 rounded-full" />
+            <span className="text-lg font-semibold text-gray-800">ilon ai</span>
+          </div>
 
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          {navigation.menuItems.map((item) => {
-            const hasChildren = item.children?.length > 0;
-            const defaultHref = `/#${item.label.toLowerCase().replace(/\s+/g, '-')}`;
+          {/* Center: Nav Links (hide on mobile) */}
+          <div className="hidden md:flex flex-grow justify-end mr-6">
+            <nav className="flex gap-4 text-sm font-medium">
+              {['How to use', 'Usecase', 'Pricing', "FAQ's"].map((label, i) => {
+                const href = ['#how-to-use', '#usecase', '#pricing', '#faqs'][i];
+                return (
+                  <a key={label} href={href} className={cfg.TextHoverEffect}>
+                    {label}
+                  </a>
+                );
+              })}
+            </nav>
+          </div>
 
-            return hasChildren ? (
-              <div key={item.label} className="relative group">
-                <span className={`${cfg.navLink} cursor-pointer flex items-center gap-1 transition-colors`}>
-                  {item.label}
-                  <ChevronDown size={16} />
-                </span>
-                <ul className={`absolute left-0 mt-2 w-48 rounded-md shadow-lg py-1 ${cfg.cardBg} hidden group-hover:block`}>
-                  {item.children.map((child) => (
-                    <li key={child.label}>
-                      <a href={child.href} className={`${cfg.navLink} block px-4 py-2 text-sm transition-colors`}>
-                        {child.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <a key={item.label} href={defaultHref} className={`${cfg.navLink} transition-colors`}>
-                {item.label}
+          {/* Right: Buttons */}
+          <div className="flex items-center gap-4">
+            <button
+              className={`hidden md:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-2 font-medium transition`}
+            >
+              <Download size={16} />
+              Chrome Extension
+            </button>
+            <button
+              className={`${cfg.primaryBtn} transition font-medium px-3 md:px-5 py-1.5 md:py-2 text-sm md:text-base`}
+            >
+              Start for Free
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Floating Bottom Nav (Mobile Only) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow md:hidden font-fraunces">
+        <div className="flex justify-around items-center h-14 text-sm font-medium text-gray-700">
+          {['How to use', 'Usecase', 'Pricing', "FAQ's"].map((label, i) => {
+            const hrefs = ['#how-to-use', '#usecase', '#pricing', '#faqs'];
+            return (
+              <a key={label} href={hrefs[i]} className={cfg.TextHoverEffect}>
+                {label}
               </a>
             );
           })}
-        </nav>
-
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={`md:hidden p-1 rounded transition ${cfg.icon}`}
-            aria-label="Toggle menu"
-          >
-            <Menu size={24} />
-          </button>
-          <button
-            onClick={toggleTheme}
-            className={`p-2 rounded-full transition ${cfg.icon}`}
-            aria-label="Toggle theme"
-          >
-            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-          </button>
-          <Link
-            to="/login"
-            className={`rounded-full px-5 py-2 text-sm font-semibold shadow-md transition ${cfg.primaryBtn}`}
-          >
-            {navigation.ctaButton}
-          </Link>
         </div>
-      </div>
-
-      {isOpen && (
-        <div className={`md:hidden ${cfg.borderTop} ${cfg.cardBg}`}>
-          {navigation.menuItems.map((item) => {
-            const hasChildren = item.children?.length > 0;
-            const defaultHref = `/#${item.label.toLowerCase().replace(/\s+/g, '-')}`;
-
-            return (
-              <div key={item.label}>
-                {hasChildren ? (
-                  <>
-                    <div className={`px-6 py-3 font-medium ${cfg.text}`}>{item.label}</div>
-                    {item.children.map((child) => (
-                      <a
-                        key={child.label}
-                        href={child.href}
-                        className={`${cfg.navLink} block px-10 py-2 text-sm transition-colors`}
-                      >
-                        {child.label}
-                      </a>
-                    ))}
-                  </>
-                ) : (
-                  <a
-                    href={defaultHref}
-                    className={`${cfg.navLink} block px-6 py-3 font-medium transition-colors`}
-                  >
-                    {item.label}
-                  </a>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </header>
+      </nav>
+    </>
   );
 };
 

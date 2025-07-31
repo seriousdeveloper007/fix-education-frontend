@@ -1,30 +1,3 @@
-// import { BrowserRouter, Routes, Route } from 'react-router-dom';
-// import Navbar from './components/Navbar';
-// import LandingPage from './components/LandingPage';
-// import PrivacyPolicy from './components/PrivacyPolicy';
-// import CookiePolicy from './components/CookiePolicy';
-// import TermsOfService from './components/TermsOfService';
-// import GDPRCompliance from './components/GDPRCompliance';
-// import Footer from './components/Footer';
-
-// export default function App() {
-//   return (
-//     <BrowserRouter>
-
-//       <Routes>
-//         <Route path="/" element={<LandingPage />} />
-//         <Route path="/privacy" element={<PrivacyPolicy />} />
-//         <Route path="/cookies" element={<CookiePolicy />} />
-//         <Route path="/terms" element={<TermsOfService />} />
-
-//         <Route path="/gdpr" element={<GDPRCompliance />} />
-//       </Routes>
-
-//     </BrowserRouter>
-     
-//   );
-// }
-
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
@@ -63,9 +36,6 @@ function AppRoutes({ theme, toggleTheme }) {
     <>
       {!isWorkspace && (
         <Navbar
-          theme={theme}
-          toggleTheme={toggleTheme}
-          navigation={navigation}
         />
       )}
       <Routes>
@@ -75,7 +45,7 @@ function AppRoutes({ theme, toggleTheme }) {
             isLoggedIn() ? (
               <Navigate to="/workspace" replace />
             ) : (
-              <LandingPage theme={theme} />
+              <LandingPage/>
             )
           }
         />
