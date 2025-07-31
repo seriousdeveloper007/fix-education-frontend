@@ -28,8 +28,12 @@ export function AudioRecorderProvider({ children }) {
   const start = async () => {
     if (isRecording) return;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true,
+      });
+      const audioStream = new MediaStream(stream.getAudioTracks());
+      mediaRecorderRef.current = new MediaRecorder(audioStream);
       mediaRecorderRef.current.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) {
           setChunks((prev) => [...prev, e.data]);
