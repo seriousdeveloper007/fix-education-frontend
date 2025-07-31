@@ -3,8 +3,8 @@ import { Sun, Moon, BookOpen, GraduationCap, UserCircle, LogOut, Mic } from 'luc
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
 
-export default function PlatformNavbar({ theme, toggleTheme }) {
-  const cfg = themeConfig[theme];
+export default function PlatformNavbar() {
+  const cfg = themeConfig.website;
   const { isRecording } = useAudioRecorder();
   const navigate = useNavigate();
   let username = 'User';
@@ -42,9 +42,9 @@ export default function PlatformNavbar({ theme, toggleTheme }) {
         </NavLink>
       </nav>
       <div className="flex items-center gap-4">
-        <button onClick={toggleTheme} aria-label="Toggle theme" className={cfg.icon}>
+        {/* <button onClick={toggleTheme} aria-label="Toggle theme" className={cfg.icon}>
           {theme === 'light' ? <Moon size={18}/> : <Sun size={18}/>}
-        </button>
+        </button> */}
         {isRecording && <Mic size={18} className="text-red-500" />}
         <div className="flex items-center gap-2">
           <UserCircle size={20} className={cfg.icon} />

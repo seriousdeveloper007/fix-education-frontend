@@ -15,18 +15,15 @@ import ErrorPage from './components/ErrorPage';
 import {landingContent} from './components/landingContent'; 
 
 export default function App() {
-  const [theme, setTheme] = useState('light');
-  const toggleTheme = () =>
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
 
   return (
     <BrowserRouter>
-      <AppRoutes theme={theme} toggleTheme={toggleTheme} />
+      <AppRoutes />
     </BrowserRouter>
   );
 }
 
-function AppRoutes({ theme, toggleTheme }) {
+function AppRoutes() {
   const isLoggedIn = () => Boolean(localStorage.getItem('token'));
   const { navigation } = landingContent;
   const location = useLocation();
@@ -57,7 +54,7 @@ function AppRoutes({ theme, toggleTheme }) {
         />
         <Route
           path="platform/*"
-          element={<Platform theme={theme} toggleTheme={toggleTheme} />}
+          element={<Platform  />}
         />
         <Route path="error" element={<ErrorPage />} />
         <Route path="privacy" element={<PrivacyPolicy />} />

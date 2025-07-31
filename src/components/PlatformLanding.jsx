@@ -16,11 +16,11 @@ function isValidYouTubeUrl(url) {
   }
 }
 
-export default function PlatformLanding({ theme }) {
+export default function PlatformLanding() {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const cfg = themeConfig[theme];
+  const cfg = themeConfig.website;
   const { start } = useAudioRecorder();
 
   const handleSubmit = (e) => {
