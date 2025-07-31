@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { HelpCircle, PencilLine, ClipboardList, ArrowLeft } from 'lucide-react';
 import themeConfig from './themeConfig';
+import { useAudioRecorder } from './AudioRecorderContext.jsx';
 
 function extractId(url) {
   try {
@@ -21,6 +22,13 @@ export default function LectureHall({ theme }) {
   const videoUrl = params.get('video');
   const videoId = extractId(videoUrl);
   const cfg = themeConfig[theme];
+  const { stop } = useAudioRecorder();
+
+  useEffect(() => {
+    return () => {
+      stop();
+    };
+  }, [stop]);
 
   const handleBack = () => {
     navigate('/workspace');
