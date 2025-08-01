@@ -2,7 +2,21 @@
 
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Video, Book, BookOpen, UserCircle, LogOut, Mic, Download, Shield, HelpCircle, Info, ChevronDown } from 'lucide-react'; // Added icons for dropdown items and ChevronDown
+import {
+  Video,
+  Book,
+  BookOpen,
+  UserCircle,
+  LogOut,
+  Mic,
+  Download,
+  Shield,
+  HelpCircle,
+  Info,
+  ChevronDown,
+  BarChart2,
+  User
+} from 'lucide-react';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
 
@@ -11,10 +25,10 @@ export default function PlatformNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const { isRecording } = useAudioRecorder();
   const navigate = useNavigate();
-  const [isResourcesOpen, setIsResourcesOpen] = useState(false); // State for dropdown toggle
+  const [isResourcesOpen, setIsResourcesOpen] = useState(false); // State for resources dropdown toggle
+  const [isUserOpen, setIsUserOpen] = useState(false); // State for user dropdown
   let username = 'User';
   const storedUser = localStorage.getItem('user');
-  console.log(storedUser)
   if (storedUser) {
     try {
       const userObj = JSON.parse(storedUser);
@@ -121,13 +135,47 @@ export default function PlatformNavbar() {
       </nav>
       <div className="flex items-center gap-4">
         {isRecording && <Mic size={18} className="text-red-500" />}
-        <div className="flex items-center gap-2">
-          <UserCircle size={20} className={cfg.icon} />
-          <span className="text-sm">{username}</span>
-          <button onClick={handleLogout} aria-label="Logout" className={`${cfg.icon} flex items-center gap-2`}>
-            <LogOut size={18} />
-            <span>Logout</span>
+        <div className="relative">
+          <button
+            onClick={() => setIsUserOpen(!isUserOpen)}
+            className="flex items-center gap-2"
+            aria-haspopup="true"
+            aria-expanded={isUserOpen}
+          >
+            <UserCircle size={20} className={cfg.icon} />
+            <span className="text-sm">{username}</span>
+            <ChevronDown className="w-4 h-4" />
           </button>
+          {isUserOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-2 z-50">
+              <NavLink
+                to="/platform/stats"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                onClick={() => setIsUserOpen(false)}
+              >
+                <BarChart2 className="w-4 h-4" />
+                Stats
+              </NavLink>
+              <NavLink
+                to="/platform/profile"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                onClick={() => setIsUserOpen(false)}
+              >
+                <User className="w-4 h-4" />
+                Profile
+              </NavLink>
+              <button
+                onClick={() => {
+                  setIsUserOpen(false);
+                  handleLogout();
+                }}
+                className="flex w-full items-center gap-2 px-4 py-2 hover:bg-gray-100 text-left"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

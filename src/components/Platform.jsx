@@ -4,6 +4,8 @@ import PlatformNavbar from './PlatformNavbar';
 import Library from './Library';
 import LectureHall from './LectureHall';
 import PlatformLanding from './PlatformLanding';
+import Stats from './Stats';
+import Profile from './Profile';
 
 export default function Platform() {
   const cfg = themeConfig.app;
@@ -15,6 +17,8 @@ export default function Platform() {
           <Route index element={<PlatformLanding/>} />
           <Route path="library" element={<Library />} />
           <Route path="lecturehall" element={<LectureHall  />} />
+          <Route path="stats" element={<Stats />} />
+          <Route path="profile" element={<Profile />} />
         </Routes>
       </main>
     </div>
