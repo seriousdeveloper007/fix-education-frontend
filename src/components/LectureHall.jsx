@@ -175,7 +175,7 @@ export default function LectureHall() {
   };
 
   return (
-    <div className={`relative p-6 pt-14 ${cfg.root}`}>
+    <div className="relative p-6 pt-14 h-full overflow-hidden bg-slate-50 text-slate-900 font-fraunces selection:bg-emerald-300/30">
       <button
         onClick={handleBack}
         className={`absolute top-4 left-4 flex items-center gap-2 px-4 py-2 rounded-full ${cfg.secondaryBtn}`}
