@@ -99,7 +99,7 @@ export default function PlatformNavbar() {
               User Guide
             </NavLink>
           </div>
-          <div className="flex items-center gap-4 ml-auto">
+          <div className="flex items-center gap-4 ml-auto -mr-4 md:-mr-6">
             <button onClick={() => openPanel('doubt')} className={`${cfg.primaryBtn} flex items-center gap-1 px-3 py-2 text-sm`}>
               <HelpCircle className="w-4 h-4" />
               Ask Doubts
