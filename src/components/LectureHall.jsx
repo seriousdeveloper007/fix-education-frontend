@@ -50,7 +50,7 @@ export default function LectureHall() {
 
   return (
     <div
-      className={`relative h-full overflow-hidden p-6 pt-14 bg-slate-50 text-slate-900 font-fraunces selection:bg-emerald-300/30 ${
+      className={`relative h-full overflow-hidden p-2 pt-2 bg-slate-50 text-slate-900 font-fraunces selection:bg-emerald-300/30 ${
         activePanel ? 'pr-[30rem]' : ''
       }`}
     >
