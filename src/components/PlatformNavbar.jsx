@@ -58,21 +58,20 @@ export default function PlatformNavbar() {
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 font-fraunces ${
-        scrolled ? 'bg-white shadow-sm border-b border-gray-200' : cfg.navbarBg
-      } ${cfg.headerBorder} ${
+        scrolled ? 'bg-white shadow-sm border-b border-gray-200' : cfg.appHeader
+      } ${
         scrolled ? 'px-2 md:px-[100px] h-[80px]' : 'px-4 md:px-[100px] h-[60px]'
       } flex items-center justify-between`}
     >
-      <Link to="/platform" className="flex items-center gap-2 font-semibold">
-        <BookOpen size={20} className={cfg.icon} />
-        <span>iLon X</span>
-      </Link>
-      
-      <nav className="flex items-center gap-4 text-sm relative">
+      <div className="flex items-center gap-6">
+        <Link to="/platform" className="flex items-center gap-2 font-semibold">
+          <BookOpen size={20} className={cfg.icon} />
+          <span>iLon X</span>
+        </Link>
         <NavLink
           to="/platform/library"
           className={({ isActive }) =>
-            `${cfg.TextHoverEffect} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`
+            `${cfg.appNavLink} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`
           }
         >
           <Book className="w-4 h-4" />
@@ -81,59 +80,59 @@ export default function PlatformNavbar() {
         <NavLink
           to="/platform/lecturehall"
           className={({ isActive }) =>
-            `${cfg.TextHoverEffect} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`
+            `${cfg.appNavLink} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`
           }
         >
           <Video className="w-4 h-4" />
           Lecture Hall
         </NavLink>
-        {/* Resources dropdown button */}
-        <button
-          onClick={() => setIsResourcesOpen(!isResourcesOpen)}
-          className={`${cfg.TextHoverEffect} font-semibold flex items-center gap-1`}
-        >
-          Resources
-          <ChevronDown className="w-4 h-4" />
-        </button>
-        {/* Dropdown menu */}
-        {isResourcesOpen && (
-          <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50">
-            <NavLink
-              to="/platform/install-extension" // Adjust path as needed
-              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-              onClick={() => setIsResourcesOpen(false)}
-            >
-              <Download className="w-4 h-4" />
-              Install Extension
-            </NavLink>
-            <NavLink
-              to="/platform/privacy-policy" // Adjust path as needed
-              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-              onClick={() => setIsResourcesOpen(false)}
-            >
-              <Shield className="w-4 h-4" />
-              Privacy Policy
-            </NavLink>
-            <NavLink
-              to="/platform/user-guide" // Adjust path as needed
-              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-              onClick={() => setIsResourcesOpen(false)}
-            >
-              <HelpCircle className="w-4 h-4" />
-              User Guide
-            </NavLink>
-            <NavLink
-              to="/platform/why-use-ilonx" // Adjust path as needed
-              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-              onClick={() => setIsResourcesOpen(false)}
-            >
-              <Info className="w-4 h-4" />
-              Why Use iLon X
-            </NavLink>
-          </div>
-        )}
-      </nav>
+      </div>
       <div className="flex items-center gap-4">
+        <div className="relative">
+          <button
+            onClick={() => setIsResourcesOpen(!isResourcesOpen)}
+            className={`${cfg.appNavLink} font-semibold flex items-center gap-1`}
+          >
+            Resources
+            <ChevronDown className="w-4 h-4" />
+          </button>
+          {isResourcesOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50">
+              <NavLink
+                to="/platform/install-extension"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                onClick={() => setIsResourcesOpen(false)}
+              >
+                <Download className="w-4 h-4" />
+                Install Extension
+              </NavLink>
+              <NavLink
+                to="/platform/privacy-policy"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                onClick={() => setIsResourcesOpen(false)}
+              >
+                <Shield className="w-4 h-4" />
+                Privacy Policy
+              </NavLink>
+              <NavLink
+                to="/platform/user-guide"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                onClick={() => setIsResourcesOpen(false)}
+              >
+                <HelpCircle className="w-4 h-4" />
+                User Guide
+              </NavLink>
+              <NavLink
+                to="/platform/why-use-ilonx"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                onClick={() => setIsResourcesOpen(false)}
+              >
+                <Info className="w-4 h-4" />
+                Why Use iLon X
+              </NavLink>
+            </div>
+          )}
+        </div>
         {isRecording && <Mic size={18} className="text-red-500" />}
         <div className="relative">
           <button
