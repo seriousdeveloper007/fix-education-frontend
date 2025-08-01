@@ -1,7 +1,6 @@
 
 import { useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { HelpCircle, PencilLine, ClipboardList, ArrowLeft } from 'lucide-react';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
 import { useLectureHall } from './LectureHallContext.jsx';
@@ -25,7 +24,7 @@ export default function LectureHall() {
   const videoId = extractId(videoUrl);
   const cfg = themeConfig.app; // Updated to use app config
   const { stop } = useAudioRecorder();
-  const { activePanel, openPanel, closePanel, registerPause } = useLectureHall();
+  const { activePanel, closePanel, registerPause } = useLectureHall();
   const iframeRef = useRef(null);
 
   const pauseVideo = () => {
@@ -38,11 +37,6 @@ export default function LectureHall() {
   };
 
 
-  const handleOpenPanel = (panel) => {
-    pauseVideo();
-    openPanel(panel);
-  };
-
   useEffect(() => {
     registerPause(pauseVideo);
   }, [registerPause]);
@@ -53,18 +47,8 @@ export default function LectureHall() {
     };
   }, [stop]);
 
-  const handleBack = () => {
-    navigate('/platform');
-  };
-
   return (
     <div className="relative flex flex-col h-full overflow-hidden p-6 pt-14 bg-slate-50 text-slate-900 font-fraunces selection:bg-emerald-300/30">
-      <button
-        onClick={handleBack}
-        className={`absolute top-4 left-4 flex items-center gap-2 px-4 py-2 rounded-full ${cfg.secondaryBtn}`}
-      >
-        <ArrowLeft size={18} /> Back
-      </button>
       {videoId ? (
         <>
           <div className="flex-1 space-y-8 max-w-6xl mx-auto flex flex-col justify-center">
@@ -80,27 +64,6 @@ export default function LectureHall() {
               />
             </div>
             
-            {/* Action buttons with consistent styling */}
-            <div className="flex justify-center gap-6">
-              <button
-                onClick={() => handleOpenPanel('doubt')}
-                className={`flex items-center gap-2 px-6 py-3 ${cfg.primaryBtn}`}
-              >
-                <HelpCircle size={18} /> Ask Doubt
-              </button>
-              <button
-                onClick={() => handleOpenPanel('notes')}
-                className={`flex items-center gap-2 px-6 py-3 ${cfg.primaryBtn}`}
-              >
-                <PencilLine size={18} /> Write Notes
-              </button>
-              <button
-                onClick={() => handleOpenPanel('test')}
-                className={`flex items-center gap-2 px-6 py-3 ${cfg.primaryBtn}`}
-              >
-                <ClipboardList size={18} /> Test Yourself
-              </button>
-            </div>
           </div>
           
           {/* Updated sidebar with app-specific styling based on panel type */}
