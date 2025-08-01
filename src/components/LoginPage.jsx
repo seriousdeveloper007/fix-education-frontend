@@ -13,10 +13,12 @@ export default function GoogleLogin() {
   const navigate = useNavigate();
   const cfg = themeConfig.website;
   const [success, setSuccess] = useState('');
+  const [fromExtension, setFromExtension] = useState(false);
 
 
   // Initialize Google Identity Services
   useEffect(() => {
+
     window.google.accounts.id.initialize({
       client_id: '711989652397-ffcq8cuqec6o2hlr4p7tqc5f8t78aa6c.apps.googleusercontent.com',
       callback: handleCredentialResponse,
@@ -33,6 +35,15 @@ export default function GoogleLogin() {
   
     );
     window.google.accounts.id.prompt();
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('from-extension') === 'true') {
+      setFromExtension(true);
+    
+      // Remove the query param without refreshing the page
+      const url = new URL(window.location);
+      url.searchParams.delete('from-extension');
+      window.history.replaceState({}, '', url);
+    }
   }, []);
 
   async function handleCredentialResponse(response) {
@@ -104,6 +115,51 @@ export default function GoogleLogin() {
     <div className="min-h-screen flex flex-col bg-[#ffe9cc] font-fraunces">
       <Navbar showNav={false} showButtons={false} />
 
+
+      {fromExtension && (
+        <div className="fixed top-20 right-8 z-50 w-80 bg-white rounded-2xl shadow-xl p-6 text-center border border-gray-200">
+          {/* ilon AI logo and title */}
+          <div className="flex items-center justify-center mb-4">
+            <img src="https://via.placeholder.com/32x32?text=AI" alt="ilon AI logo" className="mr-2 rounded" />
+            <span className="text-xl font-semibold text-gray-900">ilon AI</span>
+          </div>
+
+          {/* Heading */}
+          <h2 className="text-lg font-bold text-gray-800 mb-2">Pin ilon AI to access later</h2>
+
+          {/* Subtext */}
+          <p className="text-sm text-gray-600 mb-4">
+            Click the 
+            <span className="inline-block mx-1">
+              <img
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABQklEQVR4Ae2WwQnDIAyFnZL4NfgDfgBPkBBK8AfYJWnpYg0UoFJwU95nmKdaIE8e/MFMrfq8wAAmLq7hISfOfjjjz8gA4gUtZMBefIB9WAFrIAm3MdQg0xSKwjQCPCtI2YdDJYWt+OG5HfItZu0BgysMFCYQFBDG7qHgEYTC1Apwl8GnBeHzC84NsckT0Cpw9xA9UJVOX2qFwYRhLGSDIvFFDJTgBK2Qu0DLDKijURnTCQZcMxAzY9WkAdN85TgD9TbDR8iBUc5+x5aaFhhMjI+Oq9k74RrfBDV9tdcKxhwAAAABJRU5ErkJggg==" 
+                alt="Pin icon" 
+                className="inline-block w-4 h-4 align-middle"
+              />
+            </span>
+            above to pin ilon AI.
+          </p>
+
+          {/* Image demo section */}
+          <div className="rounded-lg overflow-hidden border border-gray-100">
+            <img
+              src="data:image/png;base64,REPLACE_THIS_WITH_BASE64_OF_uploaded_image"
+              alt="Pin example"
+              className="w-full"
+            />
+          </div>
+
+          {/* Dismiss button */}
+          <button
+            onClick={() => setFromExtension(false)}
+            className="mt-4 w-full py-2 bg-gray-100 hover:bg-gray-200 text-sm font-medium rounded-lg text-gray-700"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+
       <div className="flex-grow flex items-start justify-center px-4 pt-16">
         <div className="bg-white rounded-xl shadow-md px-6 py-8 w-full max-w-md text-center">
           <h1 className={cfg.authHeading}>Welcome to ilon ai</h1>
@@ -149,7 +205,7 @@ export default function GoogleLogin() {
                 rel="noopener noreferrer"
                 className="underline hover:text-gray-700"
               >
-                Terms and Services
+                T&C and Privacy Policy
               </a>.
             </p>
           </div>

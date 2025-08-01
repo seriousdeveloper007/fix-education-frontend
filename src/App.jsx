@@ -9,8 +9,6 @@ import {
 
 import LandingPage from './components/LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
-import CookiePolicy from './components/CookiePolicy';
-import TermsOfService from './components/TermsOfService';
 import GoogleLogin from './components/LoginPage';
 import Workspace from './components/Workspace';
 import ErrorPage from './components/ErrorPage';
@@ -76,9 +74,7 @@ function AppRoutes({ theme, toggleTheme }) {
 
       {/* Public info routes */}
       <Route path="/verify-learner" element={<VerifyLearner />} />
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/cookies" element={<CookiePolicy />} />
-      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/error" element={<ErrorPage />} />
 
       {/* Fallback */}

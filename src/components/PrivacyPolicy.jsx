@@ -1,59 +1,110 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Shield } from 'lucide-react';
-import themeConfig from './themeConfig'; 
+import { Shield, User, Settings, Share, Globe, Clock, Key, Trash2, Mail } from 'lucide-react';
+import themeConfig from './themeConfig';
 import Navbar from './Navbar';
+
+const Section = ({ icon: Icon, title, children }) => (
+  <div className="mt-12">
+    <h4 className="text-xl font-semibold flex items-center text-orange-600">
+      <Icon className="mr-2" size={22} />
+      {title}
+    </h4>
+    <div className="mt-4 space-y-4 text-gray-700">{children}</div>
+  </div>
+);
 
 const PrivacyPolicy = ({ theme = 'light' }) => {
   const cfg = themeConfig[theme];
 
   return (
     <>
-    
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`prose max-w-3xl mx-auto py-12 ${cfg.cardBg} rounded-lg p-6 font-geist`}
-    >
-      <motion.h1 className={cfg.heading} whileHover={{ scale: 1.02 }}>
-        <Shield className={`${cfg.icon} inline-block mr-2`} size={24} />
-        Privacy Policy
-      </motion.h1>
-      <p className={cfg.text}>Last updated: July 29, 2025</p>
+      <Navbar showNav={false} showButtons={true} />
 
-      <h2 className={cfg.accent}>1. Introduction</h2>
-      <p className={cfg.text}>[Your Company] (“we”, “us”, “our”) operates the Chrome extension “Ilon X” (the “Extension”). This Privacy Policy explains how we collect, use, and share personal data when you install or use the Extension.</p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`max-w-4xl mx-auto py-12 px-[50px] sm:px-[100px] ${cfg.cardBg} rounded-lg font-geist`}
+      >
+        {/* Heading */}
+        <motion.h1
+          className="text-3xl font-bold mb-8 flex items-center text-orange-700"
+          whileHover={{ scale: 1.02 }}
+        >
+          <Shield className={`${cfg.icon} mr-2`} size={28} />
+          Privacy Policy
+        </motion.h1>
 
-      <h2 className={cfg.accent}>2. Data Collection</h2>
-      <ul className={cfg.text}>
-        <li><strong>Usage Data:</strong> URLs visited, timestamps, and user interactions to power AI-driven learning features.</li>
-        <li><strong>Metadata:</strong> Browser version, OS, and language (for analytics and support).</li>
-      </ul>
+        {/* Agreement */}
+        <Section icon={Shield} title="AGREEMENT TO OUR LEGAL TERMS">
+          <p>
+            This privacy notice for ilon ai ("we," "us," or "our") describes how and why we might collect,
+            store, use, and/or share ("process") your information when you use our services ("Services").
+          </p>
+          <p>
+            Reading this privacy notice will help you understand your privacy rights and choices. If you do not agree
+            with our policies and practices, please do not use our Services. Contact us at <a className="underline text-orange-700" href="mailto:support@ilon.ai.digital">support@ilon.ai.digital</a> with any questions.
+          </p>
+        </Section>
 
-      <h2 className={cfg.accent}>3. Data Use</h2>
-      <p className={cfg.text}>We use data solely to:</p>
-      <ul className={cfg.text}>
-        <li>Provide and improve interactive AI learning features.</li>
-        <li>Diagnose technical issues and enhance stability.</li>
-      </ul>
+        {/* Summary */}
+        <Section icon={User} title="SUMMARY OF KEY POINTS">
+          <p><strong>What personal information do we process?</strong> ...</p>
+          <p><strong>Do we process any sensitive personal information?</strong> ...</p>
+          <p><strong>Do we receive any information from third parties?</strong> ...</p>
+          <p><strong>How do we process your information?</strong> ...</p>
+          <p><strong>With whom do we share personal information?</strong> ...</p>
+          <p><strong>What are your rights?</strong> ...</p>
+          <p><strong>How do you exercise your rights?</strong> ...</p>
+        </Section>
 
-      <h2 className={cfg.accent}>4. Data Disclosure</h2>
-      <p className={cfg.text}>We do not sell or rent personal data. We disclose data only to:</p>
-      <ul className={cfg.text}>
-        <li>Comply with legal obligations.</li>
-        <li>Protect against fraud or abuse.</li>
-      </ul>
+        <Section icon={User} title="1. WHAT INFORMATION DO WE COLLECT?">
+          <p><strong>Personal information you disclose to us:</strong> We collect personal information that you voluntarily provide to us.</p>
+          <p><strong>Sensitive Information:</strong> We do not process sensitive personal information.</p>
+        </Section>
 
-      <h2 className={cfg.accent}>5. Data Retention</h2>
-      <p className={cfg.text}>We retain data only as long as needed to fulfill extension functionality or as required by law.</p>
+        <Section icon={Settings} title="2. HOW DO WE PROCESS YOUR INFORMATION?">
+          <p><strong>In Short:</strong> We process your personal information for various business purposes depending on how you interact with our Services.</p>
+        </Section>
 
-      <h2 className={cfg.accent}>6. Your Rights</h2>
-      <p className={cfg.text}>You may request access, correction, or deletion of your data by contacting us at <a href="mailto:privacy@ilonx.com" className={cfg.navLink}>privacy@ilonx.com</a>.</p>
+        <Section icon={Share} title="3. WHEN AND WITH WHOM DO WE SHARE YOUR INFORMATION?">
+          <p><strong>In Short:</strong> We may share your data with:</p>
+          <p><strong>Business Transfers:</strong> ...</p>
+          <p><strong>Affiliates:</strong> ...</p>
+          <p><strong>Business Partners:</strong> ...</p>
+        </Section>
 
-      <h2 className={cfg.accent}>7. Contact</h2>
-      <p className={cfg.text}>For privacy inquiries: <a href="mailto:privacy@ilonx.com" className={cfg.navLink}>privacy@ilonx.com</a></p>
-    </motion.div>
+        <Section icon={Settings} title="4. DO WE USE COOKIES OR TRACKING TECHNOLOGIES?">
+          <p><strong>In Short:</strong> Yes, we may use cookies and other tracking technologies to collect and store your information.</p>
+        </Section>
+
+        <Section icon={Globe} title="5. IS YOUR INFORMATION TRANSFERRED INTERNATIONALLY?">
+          <p><strong>In Short:</strong> We may transfer, store, and process your information in countries other than your own.</p>
+        </Section>
+
+        <Section icon={Clock} title="6. HOW LONG DO WE KEEP YOUR INFORMATION?">
+          <p><strong>In Short:</strong> We keep your information as long as necessary for the purposes outlined in this policy.</p>
+        </Section>
+
+        <Section icon={Key} title="7. WHAT ARE YOUR PRIVACY RIGHTS?">
+          <p><strong>In Short:</strong> You may review, change, or terminate your account at any time.</p>
+          <p><strong>Withdrawing Consent:</strong> You can withdraw your consent to data processing at any time.</p>
+        </Section>
+
+        <Section icon={Trash2} title="8. HOW CAN YOU REVIEW, UPDATE OR DELETE YOUR DATA?">
+          <p>You can request access to, update, or delete your personal information by contacting us at <a className="underline text-orange-700" href="mailto:support@ilon.ai.digital">support@ilon.ai.digital</a>.</p>
+        </Section>
+
+        <Section icon={Mail} title="9. HOW CAN YOU CONTACT US?">
+          <p>If you have questions, email us at <a className="underline text-orange-700" href="mailto:support@ilon.ai.digital">support@ilon.ai.digital</a> or write to:</p>
+          <p>
+            ilon ai<br />
+            Y7 001 GreenWood<br />
+            Sarjapur , Bangalore 560035
+          </p>
+        </Section>
+      </motion.div>
     </>
   );
 };

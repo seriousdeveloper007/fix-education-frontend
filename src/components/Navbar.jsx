@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import themeConfig from './themeConfig';
 import { Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 
 const Navbar = ({
   showNav = true,
@@ -15,11 +17,18 @@ const Navbar = ({
 
   useEffect(() => {
     const handleScroll = () => {
+      console.log('scrollY:', window.scrollY); // DEBUG
       setScrolled(window.scrollY > 10);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  useEffect(() => {
+    console.log('scrolled state changed:', scrolled); // DEBUG
+  }, [scrolled]);
+  
+
 
   return (
     <>
@@ -35,10 +44,10 @@ const Navbar = ({
           } font-fraunces`}
         >
           {/* Left: Logo */}
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gray-300 rounded-full" />
             <span className="text-lg font-semibold text-gray-800">ilon ai</span>
-          </div>
+          </Link>
 
           {/* Center: Nav Links (hide on mobile) */}
           {showNav && (
