@@ -120,14 +120,16 @@ export default function LectureHall() {
               
               {activePanel === 'notes' && (
                 <div className="flex flex-col h-full space-y-4">
+                  <button
+                    className={`${cfg.successBtn} flex items-center gap-1 px-2 py-1 text-xs self-start`}
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    Improve Notes
+                  </button>
                   <textarea
                     className={`${cfg.notesEditor} flex-1 w-full border-0 resize-none ${cfg.focusRing}`}
                     placeholder="Write your notes here. They'll be automatically saved with timestamps."
                   />
-                  <button className={`${cfg.primaryBtn} flex items-center gap-1 px-3 py-2 text-sm`}>
-                    <Sparkles className="w-4 h-4" />
-                    Improve Notes
-                  </button>
                 </div>
               )}
               
