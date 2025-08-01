@@ -4,6 +4,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
 import { useLectureHall } from './LectureHallContext.jsx';
+import { Bot } from 'lucide-react';
 
 function extractId(url) {
   try {
@@ -119,23 +120,15 @@ export default function LectureHall() {
               
               {activePanel === 'notes' && (
                 <div className="space-y-4">
-                  <div className={cfg.notesToolbar}>
-                    <button className={`${cfg.interactiveBtn} px-3 py-1 text-sm`}>Bold</button>
-                    <button className={`${cfg.interactiveBtn} px-3 py-1 text-sm`}>Italic</button>
-                    <button className={`${cfg.interactiveBtn} px-3 py-1 text-sm`}>Highlight</button>
-                  </div>
-                  <textarea 
+                  <textarea
                     className={`${cfg.notesEditor} w-full border-0 resize-none ${cfg.focusRing}`}
                     placeholder="Write your notes here. They'll be automatically saved with timestamps."
                     rows="15"
                   />
-                  <div className="space-y-2">
-                    <h3 className={`text-sm font-medium ${cfg.text}`}>Recent Notes</h3>
-                    <div className={cfg.noteCard}>
-                      <p className={cfg.text}>Sample note from the lecture...</p>
-                      <span className={cfg.noteTimestamp}>12:34</span>
-                    </div>
-                  </div>
+                  <button className={`${cfg.primaryBtn} flex items-center gap-1 px-3 py-2 text-sm`}>
+                    <Bot className="w-4 h-4" />
+                    Improve these notes with AI
+                  </button>
                 </div>
               )}
               
