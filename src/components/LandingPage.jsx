@@ -4,22 +4,53 @@ import { Download } from 'lucide-react';
 import themeConfig from './themeConfig';
 import { landingContent  } from './landingContent';
 import { useNavigate } from 'react-router-dom';
+import Footer from './Footer';
+import Navbar from './Navbar';
+
+
+const CTAButtons = ({ center = false, showDownload = true }) => {
+  const cfg = themeConfig.website;
+  const navigate = useNavigate();
+
+  return (
+    <div
+      className={`flex flex-col sm:flex-row items-start ${
+        center ? 'justify-center items-center' : ''
+      } gap-3 sm:gap-4 mt-6`}
+    >
+      <button
+        onClick={() => navigate('/login')}
+        className={`${cfg.primaryBtn} transition font-medium px-4 py-3 sm:py-3.5 text-sm sm:text-base`}
+      >
+        Start learning for Free
+      </button>
+
+      {showDownload && (
+        <button
+          className={`hidden sm:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-3 sm:py-3.5 font-medium transition`}
+        >
+          <Download size={16} />
+          Chrome Extension
+        </button>
+      )}
+    </div>
+  );
+};
 
 
 const LandingPage = () => {
-  const cfg = themeConfig.website;
   const { useCases, faqs } = landingContent;
-  const navigate = useNavigate();
 
 
   return (
     <div className="bg-white min-h-screen font-fraunces">
+      <Navbar />
       <div
         id="hero"
         className="bg-[#ffe9cc] shadow-md px-4 sm:px-6 md:px-[100px] pt-20 pb-16"
       >
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug">
-          Stop passively watching,
+          Stop passively watching,{' '}
           <br className="hidden sm:block" />
           Start interactive learning on YouTube.
         </h1>
@@ -27,22 +58,7 @@ const LandingPage = () => {
         <p className="mt-3 text-base sm:text-lg text-slate-700 max-w-2xl">
           Ask doubts while watching, answer ilon AI questions in every 5–10 mins, and auto-organize your notes.
         </p>
-
-        <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 mt-6">
-        <button
-          onClick={() => navigate('/login')}
-          className={`${cfg.primaryBtn} transition font-medium px-4 py-3 sm:py-3.5 text-sm sm:text-base`}
-        >
-          Start learning for Free
-        </button>
-
-        <button
-          className={`hidden sm:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-3 sm:py-3.5 font-medium transition`}
-        >
-          <Download size={16} />
-          Chrome Extension
-        </button>
-        </div>
+        <CTAButtons />
         <div id="how-to-use" className="mt-10 border-2 border-dashed border-gray-400 rounded-xl bg-white flex items-center justify-center text-gray-600 text-base sm:text-lg 
           h-[300px] sm:h-[400px] md:h-[500px]">
           How to use — there will be a video here in future
@@ -105,22 +121,7 @@ const LandingPage = () => {
         <p className="text-center mx-auto text-lg sm:text-xl md:text-2xl text-black">
           ilon ai is completely free to use — no subscriptions, no hidden fees.
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6">
-        <button
-          onClick={() => navigate('/login')}
-          className={`${cfg.primaryBtn} transition font-medium px-4 py-3 sm:py-3.5 text-sm sm:text-base`}
-        >
-          Start learning for Free
-        </button>
-
-        <button
-          className={`hidden sm:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-3 sm:py-3.5 font-medium transition`}
-        >
-          <Download size={16} />
-          Chrome Extension
-        </button>
-        </div>
-
+        <CTAButtons center />
 
       </div>
       <div
@@ -147,22 +148,9 @@ const LandingPage = () => {
           </div>
         ))}
       </div>
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6">
-        <button
-          onClick={() => navigate('/login')}
-          className={`${cfg.primaryBtn} transition font-medium px-4 py-3 sm:py-3.5 text-sm sm:text-base`}
-        >
-          Start learning for Free
-        </button>
-
-        <button
-          className={`hidden sm:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-3 sm:py-3.5 font-medium transition`}
-        >
-          <Download size={16} />
-          Chrome Extension
-        </button>
-        </div>
+      <CTAButtons center />
     </div>
+    <Footer />
     </div>
   );
 };
