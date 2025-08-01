@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
 import {
   BrowserRouter,
   Routes,
   Route,
   Navigate,
-  useLocation,
 } from 'react-router-dom';
 
 import LandingPage from './components/LandingPage';
@@ -21,7 +19,6 @@ import VerifyLearner from './components/VerifyLearner';
 
 
 export default function App() {
-
   return (
     <BrowserRouter>
       <AppRoutes />
@@ -29,23 +26,17 @@ export default function App() {
   );
 }
 
+function isLoggedIn() {
+  return Boolean(localStorage.getItem('token'));
+}
 
-function AppRoutes() {
-  const isLoggedIn = () => Boolean(localStorage.getItem('token'));
-  
-  const location = useLocation();
-  const isPlatform = location.pathname.startsWith('/platform');
-
-
-// Protected route wrapper
+// eslint-disable-next-line react/prop-types
 function PrivateRoute({ children }) {
   return isLoggedIn() ? children : <Navigate to="/login" replace />;
 }
 
-function AppRoutes({ theme, toggleTheme }) {
+function AppRoutes() {
   return (
-
-     
     <Routes>
       {/* Landing page for not-logged-in users */}
       <Route
@@ -73,9 +64,13 @@ function AppRoutes({ theme, toggleTheme }) {
 
       {/* Protected platform route */}
       <Route
-          path="platform/*"
-          element={<Platform  />}
-        />
+        path="platform/*"
+        element={
+          <PrivateRoute>
+            <Platform />
+          </PrivateRoute>
+        }
+      />
 
       {/* Public info routes */}
       <Route path="/verify-learner" element={<VerifyLearner />} />
