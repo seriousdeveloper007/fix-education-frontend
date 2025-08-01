@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
@@ -27,6 +27,8 @@ export default function LectureHall() {
   const { stop } = useAudioRecorder();
   const { activePanel, closePanel, registerPause } = useLectureHall();
   const iframeRef = useRef(null);
+
+  const [questionView, setQuestionView] = useState('attempted');
 
   // Placeholder question lists
   const attemptedQuestions = [];
@@ -140,21 +142,47 @@ export default function LectureHall() {
               {activePanel === 'test' && (
                 <div className="space-y-4">
                   <div className="flex gap-2">
-                    <button className={`${cfg.successBtn} flex-1 flex items-center justify-center gap-2 py-2`}>
+                    <button
+                      onClick={() => setQuestionView('attempted')}
+                      className={`${
+                        questionView === 'attempted' ? cfg.successBtn : cfg.secondaryBtn
+                      } flex-1 flex items-center justify-center gap-2 py-2`}
+                    >
                       <ListChecks className="w-4 h-4" />
                       Attempted Questions
                     </button>
-                    <button className={`${cfg.secondaryBtn} flex-1 flex items-center justify-center gap-2 py-2`}>
+                    <button
+                      onClick={() => setQuestionView('unattempted')}
+                      className={`${
+                        questionView === 'unattempted' ? cfg.successBtn : cfg.secondaryBtn
+                      } flex-1 flex items-center justify-center gap-2 py-2`}
+                    >
                       <ListTodo className="w-4 h-4" />
                       Unattempted Questions
                     </button>
                   </div>
+                  <h3 className={`${cfg.heading} text-center`}>{{
+                    attempted: 'Attempted Questions',
+                    unattempted: 'Unattempted Questions'
+                  }[questionView]}</h3>
                   <div className="space-y-2">
-                    {attemptedQuestions.length === 0 && (
-                      <p className={`${cfg.subtext} text-center`}>No Attempted question yet</p>
+                    {questionView === 'attempted' && (
+                      attemptedQuestions.length === 0 ? (
+                        <p className={`${cfg.subtext} text-center`}>No Attempted question yet</p>
+                      ) : (
+                        attemptedQuestions.map((q, i) => (
+                          <p key={i}>{q}</p>
+                        ))
+                      )
                     )}
-                    {unattemptedQuestions.length === 0 && attemptedQuestions.length > 1 && (
-                      <p className={`${cfg.subtext} text-center`}>You are all caught up !</p>
+                    {questionView === 'unattempted' && (
+                      unattemptedQuestions.length === 0 ? (
+                        <p className={`${cfg.subtext} text-center`}>You are all caught up !</p>
+                      ) : (
+                        unattemptedQuestions.map((q, i) => (
+                          <p key={i}>{q}</p>
+                        ))
+                      )
                     )}
                     {unattemptedQuestions.length === 0 && attemptedQuestions.length === 0 && (
                       <p className={`${cfg.subtext} text-center`}>Question coming soon to check your understanding .</p>
