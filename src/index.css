@@ -14,15 +14,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  margin: 0;
-  background: transparent; 
-}
 
 ::selection {
   background-color: rgba(52, 211, 153, 0.3); 
 }
 
-html {
-  scroll-behavior: smooth;
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  height: 100%;
 }

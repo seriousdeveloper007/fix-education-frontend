@@ -3,10 +3,15 @@ import themeConfig from './themeConfig';
 import { Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-
-const Navbar = () => {
+const Navbar = ({
+  showNav = true,
+  showButtons = true,
+  childrenNav = null,
+  childrenButtons = null,
+}) => {
   const cfg = themeConfig.website;
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,50 +41,62 @@ const Navbar = () => {
           </div>
 
           {/* Center: Nav Links (hide on mobile) */}
-          <div className="hidden md:flex flex-grow justify-end mr-6">
-            <nav className="flex gap-4 text-sm font-medium">
-              {['How to use', 'Usecase', 'Pricing', "FAQ's"].map((label, i) => {
-                const href = ['#how-to-use', '#usecase', '#pricing', '#faqs'][i];
-                return (
-                  <a key={label} href={href} className={cfg.TextHoverEffect}>
-                    {label}
-                  </a>
-                );
-              })}
-            </nav>
-          </div>
+          {showNav && (
+            <div className="hidden md:flex flex-grow justify-end mr-6">
+              {childrenNav ?? (
+                <nav className="flex gap-4 text-sm font-medium">
+                  {['How to use', 'Usecase', 'Pricing', "FAQ's"].map((label, i) => {
+                    const href = ['#how-to-use', '#usecase', '#pricing', '#faqs'][i];
+                    return (
+                      <a key={label} href={href} className={cfg.TextHoverEffect}>
+                        {label}
+                      </a>
+                    );
+                  })}
+                </nav>
+              )}
+            </div>
+          )}
 
           {/* Right: Buttons */}
-          <div className="flex items-center gap-4">
-            <button
-              className={`hidden md:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-2 font-medium transition`}
-            >
-              <Download size={16} />
-              Chrome Extension
-            </button>
-            <button
-              onClick={() => navigate('/login')}
-              className={`${cfg.primaryBtn} transition font-medium px-3 md:px-5 py-1.5 md:py-2 text-sm md:text-base`}
-            >
-              Start for Free
-            </button>
-          </div>
+          {showButtons && (
+            <div className="flex items-center gap-4">
+              {childrenButtons ?? (
+                <>
+                  <button
+                    className={`hidden md:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-2 font-medium transition`}
+                  >
+                    <Download size={16} />
+                    Chrome Extension
+                  </button>
+                  <button
+                    onClick={() => navigate('/login')}
+                    className={`${cfg.primaryBtn} transition font-medium px-3 md:px-5 py-1.5 md:py-2 text-sm md:text-base`}
+                  >
+                    Start for Free
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
       {/* Floating Bottom Nav (Mobile Only) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow md:hidden font-fraunces">
-        <div className="flex justify-around items-center h-14 text-sm font-medium text-gray-700">
-          {['How to use', 'Usecase', 'Pricing', "FAQ's"].map((label, i) => {
-            const hrefs = ['#how-to-use', '#usecase', '#pricing', '#faqs'];
-            return (
-              <a key={label} href={hrefs[i]} className={cfg.TextHoverEffect}>
-                {label}
-              </a>
-            );
-          })}
-        </div>
-      </nav>
+      {showNav && (
+        <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow md:hidden font-fraunces">
+          <div className="flex justify-around items-center h-14 text-sm font-medium text-gray-700">
+            {['How to use', 'Usecase', 'Pricing', "FAQ's"].map((label, i) => {
+              const hrefs = ['#how-to-use', '#usecase', '#pricing', '#faqs'];
+              return (
+                <a key={label} href={hrefs[i]} className={cfg.TextHoverEffect}>
+                  {label}
+                </a>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </>
   );
 };
