@@ -33,11 +33,7 @@ const Navbar = ({
   return (
     <>
       {/* Top Navbar */}
-      <header
-        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-          scrolled ? 'bg-white shadow-sm border-b border-gray-200' : cfg.navbarBg
-        } ${cfg.headerBorder}`}
-      >
+      <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${cfg.navbarBg}`}> 
         <div
           className={`flex items-center justify-between h-[80px] transition-all duration-300 ${
             scrolled ? 'px-2 md:px-[100px]' : 'px-4 md:px-[100px]'

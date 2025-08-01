@@ -9,26 +9,33 @@ import {
 
 import LandingPage from './components/LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
+
+
+import Platform from './components/Platform';
+
 import GoogleLogin from './components/LoginPage';
-import Workspace from './components/Workspace';
+
+
 import ErrorPage from './components/ErrorPage';
 import VerifyLearner from './components/VerifyLearner';
 
 
 export default function App() {
-  const [theme, setTheme] = useState('light');
-  const toggleTheme = () =>
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
 
   return (
     <BrowserRouter>
-      <AppRoutes theme={theme} toggleTheme={toggleTheme} />
+      <AppRoutes />
     </BrowserRouter>
   );
 }
 
-// Utility to check auth
-const isLoggedIn = () => Boolean(localStorage.getItem('token'));
+
+function AppRoutes() {
+  const isLoggedIn = () => Boolean(localStorage.getItem('token'));
+  
+  const location = useLocation();
+  const isPlatform = location.pathname.startsWith('/platform');
+
 
 // Protected route wrapper
 function PrivateRoute({ children }) {
@@ -37,6 +44,8 @@ function PrivateRoute({ children }) {
 
 function AppRoutes({ theme, toggleTheme }) {
   return (
+
+     
     <Routes>
       {/* Landing page for not-logged-in users */}
       <Route
@@ -64,13 +73,9 @@ function AppRoutes({ theme, toggleTheme }) {
 
       {/* Protected platform route */}
       <Route
-        path="/platform/*"
-        element={
-          <PrivateRoute>
-            <Workspace theme={theme} toggleTheme={toggleTheme} />
-          </PrivateRoute>
-        }
-      />
+          path="platform/*"
+          element={<Platform  />}
+        />
 
       {/* Public info routes */}
       <Route path="/verify-learner" element={<VerifyLearner />} />
@@ -80,5 +85,6 @@ function AppRoutes({ theme, toggleTheme }) {
       {/* Fallback */}
       <Route path="*" element={<p>404 Not Found</p>} />
     </Routes>
+
   );
 }
