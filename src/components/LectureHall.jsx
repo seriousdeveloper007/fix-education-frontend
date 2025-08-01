@@ -73,7 +73,7 @@ export default function LectureHall({ theme }) {
               allowFullScreen
             />
           </div>
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-center gap-4">
             <button
               onClick={() => openPanel('doubt')}
               className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.primaryBtn}`}
