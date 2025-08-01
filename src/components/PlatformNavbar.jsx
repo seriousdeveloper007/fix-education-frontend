@@ -67,7 +67,7 @@ export default function PlatformNavbar() {
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 font-fraunces ${
-        scrolled ? 'bg-white shadow-sm border-b border-gray-200' : cfg.appHeader
+        scrolled ? cfg.appHeader : cfg.appHeader
       } ${
         scrolled ? 'px-2 md:px-[100px] h-[80px]' : 'px-4 md:px-[100px] h-[60px]'
       } flex items-center justify-between`}

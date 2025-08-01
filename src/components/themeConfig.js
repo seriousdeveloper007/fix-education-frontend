@@ -38,7 +38,7 @@ export default {
     statText: 'text-sm text-slate-500',
     icon: 'text-slate-700 hover:text-emerald-600',
     headerBg: 'bg-white/70 backdrop-blur-lg shadow-md',
-    navbarBg: 'bg-[#ffe9cc] hover:bg-white transition-colors duration-300',
+    navbarBg: 'bg-[#ffe9cc]',
     headerBorder: 'border-slate-200/50',
     borderTop: 'border-t border-slate-200/50',
     TextHoverEffect: 'text-black px-3 py-2 rounded-lg transition hover:bg-gray-200',
@@ -48,7 +48,7 @@ export default {
    root: 'min-h-screen bg-slate-50 text-slate-900 selection:bg-emerald-300/30 font-fraunces',
 
 
-    appHeader: 'bg-white/80 backdrop-blur-lg shadow-md border-b border-slate-200/50',
+    appHeader: 'bg-slate-50',
     appNavLink: 'text-slate-700 hover:text-emerald-600 transition-colors duration-200',
     breadcrumb: 'text-sm text-slate-500 hover:text-slate-700',
     
