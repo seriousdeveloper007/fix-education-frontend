@@ -1,13 +1,12 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // import Link
 import themeConfig from './themeConfig';
 
 const Footer = () => {
   const cfg = themeConfig.website;
 
   return (
-    <footer
-      className={`bg-[#fef5ec] ${cfg.borderTop} ${cfg.text}`}
-    >
+    <footer className={`bg-[#fef5ec] ${cfg.borderTop} ${cfg.text}`}>
       <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-[70px]">
         {/* Left: Logo */}
         <div className="flex justify-between items-start w-full sm:w-auto">
@@ -30,14 +29,12 @@ const Footer = () => {
             >
               Chrome Extension
             </a>
-            <a
-              href="https://www.google.com"
+            <Link
+              to="/privacy-policy"
               className="hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
             >
-              Terms &amp; Conditions
-            </a>
+              T&C and Privacy Policy
+            </Link>
           </div>
         </div>
 
@@ -51,14 +48,12 @@ const Footer = () => {
           >
             Chrome Extension
           </a>
-          <a
-            href="https://www.google.com"
+          <Link
+            to="/privacy-policy"
             className="hover:underline"
-            target="_blank"
-            rel="noopener noreferrer"
           >
-            Terms &amp; Conditions
-          </a>
+            T&C and Privacy Policy
+          </Link>
         </div>
       </div>
     </footer>
