@@ -4,7 +4,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
 import { useLectureHall } from './LectureHallContext.jsx';
-import { Bot } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 function extractId(url) {
   try {
@@ -119,15 +119,14 @@ export default function LectureHall() {
               )}
               
               {activePanel === 'notes' && (
-                <div className="space-y-4">
+                <div className="flex flex-col h-full space-y-4">
                   <textarea
-                    className={`${cfg.notesEditor} w-full border-0 resize-none ${cfg.focusRing}`}
+                    className={`${cfg.notesEditor} flex-1 w-full border-0 resize-none ${cfg.focusRing}`}
                     placeholder="Write your notes here. They'll be automatically saved with timestamps."
-                    rows="15"
                   />
                   <button className={`${cfg.primaryBtn} flex items-center gap-1 px-3 py-2 text-sm`}>
-                    <Bot className="w-4 h-4" />
-                    Improve these notes with AI
+                    <Sparkles className="w-4 h-4" />
+                    Improve Notes
                   </button>
                 </div>
               )}
