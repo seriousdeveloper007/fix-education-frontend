@@ -99,7 +99,7 @@ export default function PlatformNavbar() {
               User Guide
             </NavLink>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 ml-auto">
             <button onClick={() => openPanel('doubt')} className={`${cfg.primaryBtn} flex items-center gap-1 px-3 py-2 text-sm`}>
               <HelpCircle className="w-4 h-4" />
               Ask Doubts
@@ -113,57 +113,6 @@ export default function PlatformNavbar() {
               Write Notes
             </button>
             {isRecording && <Mic size={18} className="text-red-500" />}
-            <div
-              className="relative"
-              onMouseEnter={() => {
-                if (userTimeout.current) clearTimeout(userTimeout.current);
-                setIsUserOpen(true);
-              }}
-              onMouseLeave={() => {
-                userTimeout.current = setTimeout(() => setIsUserOpen(false), 200);
-              }}
-            >
-              <button
-                className="flex items-center gap-2"
-                aria-haspopup="true"
-                aria-expanded={isUserOpen}
-              >
-                <UserCircle size={20} className={cfg.icon} />
-                <span className="text-sm">{username}</span>
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              <div
-                className={`absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-2 z-50 transition-opacity duration-300 ${
-                  isUserOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-                }`}
-              >
-                  <NavLink
-                    to="/platform/stats"
-                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-                    onClick={() => setIsUserOpen(false)}
-                  >
-                    <BarChart2 className="w-4 h-4" />
-                    Stats
-                  </NavLink>
-                  <NavLink
-                    to="/platform/profile"
-                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-                    onClick={() => setIsUserOpen(false)}
-                  >
-                    <User className="w-4 h-4" />
-                    Profile
-                  </NavLink>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                    }}
-                    className="flex w-full items-center gap-2 px-4 py-2 hover:bg-gray-100 text-left"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Logout
-                  </button>
-              </div>
-            </div>
           </div>
         </>
       ) : (
