@@ -48,17 +48,21 @@ export default function LectureHall() {
   }, [stop]);
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden p-6 pt-14 bg-slate-50 text-slate-900 font-fraunces selection:bg-emerald-300/30">
+    <div
+      className={`relative h-full overflow-hidden p-6 pt-14 bg-slate-50 text-slate-900 font-fraunces selection:bg-emerald-300/30 ${
+        activePanel ? 'pr-[30rem]' : ''
+      }`}
+    >
       {videoId ? (
         <>
-          <div className="flex-1 space-y-8 max-w-6xl mx-auto flex flex-col justify-center">
+          <div className="h-full">
             {/* Updated video container with app-specific styling */}
-            <div className={cfg.videoContainer}>
+            <div className={`${cfg.videoContainer} h-full`}>
               <iframe
                 ref={iframeRef}
                 src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1`}
                 title="YouTube video"
-                className={cfg.videoPlayer}
+                className={`${cfg.videoPlayer} h-full`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
