@@ -1,9 +1,10 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { HelpCircle, PencilLine, ClipboardList, ArrowLeft } from 'lucide-react';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
+import { useLectureHall } from './LectureHallContext.jsx';
 
 function extractId(url) {
   try {
@@ -24,7 +25,7 @@ export default function LectureHall() {
   const videoId = extractId(videoUrl);
   const cfg = themeConfig.app; // Updated to use app config
   const { stop } = useAudioRecorder();
-  const [activePanel, setActivePanel] = useState(null);
+  const { activePanel, openPanel, closePanel, registerPause } = useLectureHall();
   const iframeRef = useRef(null);
 
   const pauseVideo = () => {
@@ -36,12 +37,15 @@ export default function LectureHall() {
     }
   };
 
-  const openPanel = (panel) => {
+
+  const handleOpenPanel = (panel) => {
     pauseVideo();
-    setActivePanel((prev) => (prev === panel ? null : panel));
+    openPanel(panel);
   };
 
-  const closePanel = () => setActivePanel(null);
+  useEffect(() => {
+    registerPause(pauseVideo);
+  }, [registerPause]);
 
   useEffect(() => {
     return () => {
@@ -79,19 +83,19 @@ export default function LectureHall() {
             {/* Action buttons with consistent styling */}
             <div className="flex justify-center gap-6">
               <button
-                onClick={() => openPanel('doubt')}
+                onClick={() => handleOpenPanel('doubt')}
                 className={`flex items-center gap-2 px-6 py-3 ${cfg.primaryBtn}`}
               >
                 <HelpCircle size={18} /> Ask Doubt
               </button>
               <button
-                onClick={() => openPanel('notes')}
+                onClick={() => handleOpenPanel('notes')}
                 className={`flex items-center gap-2 px-6 py-3 ${cfg.primaryBtn}`}
               >
                 <PencilLine size={18} /> Write Notes
               </button>
               <button
-                onClick={() => openPanel('test')}
+                onClick={() => handleOpenPanel('test')}
                 className={`flex items-center gap-2 px-6 py-3 ${cfg.primaryBtn}`}
               >
                 <ClipboardList size={18} /> Test Yourself
@@ -138,7 +142,7 @@ export default function LectureHall() {
               {activePanel === 'doubt' && (
                 <div className={cfg.aiChatMessages}>
                   <div className={`${cfg.aiMessageBot} mb-4`}>
-                    Welcome! I'm here to help resolve your doubts about this lecture. Ask me anything!
+                    Welcome! I&apos;m here to help resolve your doubts about this lecture. Ask me anything!
                   </div>
                   <div className="space-y-3">
                     {/* Placeholder for chat messages */}
