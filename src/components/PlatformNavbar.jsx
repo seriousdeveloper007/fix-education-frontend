@@ -1,5 +1,3 @@
-
-
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import {
@@ -74,7 +72,7 @@ export default function PlatformNavbar() {
     >
       {inLectureHall ? (
         <>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <Link to="/platform" className="flex items-center gap-2 font-semibold">
               <BookOpen size={20} className={cfg.icon} />
               <span>iLon X</span>
@@ -83,17 +81,19 @@ export default function PlatformNavbar() {
               <ArrowLeft className="w-4 h-4" />
               Back
             </button>
+          </div>
+          <div className="flex-1 flex justify-center items-center gap-8">
             <NavLink
               to="/platform/library"
               className={({ isActive }) =>
-                `${cfg.appNavLink} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`}
+                `px-3 py-2 rounded-md ${isActive ? 'bg-emerald-600 text-white' : 'bg-white/80 text-slate-700'} hover:bg-emerald-50 flex items-center gap-1 font-semibold transition-colors`}
             >
               <Book className="w-4 h-4" />
               Library
             </NavLink>
             <NavLink
               to="/platform/user-guide"
-              className={`${cfg.appNavLink} font-semibold flex items-center gap-1`}
+              className={`${cfg.appNavLink} font-semibold flex items-center gap-1 px-3 py-2 rounded-md hover:bg-emerald-50`}
             >
               <HelpCircle className="w-4 h-4" />
               User Guide
@@ -117,15 +117,17 @@ export default function PlatformNavbar() {
         </>
       ) : (
         <>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <Link to="/platform" className="flex items-center gap-2 font-semibold">
               <BookOpen size={20} className={cfg.icon} />
               <span>iLon X</span>
             </Link>
+          </div>
+          <div className="flex-1 flex justify-center items-center gap-8">
             <NavLink
               to="/platform/library"
               className={({ isActive }) =>
-                `${cfg.appNavLink} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`}
+                `px-3 py-2 rounded-md ${isActive ? 'bg-emerald-600 text-white' : 'bg-white/80 text-slate-700'} hover:bg-emerald-50 flex items-center gap-1 font-semibold transition-colors`}
             >
               <Book className="w-4 h-4" />
               Library
@@ -133,7 +135,7 @@ export default function PlatformNavbar() {
             <NavLink
               to="/platform/lecturehall"
               className={({ isActive }) =>
-                `${cfg.appNavLink} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`}
+                `px-3 py-2 rounded-md ${isActive ? 'bg-emerald-600 text-white' : 'bg-white/80 text-slate-700'} hover:bg-emerald-50 flex items-center gap-1 font-semibold transition-colors`}
             >
               <Video className="w-4 h-4" />
               Lecture Hall
