@@ -4,6 +4,7 @@ import { Download } from 'lucide-react';
 import themeConfig from './themeConfig';
 import { landingContent  } from './landingContent';
 import { useNavigate } from 'react-router-dom';
+import Footer from './Footer';
 
 
 const LandingPage = () => {
@@ -163,6 +164,7 @@ const LandingPage = () => {
         </button>
         </div>
     </div>
+    <Footer />
     </div>
   );
 };
