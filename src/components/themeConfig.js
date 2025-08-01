@@ -53,8 +53,8 @@ export default {
     breadcrumb: 'text-sm text-slate-500 hover:text-slate-700',
     
     // Video Player Components
-    videoContainer: 'bg-black rounded-lg shadow-xl overflow-hidden ring-1 ring-slate-200/50',
-    videoPlayer: 'w-full aspect-video bg-black rounded-lg',
+    videoContainer: 'w-full h-full bg-black rounded-lg shadow-xl overflow-hidden ring-1 ring-slate-200/50',
+    videoPlayer: 'w-full h-full bg-black',
     videoControls: 'bg-black/80 backdrop-blur-sm',
     videoOverlay: 'bg-black/50 hover:bg-black/30 transition-all duration-300',
     videoProgress: 'bg-emerald-600 h-1 transition-all duration-100',
