@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Sun, Moon, BookOpen, GraduationCap, UserCircle, LogOut, Mic } from 'lucide-react';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
@@ -7,8 +7,6 @@ export default function WorkspaceNavbar({ theme, toggleTheme }) {
   const cfg = themeConfig[theme];
   const { isRecording } = useAudioRecorder();
   const navigate = useNavigate();
-  const location = useLocation();
-  const isLectureHall = location.pathname.startsWith('/platform/lecturehall');
   let username = 'User';
   const storedUser = localStorage.getItem('user');
   if (storedUser) {
@@ -48,15 +46,13 @@ export default function WorkspaceNavbar({ theme, toggleTheme }) {
           {theme === 'light' ? <Moon size={18}/> : <Sun size={18}/>}
         </button>
         {isRecording && <Mic size={18} className="text-red-500" />}
-        {!isLectureHall && (
-          <div className="flex items-center gap-2">
-            <UserCircle size={20} className={cfg.icon} />
-            <span className="text-sm">{username}</span>
-            <button onClick={handleLogout} aria-label="Logout" className={cfg.icon}>
-              <LogOut size={18} />
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <UserCircle size={20} className={cfg.icon} />
+          <span className="text-sm">{username}</span>
+          <button onClick={handleLogout} aria-label="Logout" className={cfg.icon}>
+            <LogOut size={18} />
+          </button>
+        </div>
       </div>
     </header>
   );
