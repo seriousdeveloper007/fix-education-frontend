@@ -1,125 +1,3 @@
-// import React, { useEffect, useRef, useState } from 'react';
-// import { useSearchParams, useNavigate } from 'react-router-dom';
-// import { HelpCircle, PencilLine, ClipboardList, ArrowLeft } from 'lucide-react';
-// import themeConfig from './themeConfig';
-// import { useAudioRecorder } from './AudioRecorderContext.jsx';
-
-// function extractId(url) {
-//   try {
-//     const u = new URL(url);
-//     if (u.hostname === 'youtu.be') {
-//       return u.pathname.slice(1);
-//     }
-//     return u.searchParams.get('v');
-//   } catch {
-//     return null;
-//   }
-// }
-
-// export default function LectureHall() {
-//   const [params] = useSearchParams();
-//   const navigate = useNavigate();
-//   const videoUrl = params.get('video');
-//   const videoId = extractId(videoUrl);
-//   const cfg = themeConfig.website;
-//   const { stop } = useAudioRecorder();
-//   const [activePanel, setActivePanel] = useState(null);
-//   const iframeRef = useRef(null);
-
-//   const pauseVideo = () => {
-//     if (iframeRef.current) {
-//       iframeRef.current.contentWindow.postMessage(
-//         '{"event":"command","func":"pauseVideo","args":""}',
-//         '*'
-//       );
-//     }
-//   };
-
-//   const openPanel = (panel) => {
-//     pauseVideo();
-//     setActivePanel((prev) => (prev === panel ? null : panel));
-//   };
-
-//   const closePanel = () => setActivePanel(null);
-
-//   useEffect(() => {
-//     return () => {
-//       stop();
-//     };
-//   }, [stop]);
-
-//   const handleBack = () => {
-//     navigate('/platform');
-//   };
-
-//   return (
-//     <div className="relative p-6 pt-14">
-//       <button
-//         onClick={handleBack}
-//         className={`absolute top-4 left-4 flex items-center gap-2 px-4 py-2 rounded-full ${cfg.secondaryBtn}`}
-//       >
-//         <ArrowLeft size={18} /> Back
-//       </button>
-//       {videoId ? (
-//         <>
-//         <div className="space-y-8 max-w-6xl mx-auto">
-//           <div className="rounded-2xl overflow-hidden shadow-lg aspect-video">
-//             <iframe
-//               ref={iframeRef}
-//               src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1`}
-//               title="YouTube video"
-//               className="w-full h-full"
-//               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-//               allowFullScreen
-//             />
-//           </div>
-//           <div className="flex justify-center gap-6">
-//             <button
-//               onClick={() => openPanel('doubt')}
-//               className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.primaryBtn}`}
-//             >
-//               <HelpCircle size={18} /> Ask Doubt
-//             </button>
-//             <button
-//               onClick={() => openPanel('notes')}
-//               className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.primaryBtn}`}
-//             >
-//               <PencilLine size={18} /> Write Notes
-//             </button>
-//             <button
-//               onClick={() => openPanel('test')}
-//               className={`flex items-center gap-2 px-4 py-2 rounded-full ${cfg.primaryBtn}`}
-//             >
-//               <ClipboardList size={18} /> Test Yourself
-//             </button>
-//           </div>
-//         </div>
-//         <aside
-//           className={`fixed top-0 right-0 w-[30rem] max-w-full h-full shadow-xl transition-transform transform ${activePanel ? 'translate-x-0' : 'translate-x-full'} bg-white`}
-//         >
-//           <div className="flex items-center justify-between p-4 border-b border-slate-200/50">
-//             <h2 className="font-semibold capitalize">{activePanel ? activePanel : ''}</h2>
-//             <button onClick={closePanel} aria-label="Close" className="text-xl">×</button>
-//           </div>
-//           <div className="p-4 overflow-y-auto space-y-4">
-//             {activePanel === 'doubt' && (
-//               <p>Here you can ask your questions about the lecture.</p>
-//             )}
-//             {activePanel === 'notes' && (
-//               <textarea className="w-full h-40 p-2 rounded border" placeholder="Write your notes here" />
-//             )}
-//             {activePanel === 'test' && (
-//               <p>Test yourself with quizzes coming soon!</p>
-//             )}
-//           </div>
-//         </aside>
-//         </>
-//       ) : (
-//         <p className="text-center">No video selected.</p>
-//       )}
-//     </div>
-//   );
-// }
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { HelpCircle, PencilLine, ClipboardList, ArrowLeft } from 'lucide-react';
@@ -175,7 +53,7 @@ export default function LectureHall() {
   };
 
   return (
-    <div className="relative p-6 pt-14 h-full overflow-hidden bg-slate-50 text-slate-900 font-fraunces selection:bg-emerald-300/30">
+    <div className="relative flex flex-col h-full overflow-hidden p-6 pt-14 bg-slate-50 text-slate-900 font-fraunces selection:bg-emerald-300/30">
       <button
         onClick={handleBack}
         className={`absolute top-4 left-4 flex items-center gap-2 px-4 py-2 rounded-full ${cfg.secondaryBtn}`}
@@ -184,7 +62,7 @@ export default function LectureHall() {
       </button>
       {videoId ? (
         <>
-          <div className="space-y-8 max-w-6xl mx-auto">
+          <div className="flex-1 space-y-8 max-w-6xl mx-auto flex flex-col justify-center">
             {/* Updated video container with app-specific styling */}
             <div className={cfg.videoContainer}>
               <iframe

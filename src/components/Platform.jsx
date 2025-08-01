@@ -10,7 +10,7 @@ import Profile from './Profile';
 export default function Platform() {
   const cfg = themeConfig.app;
   return (
-    <div className={`${cfg.root} min-h-screen flex flex-col`}>
+    <div className={`${cfg.root} h-screen flex flex-col overflow-hidden`}>
       <PlatformNavbar />
       <main className="flex-1 overflow-hidden px-4 py-6">
         <Routes>
