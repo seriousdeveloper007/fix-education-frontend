@@ -175,7 +175,7 @@ export default function LectureHall() {
   };
 
   return (
-    <div className="relative p-6 pt-14 h-full overflow-hidden bg-slate-50 text-slate-900 font-fraunces selection:bg-emerald-300/30">
+    <div className="relative p-6 pt-14 min-h-screen overflow-hidden flex flex-col bg-slate-50 text-slate-900 font-fraunces selection:bg-emerald-300/30">
       <button
         onClick={handleBack}
         className={`absolute top-4 left-4 flex items-center gap-2 px-4 py-2 rounded-full ${cfg.secondaryBtn}`}
@@ -184,7 +184,7 @@ export default function LectureHall() {
       </button>
       {videoId ? (
         <>
-          <div className="space-y-8 max-w-6xl mx-auto">
+          <div className="space-y-8 max-w-6xl mx-auto flex-1 flex flex-col justify-center">
             {/* Updated video container with app-specific styling */}
             <div className={cfg.videoContainer}>
               <iframe
