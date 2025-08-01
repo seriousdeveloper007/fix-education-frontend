@@ -1,7 +1,7 @@
 
 
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Video,
   Book,
@@ -27,13 +27,15 @@ export default function PlatformNavbar() {
   const navigate = useNavigate();
   const [isResourcesOpen, setIsResourcesOpen] = useState(false); // State for resources dropdown toggle
   const [isUserOpen, setIsUserOpen] = useState(false); // State for user dropdown
+  const resourcesTimeout = useRef(null);
+  const userTimeout = useRef(null);
   let username = 'User';
   const storedUser = localStorage.getItem('user');
   if (storedUser) {
     try {
       const userObj = JSON.parse(storedUser);
       username = userObj.name || 'User';
-    } catch (e) {
+    } catch {
       // ignore parse errors and use default username
     }
   }
@@ -88,28 +90,35 @@ export default function PlatformNavbar() {
         </NavLink>
       </div>
       <div className="flex items-center gap-4">
-        <div className="relative">
-          <button
-            onClick={() => setIsResourcesOpen(!isResourcesOpen)}
-            className={`${cfg.appNavLink} font-semibold flex items-center gap-1`}
-          >
+        <NavLink
+          to="/platform/install-extension"
+          className={`${cfg.successBtn} hidden md:flex items-center gap-1 px-3 py-2 text-sm`}
+        >
+          <Download className="w-4 h-4" />
+          Get Extension
+        </NavLink>
+        <div
+          className="relative"
+          onMouseEnter={() => {
+            if (resourcesTimeout.current) clearTimeout(resourcesTimeout.current);
+            setIsResourcesOpen(true);
+          }}
+          onMouseLeave={() => {
+            resourcesTimeout.current = setTimeout(() => setIsResourcesOpen(false), 200);
+          }}
+        >
+          <button className={`${cfg.appNavLink} font-semibold flex items-center gap-1`}>
             Resources
             <ChevronDown className="w-4 h-4" />
           </button>
-          {isResourcesOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50">
-              <NavLink
-                to="/platform/install-extension"
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-                onClick={() => setIsResourcesOpen(false)}
-              >
-                <Download className="w-4 h-4" />
-                Install Extension
-              </NavLink>
+          <div
+            className={`absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50 transition-opacity duration-300 ${
+              isResourcesOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+            }`}
+          >
               <NavLink
                 to="/platform/privacy-policy"
                 className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-                onClick={() => setIsResourcesOpen(false)}
               >
                 <Shield className="w-4 h-4" />
                 Privacy Policy
@@ -117,7 +126,6 @@ export default function PlatformNavbar() {
               <NavLink
                 to="/platform/user-guide"
                 className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-                onClick={() => setIsResourcesOpen(false)}
               >
                 <HelpCircle className="w-4 h-4" />
                 User Guide
@@ -125,18 +133,24 @@ export default function PlatformNavbar() {
               <NavLink
                 to="/platform/why-use-ilonx"
                 className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-                onClick={() => setIsResourcesOpen(false)}
               >
                 <Info className="w-4 h-4" />
                 Why Use iLon X
               </NavLink>
-            </div>
-          )}
+          </div>
         </div>
         {isRecording && <Mic size={18} className="text-red-500" />}
-        <div className="relative">
+        <div
+          className="relative"
+          onMouseEnter={() => {
+            if (userTimeout.current) clearTimeout(userTimeout.current);
+            setIsUserOpen(true);
+          }}
+          onMouseLeave={() => {
+            userTimeout.current = setTimeout(() => setIsUserOpen(false), 200);
+          }}
+        >
           <button
-            onClick={() => setIsUserOpen(!isUserOpen)}
             className="flex items-center gap-2"
             aria-haspopup="true"
             aria-expanded={isUserOpen}
@@ -145,8 +159,11 @@ export default function PlatformNavbar() {
             <span className="text-sm">{username}</span>
             <ChevronDown className="w-4 h-4" />
           </button>
-          {isUserOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-2 z-50">
+          <div
+            className={`absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-2 z-50 transition-opacity duration-300 ${
+              isUserOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+            }`}
+          >
               <NavLink
                 to="/platform/stats"
                 className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
@@ -165,7 +182,6 @@ export default function PlatformNavbar() {
               </NavLink>
               <button
                 onClick={() => {
-                  setIsUserOpen(false);
                   handleLogout();
                 }}
                 className="flex w-full items-center gap-2 px-4 py-2 hover:bg-gray-100 text-left"
@@ -173,8 +189,7 @@ export default function PlatformNavbar() {
                 <LogOut className="w-4 h-4" />
                 Logout
               </button>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </header>
