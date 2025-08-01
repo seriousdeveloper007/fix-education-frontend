@@ -1,11 +1,14 @@
 
 
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import {
   Video,
   Book,
   BookOpen,
+  ArrowLeft,
+  PencilLine,
+  ClipboardList,
   UserCircle,
   LogOut,
   Mic,
@@ -19,12 +22,16 @@ import {
 } from 'lucide-react';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
+import { useLectureHall } from './LectureHallContext.jsx';
 
 export default function PlatformNavbar() {
   const cfg = themeConfig.app;
   const [scrolled, setScrolled] = useState(false);
   const { isRecording } = useAudioRecorder();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { openPanel } = useLectureHall();
+  const inLectureHall = location.pathname.startsWith('/platform/lecturehall');
   const [isResourcesOpen, setIsResourcesOpen] = useState(false); // State for resources dropdown toggle
   const [isUserOpen, setIsUserOpen] = useState(false); // State for user dropdown
   const resourcesTimeout = useRef(null);
@@ -65,133 +72,229 @@ export default function PlatformNavbar() {
         scrolled ? 'px-2 md:px-[100px] h-[80px]' : 'px-4 md:px-[100px] h-[60px]'
       } flex items-center justify-between`}
     >
-      <div className="flex items-center gap-6">
-        <Link to="/platform" className="flex items-center gap-2 font-semibold">
-          <BookOpen size={20} className={cfg.icon} />
-          <span>iLon X</span>
-        </Link>
-        <NavLink
-          to="/platform/library"
-          className={({ isActive }) =>
-            `${cfg.appNavLink} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`
-          }
-        >
-          <Book className="w-4 h-4" />
-          Library
-        </NavLink>
-        <NavLink
-          to="/platform/lecturehall"
-          className={({ isActive }) =>
-            `${cfg.appNavLink} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`
-          }
-        >
-          <Video className="w-4 h-4" />
-          Lecture Hall
-        </NavLink>
-      </div>
-      <div className="flex items-center gap-4">
-        <NavLink
-          to="/platform/install-extension"
-          className={`${cfg.successBtn} hidden md:flex items-center gap-1 px-3 py-2 text-sm`}
-        >
-          <Download className="w-4 h-4" />
-          Get Extension
-        </NavLink>
-        <div
-          className="relative"
-          onMouseEnter={() => {
-            if (resourcesTimeout.current) clearTimeout(resourcesTimeout.current);
-            setIsResourcesOpen(true);
-          }}
-          onMouseLeave={() => {
-            resourcesTimeout.current = setTimeout(() => setIsResourcesOpen(false), 200);
-          }}
-        >
-          <button className={`${cfg.appNavLink} font-semibold flex items-center gap-1`}>
-            Resources
-            <ChevronDown className="w-4 h-4" />
-          </button>
-          <div
-            className={`absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50 transition-opacity duration-300 ${
-              isResourcesOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-            }`}
-          >
-              <NavLink
-                to="/platform/privacy-policy"
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-              >
-                <Shield className="w-4 h-4" />
-                Privacy Policy
-              </NavLink>
-              <NavLink
-                to="/platform/user-guide"
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-              >
-                <HelpCircle className="w-4 h-4" />
-                User Guide
-              </NavLink>
-              <NavLink
-                to="/platform/why-use-ilonx"
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-              >
-                <Info className="w-4 h-4" />
-                Why Use iLon X
-              </NavLink>
+      {inLectureHall ? (
+        <>
+          <div className="flex items-center gap-6">
+            <Link to="/platform" className="flex items-center gap-2 font-semibold">
+              <BookOpen size={20} className={cfg.icon} />
+              <span>iLon X</span>
+            </Link>
+            <button onClick={() => navigate('/platform')} className={`${cfg.appNavLink} font-semibold flex items-center gap-1`}>
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </button>
+            <NavLink
+              to="/platform/library"
+              className={({ isActive }) =>
+                `${cfg.appNavLink} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`}
+            >
+              <Book className="w-4 h-4" />
+              Library
+            </NavLink>
+            <NavLink
+              to="/platform/user-guide"
+              className={`${cfg.appNavLink} font-semibold flex items-center gap-1`}
+            >
+              <HelpCircle className="w-4 h-4" />
+              User Guide
+            </NavLink>
           </div>
-        </div>
-        {isRecording && <Mic size={18} className="text-red-500" />}
-        <div
-          className="relative"
-          onMouseEnter={() => {
-            if (userTimeout.current) clearTimeout(userTimeout.current);
-            setIsUserOpen(true);
-          }}
-          onMouseLeave={() => {
-            userTimeout.current = setTimeout(() => setIsUserOpen(false), 200);
-          }}
-        >
-          <button
-            className="flex items-center gap-2"
-            aria-haspopup="true"
-            aria-expanded={isUserOpen}
-          >
-            <UserCircle size={20} className={cfg.icon} />
-            <span className="text-sm">{username}</span>
-            <ChevronDown className="w-4 h-4" />
-          </button>
-          <div
-            className={`absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-2 z-50 transition-opacity duration-300 ${
-              isUserOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-            }`}
-          >
-              <NavLink
-                to="/platform/stats"
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-                onClick={() => setIsUserOpen(false)}
-              >
-                <BarChart2 className="w-4 h-4" />
-                Stats
-              </NavLink>
-              <NavLink
-                to="/platform/profile"
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
-                onClick={() => setIsUserOpen(false)}
-              >
-                <User className="w-4 h-4" />
-                Profile
-              </NavLink>
+          <div className="flex items-center gap-4">
+            <button onClick={() => openPanel('doubt')} className={`${cfg.primaryBtn} flex items-center gap-1 px-3 py-2 text-sm`}>
+              <HelpCircle className="w-4 h-4" />
+              Ask Doubts
+            </button>
+            <button onClick={() => openPanel('test')} className={`${cfg.primaryBtn} flex items-center gap-1 px-3 py-2 text-sm`}>
+              <ClipboardList className="w-4 h-4" />
+              Test Yourself
+            </button>
+            <button onClick={() => openPanel('notes')} className={`${cfg.primaryBtn} flex items-center gap-1 px-3 py-2 text-sm`}>
+              <PencilLine className="w-4 h-4" />
+              Write Notes
+            </button>
+            {isRecording && <Mic size={18} className="text-red-500" />}
+            <div
+              className="relative"
+              onMouseEnter={() => {
+                if (userTimeout.current) clearTimeout(userTimeout.current);
+                setIsUserOpen(true);
+              }}
+              onMouseLeave={() => {
+                userTimeout.current = setTimeout(() => setIsUserOpen(false), 200);
+              }}
+            >
               <button
-                onClick={() => {
-                  handleLogout();
-                }}
-                className="flex w-full items-center gap-2 px-4 py-2 hover:bg-gray-100 text-left"
+                className="flex items-center gap-2"
+                aria-haspopup="true"
+                aria-expanded={isUserOpen}
               >
-                <LogOut className="w-4 h-4" />
-                Logout
+                <UserCircle size={20} className={cfg.icon} />
+                <span className="text-sm">{username}</span>
+                <ChevronDown className="w-4 h-4" />
               </button>
+              <div
+                className={`absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-2 z-50 transition-opacity duration-300 ${
+                  isUserOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+                }`}
+              >
+                  <NavLink
+                    to="/platform/stats"
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setIsUserOpen(false)}
+                  >
+                    <BarChart2 className="w-4 h-4" />
+                    Stats
+                  </NavLink>
+                  <NavLink
+                    to="/platform/profile"
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setIsUserOpen(false)}
+                  >
+                    <User className="w-4 h-4" />
+                    Profile
+                  </NavLink>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2 hover:bg-gray-100 text-left"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      ) : (
+        <>
+          <div className="flex items-center gap-6">
+            <Link to="/platform" className="flex items-center gap-2 font-semibold">
+              <BookOpen size={20} className={cfg.icon} />
+              <span>iLon X</span>
+            </Link>
+            <NavLink
+              to="/platform/library"
+              className={({ isActive }) =>
+                `${cfg.appNavLink} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`}
+            >
+              <Book className="w-4 h-4" />
+              Library
+            </NavLink>
+            <NavLink
+              to="/platform/lecturehall"
+              className={({ isActive }) =>
+                `${cfg.appNavLink} ${isActive ? 'font-bold' : 'font-semibold'} flex items-center gap-1`}
+            >
+              <Video className="w-4 h-4" />
+              Lecture Hall
+            </NavLink>
+          </div>
+          <div className="flex items-center gap-4">
+            <NavLink
+              to="/platform/install-extension"
+              className={`${cfg.successBtn} hidden md:flex items-center gap-1 px-3 py-2 text-sm`}
+            >
+              <Download className="w-4 h-4" />
+              Get Extension
+            </NavLink>
+            <div
+              className="relative"
+              onMouseEnter={() => {
+                if (resourcesTimeout.current) clearTimeout(resourcesTimeout.current);
+                setIsResourcesOpen(true);
+              }}
+              onMouseLeave={() => {
+                resourcesTimeout.current = setTimeout(() => setIsResourcesOpen(false), 200);
+              }}
+            >
+              <button className={`${cfg.appNavLink} font-semibold flex items-center gap-1`}>
+                Resources
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <div
+                className={`absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-50 transition-opacity duration-300 ${
+                  isResourcesOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+                }`}
+              >
+                  <NavLink
+                    to="/platform/privacy-policy"
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                  >
+                    <Shield className="w-4 h-4" />
+                    Privacy Policy
+                  </NavLink>
+                  <NavLink
+                    to="/platform/user-guide"
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                  >
+                    <HelpCircle className="w-4 h-4" />
+                    User Guide
+                  </NavLink>
+                  <NavLink
+                    to="/platform/why-use-ilonx"
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                  >
+                    <Info className="w-4 h-4" />
+                    Why Use iLon X
+                  </NavLink>
+              </div>
+            </div>
+            {isRecording && <Mic size={18} className="text-red-500" />}
+            <div
+              className="relative"
+              onMouseEnter={() => {
+                if (userTimeout.current) clearTimeout(userTimeout.current);
+                setIsUserOpen(true);
+              }}
+              onMouseLeave={() => {
+                userTimeout.current = setTimeout(() => setIsUserOpen(false), 200);
+              }}
+            >
+              <button
+                className="flex items-center gap-2"
+                aria-haspopup="true"
+                aria-expanded={isUserOpen}
+              >
+                <UserCircle size={20} className={cfg.icon} />
+                <span className="text-sm">{username}</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <div
+                className={`absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-2 z-50 transition-opacity duration-300 ${
+                  isUserOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+                }`}
+              >
+                  <NavLink
+                    to="/platform/stats"
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setIsUserOpen(false)}
+                  >
+                    <BarChart2 className="w-4 h-4" />
+                    Stats
+                  </NavLink>
+                  <NavLink
+                    to="/platform/profile"
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setIsUserOpen(false)}
+                  >
+                    <User className="w-4 h-4" />
+                    Profile
+                  </NavLink>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2 hover:bg-gray-100 text-left"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </header>
   );
 }
