@@ -4,7 +4,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
 import { useLectureHall } from './LectureHallContext.jsx';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, ListChecks, ListTodo } from 'lucide-react';
 
 function extractId(url) {
   try {
@@ -27,6 +27,10 @@ export default function LectureHall() {
   const { stop } = useAudioRecorder();
   const { activePanel, closePanel, registerPause } = useLectureHall();
   const iframeRef = useRef(null);
+
+  // Placeholder question lists
+  const attemptedQuestions = [];
+  const unattemptedQuestions = [];
 
   const pauseVideo = () => {
     if (iframeRef.current) {
@@ -135,29 +139,26 @@ export default function LectureHall() {
               
               {activePanel === 'test' && (
                 <div className="space-y-4">
-                  <div className={cfg.progressContainer}>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className={cfg.progressText}>Quiz Progress</span>
-                      <span className={cfg.progressText}>0/5</span>
-                    </div>
-                    <div className={cfg.progressBar}>
-                      <div className={cfg.progressFill} style={{width: '0%'}}></div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className={cfg.quizQuestion}>
-                      Ready to test your understanding of this lecture?
-                    </div>
-                    <button className={`w-full ${cfg.successBtn} py-3`}>
-                      Start Quiz
+                  <div className="flex gap-2">
+                    <button className={`${cfg.successBtn} flex-1 flex items-center justify-center gap-2 py-2`}>
+                      <ListChecks className="w-4 h-4" />
+                      Attempted Questions
                     </button>
-                    
-                    <div className="text-center">
-                      <p className={cfg.subtext}>
-                        AI-generated questions based on the video content
-                      </p>
-                    </div>
+                    <button className={`${cfg.secondaryBtn} flex-1 flex items-center justify-center gap-2 py-2`}>
+                      <ListTodo className="w-4 h-4" />
+                      Unattempted Questions
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {attemptedQuestions.length === 0 && (
+                      <p className={`${cfg.subtext} text-center`}>No Attempted question yet</p>
+                    )}
+                    {unattemptedQuestions.length === 0 && attemptedQuestions.length > 1 && (
+                      <p className={`${cfg.subtext} text-center`}>You are all caught up !</p>
+                    )}
+                    {unattemptedQuestions.length === 0 && attemptedQuestions.length === 0 && (
+                      <p className={`${cfg.subtext} text-center`}>Question coming soon to check your understanding .</p>
+                    )}
                   </div>
                 </div>
               )}
