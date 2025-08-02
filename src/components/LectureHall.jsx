@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
@@ -34,19 +34,19 @@ export default function LectureHall() {
   const attemptedQuestions = [];
   const unattemptedQuestions = [];
 
-  const pauseVideo = () => {
+  const pauseVideo = useCallback(() => {
     if (iframeRef.current) {
       iframeRef.current.contentWindow.postMessage(
         '{"event":"command","func":"pauseVideo","args":""}',
         '*'
       );
     }
-  };
+  }, []);
 
 
   useEffect(() => {
     registerPause(pauseVideo);
-  }, [registerPause]);
+  }, [registerPause, pauseVideo]);
 
   useEffect(() => {
     return () => {
