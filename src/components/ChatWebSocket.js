@@ -1,10 +1,17 @@
 import { useEffect, useRef } from 'react';
 
-export function useChatWebSocket(tabId, { onMessage, onToken, onChatId } = {}) {
+export function useChatWebSocket(
+  tabId,
+  { onMessage, onToken, onChatId, getPlaybackTime } = {}
+) {
   const wsRef = useRef(null);
 
   useEffect(() => {
     const params = new URLSearchParams({ tab_id: tabId });
+    if (getPlaybackTime) {
+      const time = Math.floor(getPlaybackTime());
+      params.append('playback_time', time);
+    }
     const storedChatId = localStorage.getItem('chatId');
     if (storedChatId) {
       params.append('chat_id', storedChatId);
@@ -32,11 +39,15 @@ export function useChatWebSocket(tabId, { onMessage, onToken, onChatId } = {}) {
     return () => {
       ws.close();
     };
-  }, [tabId, onMessage, onToken, onChatId]);
+  }, [tabId, onMessage, onToken, onChatId, getPlaybackTime]);
 
   const sendMessage = (message) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ message }));
+      const payload = { message };
+      if (getPlaybackTime) {
+        payload.playback_time = Math.floor(getPlaybackTime());
+      }
+      wsRef.current.send(JSON.stringify(payload));
     }
   };
 

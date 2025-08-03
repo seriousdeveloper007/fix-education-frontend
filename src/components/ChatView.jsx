@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { ArrowRight } from 'lucide-react';
 import { useChatWebSocket } from './ChatWebSocket';
 
@@ -11,7 +12,7 @@ function getTabId() {
   return id;
 }
 
-export default function ChatView() {
+export default function ChatView({ getCurrentTime }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
 
@@ -32,6 +33,7 @@ export default function ChatView() {
         return updated;
       });
     },
+    getPlaybackTime: getCurrentTime,
   });
 
   const handleSend = () => {
@@ -93,3 +95,7 @@ export default function ChatView() {
     </div>
   );
 }
+
+ChatView.propTypes = {
+  getCurrentTime: PropTypes.func,
+};
