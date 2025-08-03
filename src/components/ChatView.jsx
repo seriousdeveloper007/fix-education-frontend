@@ -1,22 +1,45 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import themeConfig from './themeConfig';
+import { useChatWebSocket } from './useChatWebSocket';
+
+function getTabId() {
+  let id = sessionStorage.getItem('tab_id');
+  if (!id) {
+    id = crypto.randomUUID();
+    sessionStorage.setItem('tab_id', id);
+  }
+  return id;
+}
 
 export default function ChatView() {
-  const cfg = themeConfig.app;
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+
+  const tabId = getTabId();
+
+  const { sendMessage } = useChatWebSocket(tabId, {
+    onMessage: (msg) => {
+      setMessages((prev) => [...prev, { role: 'agent', text: msg }]);
+    },
+    onToken: (token) => {
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (!last || last.role === 'user') {
+          return [...prev, { role: 'agent', text: token }];
+        }
+        const updated = [...prev];
+        updated[prev.length - 1] = { ...last, text: (last.text || '') + token };
+        return updated;
+      });
+    },
+  });
 
   const handleSend = () => {
     const trimmed = input.trim();
     if (!trimmed) return;
 
-    const newMessages = [
-      ...messages,
-      { role: 'user', text: trimmed },
-      { role: 'agent', text: 'We are processing your response' },
-    ];
-    setMessages(newMessages);
+    setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
+    sendMessage(trimmed);
     setInput('');
   };
 
@@ -32,7 +55,7 @@ export default function ChatView() {
       {/* Scrollable message list */}
       <div className="flex-1 overflow-y-auto space-y-3 pr-1 mt-2 scrollbar-hide">
         {messages.map((msg, idx) => (
-            <div
+          <div
             key={idx}
             className={`${
               msg.role === 'user'
@@ -42,7 +65,6 @@ export default function ChatView() {
           >
             {msg.text}
           </div>
-          
         ))}
       </div>
 
