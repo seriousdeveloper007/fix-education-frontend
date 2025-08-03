@@ -7,15 +7,12 @@ import {
 
 import LandingPage from './components/LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
-
-
-import Platform from './components/Platform';
-
+import PlatformLanding from './components/PlatformLanding';
 import GoogleLogin from './components/LoginPage';
-
-
 import ErrorPage from './components/ErrorPage';
 import VerifyLearner from './components/VerifyLearner';
+import StudyRoom from './components/studyRoom';
+import Library from './components/Library';
 
 
 export default function App() {
@@ -30,7 +27,7 @@ function isLoggedIn() {
   return Boolean(localStorage.getItem('token'));
 }
 
-// eslint-disable-next-line react/prop-types
+// A wrapper for private routes
 function PrivateRoute({ children }) {
   return isLoggedIn() ? children : <Navigate to="/login" replace />;
 }
@@ -38,7 +35,7 @@ function PrivateRoute({ children }) {
 function AppRoutes() {
   return (
     <Routes>
-      {/* Landing page for not-logged-in users */}
+      {/* Root redirects based on login status */}
       <Route
         path="/"
         element={
@@ -50,7 +47,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Login route */}
+      {/* Login */}
       <Route
         path="/login"
         element={
@@ -62,24 +59,50 @@ function AppRoutes() {
         }
       />
 
-      {/* Protected platform route */}
+      {/* Single Protected PlatformLanding Route */}
       <Route
-        path="platform/*"
+        path="/platform"
         element={
           <PrivateRoute>
-            <Platform />
+            <PlatformLanding />
           </PrivateRoute>
         }
       />
 
-      {/* Public info routes */}
+      <Route
+        path="/study-room"
+        element={
+          <PrivateRoute>
+            <StudyRoom />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/library"
+        element={
+          <PrivateRoute>
+            <Library />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Public Routes */}
       <Route path="/verify-learner" element={<VerifyLearner />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/error" element={<ErrorPage />} />
 
       {/* Fallback */}
-      <Route path="*" element={<p>404 Not Found</p>} />
+      <Route
+        path="*"
+        element={
+          isLoggedIn() ? (
+            <Navigate to="/platform" replace />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
     </Routes>
-
   );
 }

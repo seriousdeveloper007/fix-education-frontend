@@ -63,7 +63,13 @@ export default function GoogleLogin() {
       }
 
       const { user: backendUser, token: appJwt } = await res.json();
-      localStorage.setItem('user', JSON.stringify(backendUser));
+      const minimalUser = {
+        email: backendUser.email,
+        profile_picture: backendUser.profile_picture,
+        name: backendUser.name,
+        id: backendUser.id
+      };      
+      localStorage.setItem('user', JSON.stringify(minimalUser));
       localStorage.setItem('token', appJwt);
       navigate('/platform');
     } catch (err) {

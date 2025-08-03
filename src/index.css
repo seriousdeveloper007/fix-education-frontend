@@ -7,22 +7,35 @@
 @tailwind utilities;
 
 :root {
-  font-family: 'Geist Sans', 'Inter', system-ui, sans-serif;
+  font-family: 'font-fraunces','Geist Sans', 'Inter', system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  margin: 0;
-  background: transparent; 
-}
+
 
 ::selection {
   background-color: rgba(52, 211, 153, 0.3); 
 }
 
-html{
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   scroll-behavior: smooth;
+}
+
+/* Hide scrollbar for WebKit-based browsers */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
 }

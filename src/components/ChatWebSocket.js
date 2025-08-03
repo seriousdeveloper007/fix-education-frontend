@@ -1,0 +1,65 @@
+import { useRef } from 'react';
+
+export function useChatWebSocket({ onMessage, onToken, getPlaybackTime } = {}) {
+  const wsRef = useRef(null);
+
+  const connect = () => {
+    if (wsRef.current) return; // avoid reconnecting if already connected
+
+    const tabId = localStorage.getItem('tabId');
+    const params = new URLSearchParams({ tabId });
+
+    console.log('PlaybackTime at send chatwebsocket:', getPlaybackTime());
+
+
+    if (getPlaybackTime) {
+      const time = Math.floor(getPlaybackTime());
+      params.append('currentPlaybackTime', time);
+    }
+
+    const storedChatId = localStorage.getItem('chatId');
+    if (storedChatId) {
+      params.append('chatId', storedChatId);
+    }
+
+    const ws = new WebSocket(`ws://localhost:8000/ws/chat?${params.toString()}`);
+    wsRef.current = ws;
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.chat_id) {
+          localStorage.setItem('chatId', data.chat_id);
+        } else if (data.message !== undefined) {
+          onMessage?.(data.message);
+        } else if (data.token !== undefined) {
+          onToken?.(data.token);
+        }
+      } catch (err) {
+        console.error('Invalid websocket message', err);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('[WebSocket Closed]');
+      wsRef.current = null;
+    };
+  };
+
+  const close = () => {
+    wsRef.current?.close();
+  };
+
+  const sendMessage = (text) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      const playbackTime = getPlaybackTime ? Math.floor(getPlaybackTime()) : 0;
+      wsRef.current.send(JSON.stringify({
+        message_type: 'text',
+        text,
+        currentPlaybackTime: playbackTime,
+      }));
+    }
+  };
+
+  return { connect, sendMessage, close };
+}
