@@ -11,7 +11,7 @@ import PlatformLanding from './components/PlatformLanding';
 import GoogleLogin from './components/LoginPage';
 import ErrorPage from './components/ErrorPage';
 import VerifyLearner from './components/VerifyLearner';
-import StudyRoom from './components/studyRoom';
+import StudyRoom from './components/StudyRoom.jsx';
 import Library from './components/Library';
 
 
