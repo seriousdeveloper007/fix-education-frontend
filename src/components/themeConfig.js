@@ -50,8 +50,25 @@ export default {
   app: {
    root: 'min-h-screen bg-slate-50 text-slate-900 selection:bg-emerald-300/30 font-fraunces',
 
+    appHeader: 'bg-white shadow-md font-semibold text-lg h-20 flex items-center',
+    tabActive: 'font-semibold text-black',
+    tabInactive: 'text-gray-600 hover:text-black',
+    dropdownIcon: 'w-5 h-5 cursor-pointer',
+    dropdownMenu: 'absolute right-0 mt-2 w-32 bg-white border rounded shadow-md z-50',
+    dropdownButton: 'w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100',
+    dropdownIconButton: 'w-4 h-4 mr-2',
+    avatarImage: 'w-8 h-8 rounded-full object-cover',
+    avatarFallback: 'w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold',
+    card: 'bg-white rounded-xl border shadow-md px-6 py-4',
+    cardHeadinglarge: 'text-sm sm:text-4xl font-medium text-black-500',
+    cardHeadingSecondary: 'text-base sm:text-lg font-medium text-black-400',
+    cardSubheading:'mt-2 text-m text-gray-500',
+    primaryButton: 'w-full max-w-[250px] px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded disabled:opacity-50 mt-5',
+    inputfield:'w-full border border-gray-300 rounded px-3 py-2 mt-5 focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600',
 
-    appHeader: 'bg-slate-50',
+
+
+
     appNavLink: 'text-slate-700 hover:text-emerald-600 transition-colors duration-200',
     breadcrumb: 'text-sm text-slate-500 hover:text-slate-700',
     
@@ -133,6 +150,4 @@ export default {
     hoverEffect: 'hover:bg-white/90 transition-colors duration-200',
     focusRing: 'focus:outline-none focus:ring-2 focus:ring-emerald-300/50',
   }
-  
-    
 };
