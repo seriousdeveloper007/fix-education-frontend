@@ -1,6 +1,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import themeConfig from './themeConfig';
 import { useAudioRecorder } from './AudioRecorderContext.jsx';
 import { useLectureHall } from './LectureHallContext.jsx';
@@ -27,6 +28,9 @@ export default function LectureHall() {
   const { stop } = useAudioRecorder();
   const { activePanel, closePanel, registerPause } = useLectureHall();
   const iframeRef = useRef(null);
+  const tabIdRef = useRef(window.crypto?.randomUUID?.() || String(Date.now()));
+  const [socket, setSocket] = useState(null);
+  const [message, setMessage] = useState('');
 
   const [questionView, setQuestionView] = useState('attempted');
 
@@ -43,6 +47,36 @@ export default function LectureHall() {
     }
   };
 
+  const getPlaybackTime = () => {
+    return new Promise((resolve) => {
+      const handler = (event) => {
+        try {
+          const data =
+            typeof event.data === 'string' ? JSON.parse(event.data) : null;
+          if (
+            data?.event === 'infoDelivery' &&
+            typeof data.info?.currentTime === 'number'
+          ) {
+            window.removeEventListener('message', handler);
+            resolve(data.info.currentTime);
+          }
+        } catch {
+          /* ignore */
+        }
+      };
+      window.addEventListener('message', handler);
+      if (iframeRef.current) {
+        iframeRef.current.contentWindow.postMessage(
+          '{"event":"command","func":"getCurrentTime","args":""}',
+          '*'
+        );
+      } else {
+        window.removeEventListener('message', handler);
+        resolve(0);
+      }
+    });
+  };
+
 
   useEffect(() => {
     registerPause(pauseVideo);
@@ -53,6 +87,40 @@ export default function LectureHall() {
       stop();
     };
   }, [stop]);
+
+  useEffect(() => {
+    if (activePanel !== 'doubt') {
+      setSocket((prev) => {
+        if (prev) prev.disconnect();
+        return null;
+      });
+      return;
+    }
+
+    let newSocket;
+    getPlaybackTime().then((time) => {
+      newSocket = io('http://localhost:3000', {
+        query: { tabId: tabIdRef.current, startTime: time }
+      });
+      setSocket(newSocket);
+    });
+
+    return () => {
+      if (newSocket) newSocket.disconnect();
+      setSocket(null);
+    };
+  }, [activePanel]);
+
+  const sendMessage = async () => {
+    if (!socket || !message.trim()) return;
+    const time = await getPlaybackTime();
+    socket.emit('chat-message', {
+      tabId: tabIdRef.current,
+      text: message,
+      playbackTime: time
+    });
+    setMessage('');
+  };
 
   return (
     <div
@@ -193,15 +261,23 @@ export default function LectureHall() {
             </div>
             
             {/* Fixed input area for doubt panel */}
-            {activePanel === 'doubt' && (
+              {activePanel === 'doubt' && (
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-200/50">
                 <div className="flex gap-2">
                   <input
                     type="text"
                     placeholder="Ask your question here..."
                     className={cfg.aiChatInput}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        sendMessage();
+                      }
+                    }}
                   />
-                  <button className={cfg.aiChatButton}>
+                  <button className={cfg.aiChatButton} onClick={sendMessage}>
                     Send
                   </button>
                 </div>
