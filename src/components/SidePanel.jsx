@@ -1,9 +1,9 @@
-import React from 'react';
 import themeConfig from './themeConfig';
 import { X } from 'lucide-react';
 import ChatView from './ChatView';
+import PropTypes from 'prop-types';
 
-export default function SidePanel({ tab, onClose }) {
+export default function SidePanel({ tab, onClose, getCurrentTime }) {
   const cfg = themeConfig.app;
 
   const renderContent = () => {
@@ -11,7 +11,7 @@ export default function SidePanel({ tab, onClose }) {
       return <p className={cfg.cardSubheading}>Ask your doubt here</p>;
     }
     if (tab === 'Attempt Question') {
-      return <p className={cfg.cardSubheading}>Here's a question to try</p>;
+      return <p className={cfg.cardSubheading}>Here&apos;s a question to try</p>;
     }
     if (tab === 'Take Notes') {
       return <p className={cfg.cardSubheading}>Take your notes here</p>;
@@ -20,7 +20,7 @@ export default function SidePanel({ tab, onClose }) {
   };
 
   const renderUI = () => {
-    if (tab === 'Ask Doubt') return <ChatView />;
+    if (tab === 'Ask Doubt') return <ChatView getCurrentTime={getCurrentTime} />;
     return null;
   };
 
@@ -36,3 +36,9 @@ export default function SidePanel({ tab, onClose }) {
     </div>
   );
 }
+
+SidePanel.propTypes = {
+  tab: PropTypes.string,
+  onClose: PropTypes.func,
+  getCurrentTime: PropTypes.func,
+};

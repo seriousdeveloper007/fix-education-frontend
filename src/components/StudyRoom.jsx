@@ -28,7 +28,7 @@ export default function StudyRoom() {
   const [sidePanelTab, setSidePanelTab] = useState(null);
   const isSidePanelOpen = !!sidePanelTab;
 
-  const { iframeRef , pause} = useYouTubePlayer(videoId);
+  const { iframeRef, pause, getCurrentTime } = useYouTubePlayer(videoId);
 
   const showIframe = videoId && mode === 'play';
   
@@ -59,7 +59,11 @@ export default function StudyRoom() {
               allowFullScreen
             />
             {isSidePanelOpen && (
-              <SidePanel tab={sidePanelTab} onClose={() => setSidePanelTab(null)} />
+              <SidePanel
+                tab={sidePanelTab}
+                onClose={() => setSidePanelTab(null)}
+                getCurrentTime={getCurrentTime}
+              />
             )}
           </div>
         </>
