@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight } from 'lucide-react';
 import { useChatWebSocket } from './ChatWebSocket';
@@ -28,6 +28,29 @@ export default function ChatView({ getCurrentTime }) {
     },
     getPlaybackTime: getCurrentTime,
   });
+
+  useEffect(() => {
+    const chatId = localStorage.getItem('chatId');
+    const token = localStorage.getItem('token');
+    if (!chatId || !token) return;
+
+    fetch(`http://localhost:8000/messages/${chatId}`, {
+      headers: {
+        Authorization: token,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const loaded = (data.messages || []).map((m) => ({
+          role: m.message_from === 'assistant' ? 'agent' : 'user',
+          text: m.text,
+        }));
+        setMessages(loaded);
+      })
+      .catch((err) => {
+        console.error('Failed to load messages', err);
+      });
+  }, []);
 
   const handleSend = () => {
     const trimmed = input.trim();
