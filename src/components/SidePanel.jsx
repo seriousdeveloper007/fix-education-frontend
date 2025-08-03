@@ -2,6 +2,7 @@ import themeConfig from './themeConfig';
 import { X } from 'lucide-react';
 import ChatView from './ChatView';
 import PropTypes from 'prop-types';
+import QuestionView from './QuestionView';
 
 export default function SidePanel({ tab, onClose, getCurrentTime }) {
   const cfg = themeConfig.app;
@@ -21,6 +22,9 @@ export default function SidePanel({ tab, onClose, getCurrentTime }) {
 
   const renderUI = () => {
     if (tab === 'Ask Doubt') return <ChatView getCurrentTime={getCurrentTime} />;
+    if (tab === 'Attempt Question') {
+      return <QuestionView />
+    }
     return null;
   };
 
