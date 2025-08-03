@@ -12,7 +12,6 @@ export default function ChatView({ getCurrentTime }) {
   
   const { sendMessage, connect, close } = useChatWebSocket({
     onMessage: (msg) => {
-      console.log("message received1");
       setMessages((prev) => [...prev, { role: 'agent', text: msg }]);
     },
     onToken: (token) => {
@@ -56,16 +55,13 @@ export default function ChatView({ getCurrentTime }) {
     const trimmed = input.trim();
     if (!trimmed) return;
 
-    if (!hasConnectedRef.current && messages.length === 0) {
+    if (!hasConnectedRef.current) {
         connect();
         hasConnectedRef.current = true;
       }
 
-    console.log('PlaybackTime at send:', getCurrentTime());
-
     setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
     setTimeout(() => {
-        console.log('Sending after 2s delay');
         sendMessage(trimmed);
       }, 2000);
   

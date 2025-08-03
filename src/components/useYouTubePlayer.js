@@ -22,12 +22,14 @@ export function useYouTubePlayer(videoId) {
       if (hasInitializedRef.current) return;
 
       if (window.YT && iframeRef.current && !playerRef.current) {
+        console.log('✅ Initializing YouTube Player');
         playerRef.current = new window.YT.Player(iframeRef.current, {
           events: {
             onReady: () => {
+              console.log('🎬 YT Player Ready');
             },
             onStateChange: (event) => {
-
+              console.log('🎮 Player state changed:', event.data);
             },
           },
         });
