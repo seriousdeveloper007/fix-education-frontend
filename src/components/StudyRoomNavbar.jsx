@@ -14,9 +14,9 @@ export default function StudyRoomNavbar({ videoUrl, onTabSelect, selectedTab }) 
   ];
 
   const handleBack = () => {
-    // Go to input mode with video prefilled
-    navigate(`/study-room?video=${encodeURIComponent(videoUrl)}`);
+    window.location.href = `/study-room?video=${encodeURIComponent(videoUrl)}`;
   };
+  
 
   return (
     <header className={`sticky top-0 z-50 w-full h-16 px-6 flex items-center justify-between shadow-md ${cfg.appHeader} font-fraunces`}>
