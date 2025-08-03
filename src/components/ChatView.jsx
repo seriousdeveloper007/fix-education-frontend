@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { useChatWebSocket } from './useChatWebSocket';
+import { useChatWebSocket } from './ChatWebSocket';
 
 function getTabId() {
   let id = sessionStorage.getItem('tab_id');

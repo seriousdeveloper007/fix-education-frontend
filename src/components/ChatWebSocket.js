@@ -5,7 +5,7 @@ export function useChatWebSocket(tabId, { onMessage, onToken, onChatId } = {}) {
 
   useEffect(() => {
     const params = new URLSearchParams({ tab_id: tabId });
-    const storedChatId = localStorage.getItem('chat_id');
+    const storedChatId = localStorage.getItem('chatId');
     if (storedChatId) {
       params.append('chat_id', storedChatId);
     }
@@ -17,7 +17,7 @@ export function useChatWebSocket(tabId, { onMessage, onToken, onChatId } = {}) {
       try {
         const data = JSON.parse(event.data);
         if (data.chat_id) {
-          localStorage.setItem('chat_id', data.chat_id);
+          localStorage.setItem('chatId', data.chat_id);
           if (onChatId) onChatId(data.chat_id);
         } else if (data.message !== undefined) {
           if (onMessage) onMessage(data.message);
