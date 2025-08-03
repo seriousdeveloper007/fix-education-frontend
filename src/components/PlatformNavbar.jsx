@@ -47,9 +47,7 @@ export default function PlatformNavbar({ defaultTab = 'Home' }) {
         const email = user.email || '';
         const emailPrefix = email.split('@')[0];
         const profilePicture = user.profile_picture
-        console.log("profile picture", profilePicture)
         setUserInfo({ emailPrefix, profilePicture });
-        console.log("userInfo", userInfo);
 
       } catch (err) {
         console.error('Invalid user data in localStorage');

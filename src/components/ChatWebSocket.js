@@ -1,20 +1,25 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
-export function useChatWebSocket(
-  tabId,
-  { onMessage, onToken, onChatId, getPlaybackTime } = {}
-) {
+export function useChatWebSocket({ onMessage, onToken, getPlaybackTime } = {}) {
   const wsRef = useRef(null);
 
-  useEffect(() => {
-    const params = new URLSearchParams({ tab_id: tabId });
+  const connect = () => {
+    if (wsRef.current) return; // avoid reconnecting if already connected
+
+    const tabId = localStorage.getItem('tabId');
+    const params = new URLSearchParams({ tabId });
+
+    console.log('PlaybackTime at send chatwebsocket:', getPlaybackTime());
+
+
     if (getPlaybackTime) {
       const time = Math.floor(getPlaybackTime());
-      params.append('playback_time', time);
+      params.append('currentPlaybackTime', time);
     }
+
     const storedChatId = localStorage.getItem('chatId');
     if (storedChatId) {
-      params.append('chat_id', storedChatId);
+      params.append('chatId', storedChatId);
     }
 
     const ws = new WebSocket(`ws://localhost:8000/ws/chat?${params.toString()}`);
@@ -25,31 +30,36 @@ export function useChatWebSocket(
         const data = JSON.parse(event.data);
         if (data.chat_id) {
           localStorage.setItem('chatId', data.chat_id);
-          if (onChatId) onChatId(data.chat_id);
         } else if (data.message !== undefined) {
-          if (onMessage) onMessage(data.message);
+          onMessage?.(data.message);
         } else if (data.token !== undefined) {
-          if (onToken) onToken(data.token);
+          onToken?.(data.token);
         }
       } catch (err) {
         console.error('Invalid websocket message', err);
       }
     };
 
-    return () => {
-      ws.close();
+    ws.onclose = () => {
+      console.log('[WebSocket Closed]');
+      wsRef.current = null;
     };
-  }, [tabId, onMessage, onToken, onChatId, getPlaybackTime]);
+  };
 
-  const sendMessage = (message) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      const payload = { message };
-      if (getPlaybackTime) {
-        payload.playback_time = Math.floor(getPlaybackTime());
-      }
-      wsRef.current.send(JSON.stringify(payload));
+  const close = () => {
+    wsRef.current?.close();
+  };
+
+  const sendMessage = (text) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      const playbackTime = getPlaybackTime ? Math.floor(getPlaybackTime()) : 0;
+      wsRef.current.send(JSON.stringify({
+        message_type: 'text',
+        text,
+        currentPlaybackTime: playbackTime,
+      }));
     }
   };
 
-  return { sendMessage };
+  return { connect, sendMessage, close };
 }

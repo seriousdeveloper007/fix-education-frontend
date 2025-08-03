@@ -1,25 +1,18 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight } from 'lucide-react';
 import { useChatWebSocket } from './ChatWebSocket';
 
-function getTabId() {
-  let id = sessionStorage.getItem('tab_id');
-  if (!id) {
-    id = crypto.randomUUID();
-    sessionStorage.setItem('tab_id', id);
-  }
-  return id;
-}
 
 export default function ChatView({ getCurrentTime }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const hasConnectedRef = useRef(false);
 
-  const tabId = getTabId();
-
-  const { sendMessage } = useChatWebSocket(tabId, {
+  
+  const { sendMessage, connect, close } = useChatWebSocket({
     onMessage: (msg) => {
+      console.log("message received1");
       setMessages((prev) => [...prev, { role: 'agent', text: msg }]);
     },
     onToken: (token) => {
@@ -40,8 +33,20 @@ export default function ChatView({ getCurrentTime }) {
     const trimmed = input.trim();
     if (!trimmed) return;
 
+    if (!hasConnectedRef.current && messages.length === 0) {
+        connect();
+        hasConnectedRef.current = true;
+      }
+
+    console.log('PlaybackTime at send:', getCurrentTime());
+
     setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
-    sendMessage(trimmed);
+    setTimeout(() => {
+        console.log('Sending after 2s delay');
+        sendMessage(trimmed);
+      }, 2000);
+  
+    // sendMessage(trimmed);
     setInput('');
   };
 
@@ -85,12 +90,25 @@ export default function ChatView({ getCurrentTime }) {
             overflowY: 'auto',
           }}
         />
-        <button
-          onClick={handleSend}
-          className="ml-2 p-2 rounded-full bg-black text-white hover:bg-gray-800 h-[40px]"
-        >
-          <ArrowRight size={20} />
-        </button>
+        <div className="ml-2 flex flex-col items-center space-y-2">
+            <button
+                onClick={handleSend}
+                className="p-2 rounded-full bg-black text-white bg-cyan-600 hover:bg-cyan-700 h-[40px] w-[40px] flex items-center justify-center"
+            >
+                <ArrowRight size={20} />
+            </button>
+            <span
+                onClick={() => {
+                    setMessages([]);
+                    localStorage.removeItem('chatId');
+                    hasConnectedRef.current = false
+                    close();
+                  }}
+                className="text-xs text-cyan-600 hover:underline cursor-pointer"
+            >
+                + New
+            </span>
+        </div>
       </div>
     </div>
   );

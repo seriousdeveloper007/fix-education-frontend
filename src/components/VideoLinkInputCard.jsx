@@ -64,7 +64,8 @@ export default function VideoLinkInputCard({ cfg, initialUrl = '' }) {
       }
 
       const tab = await createTab(user.id, trimmed, token);
-      localStorage.setItem('tab_id', tab.id);
+      localStorage.setItem('tabId', tab.id);
+      localStorage.removeItem('chatId');
       navigate(`/study-room?video=${encodeURIComponent(trimmed)}&mode=play`);
     } catch (err) {
       console.error(err);
