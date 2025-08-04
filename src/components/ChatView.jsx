@@ -8,6 +8,8 @@ export default function ChatView({ getCurrentTime }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const hasConnectedRef = useRef(false);
+  const bottomRef = useRef(null);
+
 
   
   const { sendMessage, connect, close } = useChatWebSocket({
@@ -27,6 +29,11 @@ export default function ChatView({ getCurrentTime }) {
     },
     getPlaybackTime: getCurrentTime,
   });
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+  
 
   useEffect(() => {
     const chatId = localStorage.getItem('chatId');
@@ -96,6 +103,7 @@ export default function ChatView({ getCurrentTime }) {
             {msg.text}
           </div>
         ))}
+        <div ref={bottomRef} />
       </div>
 
       {/* Input area pinned at bottom */}

@@ -1,11 +1,10 @@
 import themeConfig from './themeConfig';
 import { ArrowLeft } from 'lucide-react';
+import { updateTab } from '../services/tabService';
 
 
 
-
-
-export default function StudyRoomNavbar({ videoUrl, onTabSelect, selectedTab, unattemptedQuestionCount }) {
+export default function StudyRoomNavbar({ videoUrl, onTabSelect, selectedTab, getCurrentTime, getDuration, unattemptedQuestionCount }) {
   const cfg = themeConfig.app;
 
   const tabs = [
@@ -15,8 +14,14 @@ export default function StudyRoomNavbar({ videoUrl, onTabSelect, selectedTab, un
   ];
   
 
-  const handleBack = () => {
-    window.location.href = `/study-room?video=${encodeURIComponent(videoUrl)}`;
+  const handleBack = async () => {
+    const last_playback_time = Math.floor(getCurrentTime?.() || 0);
+    const video_length = getDuration?.() || 0;
+    await updateTab(last_playback_time, video_length);
+    const url = new URL(videoUrl);
+    url.searchParams.set('t', `${last_playback_time}s`);
+    const encodedUrl = encodeURIComponent(url.toString());
+    window.location.href = `/study-room?video=${encodedUrl}`;
   };
   
 

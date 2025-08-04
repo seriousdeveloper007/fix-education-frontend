@@ -84,10 +84,30 @@ export function useYouTubePlayer(videoId) {
     };
   }, [videoId]);
 
+  const getPlayerState = useCallback(() => {
+    return playerRef.current?.getPlayerState?.(); // returns -1,0,1,2,3,5
+  }, []);
+
+  const getDuration = useCallback(() => {
+    const dur = playerRef.current?.getDuration?.();
+    if (typeof dur === 'number' && Number.isFinite(dur) && dur > 0) {
+      return Math.trunc(dur); // integer seconds
+    }
+    return null;
+  }, []);
+
+  const isPlaying = useCallback(() => {
+    const YT = window.YT;
+    const state = getPlayerState();
+    return YT && state === YT.PlayerState.PLAYING; // 1
+  }, [getPlayerState]);
+
   return {
     iframeRef,
     play,
     pause,
     getCurrentTime,
+    isPlaying,
+    getDuration
   };
 }
