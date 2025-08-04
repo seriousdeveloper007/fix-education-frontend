@@ -1,11 +1,13 @@
 import { useSearchParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useYouTubePlayer } from './useYouTubePlayer.js';
 import PlatformNavbar from './PlatformNavbar';
 import StudyRoomNavbar from './StudyRoomNavbar.jsx';
 import VideoLinkInputCard from './VideoLinkInputCard.jsx';
 import themeConfig from './themeConfig';
 import SidePanel from './SidePanel.jsx';
+import { fetchUnattemptedQuestions } from '../services/questionService';
+
 
 function extractId(url) {
   try {
@@ -19,6 +21,23 @@ function extractId(url) {
   }
 }
 
+function extractStartTime(url) {
+  try {
+    const u = new URL(url);
+    let t = u.searchParams.get('t');
+    if (!t) return 0;
+
+    // Remove trailing 's' if present
+    t = t.endsWith('s') ? t.slice(0, -1) : t;
+
+    const seconds = parseInt(t, 10);
+    return isNaN(seconds) ? 0 : seconds;
+  } catch {
+    return 0;
+  }
+}
+
+
 export default function StudyRoom() {
   const [params] = useSearchParams();
   const videoUrl = params.get('video') || '';
@@ -27,11 +46,66 @@ export default function StudyRoom() {
   const cfg = themeConfig.app;
   const [sidePanelTab, setSidePanelTab] = useState(null);
   const isSidePanelOpen = !!sidePanelTab;
+  const startTime = extractStartTime(videoUrl);
+  const [unattemptedQuestionCount, setUnattemptedQuestionCount] = useState(0);
+
+
 
   const { iframeRef, pause, getCurrentTime } = useYouTubePlayer(videoId);
 
   const showIframe = videoId && mode === 'play';
+
+  useEffect(() => {
+    if (!showIframe) return;
+
+    const load = async () => {
+      const data = await fetchUnattemptedQuestions();
+      setUnattemptedQuestionCount(data.length);
+    };
+    load();
   
+    const createQuestions = async () => {
+      const token = localStorage.getItem('token');
+      const tabId = localStorage.getItem('tabId');
+
+      if (!token || !tabId) return;
+      const playbackTime = getCurrentTime ? Math.floor(getCurrentTime()) : 0;
+  
+      try {
+        const res = await fetch('http://localhost:8000/questions/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token,
+          },
+          body: JSON.stringify({
+            tab_id: tabId,
+            playback_time: playbackTime,
+          }),
+        });
+  
+        if (!res.ok) return;
+        const data = await res.json();
+        console.log(data)
+        const totalNew = Object.values(data.questions).reduce((sum, arr) => sum + arr.length, 0);
+        setUnattemptedQuestionCount((prev) => prev + totalNew);
+        console.log(unattemptedQuestionCount)
+      } catch (err) {
+        console.error('Failed to fetch questions', err);
+      }
+    };
+    createQuestions();
+    const interval = setInterval(createQuestions, 30000);
+    return () => clearInterval(interval);   
+
+  }, [showIframe]);
+
+  useEffect(() => {
+    console.log("Navbar should now re-render with:", unattemptedQuestionCount);
+  }, [unattemptedQuestionCount]);
+  
+  
+
   return (
     <div className="w-full h-full flex flex-col font-fraunces">
       {!showIframe ? (
@@ -48,11 +122,12 @@ export default function StudyRoom() {
             pause(); // 👈 Pause video before opening side panel
             setSidePanelTab(tab);
           }}
+            unattemptedQuestionCount={unattemptedQuestionCount}
             selectedTab={sidePanelTab}/>
           <div className="flex flex-1 overflow-hidden"> {/* Main row: video + side panel */}
             <iframe
               ref={iframeRef}
-              src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1`}
+              src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&start=${startTime}`}
               title="YouTube video"
               className={`${isSidePanelOpen ? 'w-2/3' : 'w-full'} h-full`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -63,6 +138,9 @@ export default function StudyRoom() {
                 tab={sidePanelTab}
                 onClose={() => setSidePanelTab(null)}
                 getCurrentTime={getCurrentTime}
+                updateQuestionCount={(delta) => {
+                  setUnattemptedQuestionCount((prev) => Math.max(0, prev + delta));
+                }}
               />
             )}
           </div>

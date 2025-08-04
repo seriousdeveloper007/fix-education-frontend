@@ -1,17 +1,19 @@
 import themeConfig from './themeConfig';
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 
-export default function StudyRoomNavbar({ videoUrl, onTabSelect, selectedTab }) {
+
+
+
+export default function StudyRoomNavbar({ videoUrl, onTabSelect, selectedTab, unattemptedQuestionCount }) {
   const cfg = themeConfig.app;
-  const navigate = useNavigate();
 
   const tabs = [
     { label: 'Ask Doubt', emoji: '❓' },
     { label: 'Attempt Question', emoji: '📝' },
     { label: 'Take Notes', emoji: '✍️' },
   ];
+  
 
   const handleBack = () => {
     window.location.href = `/study-room?video=${encodeURIComponent(videoUrl)}`;
@@ -25,7 +27,13 @@ export default function StudyRoomNavbar({ videoUrl, onTabSelect, selectedTab }) 
       </div>
 
       <div className="flex-1 flex justify-center items-center space-x-12">
-        {tabs.map((tab) => (
+      {tabs.map((tab) => {
+        const isAttemptTab = tab.label === 'Attempt Question';
+        const displayLabel = isAttemptTab && unattemptedQuestionCount > 0
+          ? `${tab.label} (${unattemptedQuestionCount})`
+          : tab.label;
+
+        return (
           <div
             key={tab.label}
             onClick={() => onTabSelect(tab.label)}
@@ -34,14 +42,16 @@ export default function StudyRoomNavbar({ videoUrl, onTabSelect, selectedTab }) 
             <div className="flex items-center space-x-2">
               <span className="text-2xl">{tab.emoji}</span>
               <span className={selectedTab === tab.label ? cfg.tabActive : cfg.tabInactive}>
-                {tab.label}
+                {displayLabel}
               </span>
             </div>
             {selectedTab === tab.label && (
               <div className="mt-1 w-full h-[3px] bg-black rounded-full" />
             )}
           </div>
-        ))}
+        );
+      })}
+
       </div>
 
       <div className="w-[100px]" />

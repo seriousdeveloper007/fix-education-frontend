@@ -63,8 +63,10 @@ export default {
     cardHeadinglarge: 'text-sm sm:text-4xl font-medium text-black-500',
     cardHeadingSecondary: 'text-base sm:text-lg font-medium text-black-400',
     cardSubheading:'mt-2 text-m text-gray-500',
+    primarytext: 'text-m text-black-500',
     primaryButton: 'w-full max-w-[250px] px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded disabled:opacity-50 mt-5',
     inputfield:'w-full border border-gray-300 rounded px-3 py-2 mt-5 focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600',
+    questionText:"mt-2 text-sm text-gray-700 mb-1",
 
 
 

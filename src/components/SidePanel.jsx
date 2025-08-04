@@ -4,7 +4,7 @@ import ChatView from './ChatView';
 import PropTypes from 'prop-types';
 import QuestionView from './QuestionView';
 
-export default function SidePanel({ tab, onClose, getCurrentTime }) {
+export default function SidePanel({ tab, onClose, getCurrentTime, updateQuestionCount }) {
   const cfg = themeConfig.app;
 
   const renderContent = () => {
@@ -23,7 +23,7 @@ export default function SidePanel({ tab, onClose, getCurrentTime }) {
   const renderUI = () => {
     if (tab === 'Ask Doubt') return <ChatView getCurrentTime={getCurrentTime} />;
     if (tab === 'Attempt Question') {
-      return <QuestionView />
+      return <QuestionView updateQuestionCount={updateQuestionCount} />
     }
     return null;
   };
