@@ -48,10 +48,7 @@ export default function StudyRoom() {
   const isSidePanelOpen = !!sidePanelTab;
   const startTime = extractStartTime(videoUrl);
   const [unattemptedQuestionCount, setUnattemptedQuestionCount] = useState(0);
-
-
-
-  const { iframeRef, pause, getCurrentTime } = useYouTubePlayer(videoId);
+  const { iframeRef, pause, getCurrentTime, isPlaying, getDuration } = useYouTubePlayer(videoId);
 
   const showIframe = videoId && mode === 'play';
 
@@ -69,7 +66,10 @@ export default function StudyRoom() {
       const tabId = localStorage.getItem('tabId');
 
       if (!token || !tabId) return;
+
       const playbackTime = getCurrentTime ? Math.floor(getCurrentTime()) : 0;
+
+      if (!isPlaying() || playbackTime <= 120) return;
   
       try {
         const res = await fetch('http://localhost:8000/questions/create', {
@@ -100,12 +100,6 @@ export default function StudyRoom() {
 
   }, [showIframe]);
 
-  useEffect(() => {
-    console.log("Navbar should now re-render with:", unattemptedQuestionCount);
-  }, [unattemptedQuestionCount]);
-  
-  
-
   return (
     <div className="w-full h-full flex flex-col font-fraunces">
       {!showIframe ? (
@@ -123,6 +117,8 @@ export default function StudyRoom() {
             setSidePanelTab(tab);
           }}
             unattemptedQuestionCount={unattemptedQuestionCount}
+            getCurrentTime={getCurrentTime}
+            getDuration={getDuration}
             selectedTab={sidePanelTab}/>
           <div className="flex flex-1 overflow-hidden"> {/* Main row: video + side panel */}
             <iframe
