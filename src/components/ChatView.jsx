@@ -56,16 +56,20 @@ export default function ChatView({ getCurrentTime }) {
     if (!trimmed) return;
 
     if (!hasConnectedRef.current) {
-        connect();
-        hasConnectedRef.current = true;
-      }
-
-    setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
-    setTimeout(() => {
+      connect();
+      hasConnectedRef.current = true;
+    
+      // Delay message send until after 3 seconds
+      setTimeout(() => {
+        setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
         sendMessage(trimmed);
-      }, 2000);
-  
-    // sendMessage(trimmed);
+      }, 3000);
+    } else {
+      // For subsequent messages, no delay needed
+      setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
+      sendMessage(trimmed);
+    }
+    
     setInput('');
   };
 

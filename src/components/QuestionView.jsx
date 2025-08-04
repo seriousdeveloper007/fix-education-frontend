@@ -1,278 +1,255 @@
-// import React from 'react';
-// import themeConfig from './themeConfig';
-
-// const dummyQuestions = [
-//     // MCQ - 4 questions
-//     {
-//       id: 1,
-//       type: 'mcq',
-//       question: 'What is the capital of Japan?',
-//       options: ['Beijing', 'Seoul', 'Tokyo', 'Bangkok'],
-//     },
-//     {
-//       id: 2,
-//       type: 'mcq',
-//       question: 'Which planet is known as the Red Planet?',
-//       options: ['Earth', 'Mars', 'Jupiter', 'Venus'],
-//     },
-//     {
-//       id: 3,
-//       type: 'mcq',
-//       question: 'Which gas do plants absorb from the atmosphere?',
-//       options: ['Oxygen', 'Carbon Dioxide', 'Nitrogen', 'Helium'],
-//     },
-//     {
-//       id: 4,
-//       type: 'mcq',
-//       question: 'What is the largest ocean on Earth?',
-//       options: ['Atlantic', 'Indian', 'Arctic', 'Pacific'],
-//     },
-  
-//     // Fill in the blanks - 2 questions
-//     {
-//       id: 5,
-//       type: 'fill',
-//       question: 'Light travels at a speed of ____ km/s.',
-//     },
-//     {
-//       id: 6,
-//       type: 'fill',
-//       question: 'The square root of 144 is ____.',
-//     },
-  
-//     // Subjective - 3 questions
-//     {
-//       id: 7,
-//       type: 'subjective',
-//       question: 'Describe the process of photosynthesis.',
-//     },
-//     {
-//       id: 8,
-//       type: 'subjective',
-//       question: 'What are the main causes of climate change?',
-//     },
-//     {
-//       id: 9,
-//       type: 'subjective',
-//       question: 'Explain Newton\'s laws of motion.',
-//     },
-//   ];
-  
-
-// // 🔹 MCQ Component
-// function MCQQuestion({ question, theme }) {
-//   return (
-//     <div>
-//       <div className={`${theme.cardHeadingSecondary}`}>MCQ</div>
-//       <div className="mt-4 p-4 rounded-lg bg-gray-50 border border-gray-200">
-//         <p className="text-sm text-gray-700 mb-3">{question.question}</p>
-//         <ul className="space-y-2">
-//           {question.options.map((option, idx) => (
-//             <li key={idx} className="flex items-center space-x-2">
-//               <input type="radio" id={`${question.id}-${idx}`} name={`q-${question.id}`} />
-//               <label htmlFor={`${question.id}-${idx}`} className="text-sm">{option}</label>
-//             </li>
-//           ))}
-//         </ul>
-//       </div>
-//     </div>
-//   );
-// }
-
-// // 🔹 Fill in the Blank Component
-// function FillInTheBlank({ question, theme }) {
-//   return (
-//     <div >
-//       <div className={`${theme.cardHeadingSecondary}`}>Fill in the Blank</div>
-//       <div className="mt-4 p-4 rounded-lg bg-gray-50 border border-gray-200">
-//         <p className="text-sm text-gray-700 mb-3">{question.question}</p>
-//         <input
-//           type="text"
-//           className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600"
-//           placeholder="Your answer"
-//         />
-//       </div>
-//     </div>
-//   );
-// }
-
-// // 🔹 Subjective Component
-// function SubjectiveQuestion({ question, theme }) {
-//   return (
-//     <div >
-//       <div className={`${theme.cardHeadingSecondary}`}>Subjective</div>
-//       <div className="mt-4 p-4 rounded-lg bg-gray-50 border border-gray-200">
-//         <p className="text-sm text-gray-700 mb-3">{question.question}</p>
-//         <textarea
-//           rows={4}
-//           className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600"
-//           placeholder="Write your answer here"
-//         />
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default function QuestionView() {
-//   const cfg = themeConfig;
-
-//   return (
-//     <div className="flex flex-col h-full p-4 space-y-6 overflow-y-auto">
-//       {dummyQuestions.map((q) => {
-//         if (q.type === 'mcq') return <MCQQuestion key={q.id} question={q} theme={cfg} />;
-//         if (q.type === 'fill') return <FillInTheBlank key={q.id} question={q} theme={cfg} />;
-//         if (q.type === 'subjective') return <SubjectiveQuestion key={q.id} question={q} theme={cfg} />;
-//         return null;
-//       })}
-//     </div>
-//   );
-// }
-
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import themeConfig from './themeConfig';
+import { fetchUnattemptedQuestions } from '../services/questionService';
+import { SendHorizontal } from 'lucide-react';
 
-const dummyQuestions = [
-  // MCQ - 4 questions
-  {
-    id: 1,
-    type: 'mcq',
-    question: 'What is the capital of Japan?',
-    options: ['Beijing', 'Seoul', 'Tokyo', 'Bangkok'],
-  },
-  {
-    id: 2,
-    type: 'mcq',
-    question: 'Which planet is known as the Red Planet?',
-    options: ['Earth', 'Mars', 'Jupiter', 'Venus'],
-  },
-  {
-    id: 3,
-    type: 'mcq',
-    question: 'Which gas do plants absorb from the atmosphere?',
-    options: ['Oxygen', 'Carbon Dioxide', 'Nitrogen', 'Helium'],
-  },
-  {
-    id: 4,
-    type: 'mcq',
-    question: 'What is the largest ocean on Earth?',
-    options: ['Atlantic', 'Indian', 'Arctic', 'Pacific'],
-  },
 
-  // Fill in the blanks - 2 questions
-  {
-    id: 5,
-    type: 'fill',
-    question: 'Light travels at a speed of ____ km/s.',
-  },
-  {
-    id: 6,
-    type: 'fill',
-    question: 'The square root of 144 is ____.',
-  },
-
-  // Subjective - 3 questions
-  {
-    id: 7,
-    type: 'subjective',
-    question: 'Describe the process of photosynthesis.',
-  },
-  {
-    id: 8,
-    type: 'subjective',
-    question: 'What are the main causes of climate change?',
-  },
-  {
-    id: 9,
-    type: 'subjective',
-    question: "Explain Newton's laws of motion.",
-  },
-];
-
-// 🔹 MCQ Component
-function MCQQuestion({ question, theme }) {
+function Snackbar({ message, visible }) {
   return (
-    <div>
-      <div className="mt-4 p-4 rounded-lg bg-gray-50 border border-gray-200">
-        <p className="text-sm text-gray-700 mb-3">{question.question}</p>
-        <ul className="space-y-2">
-          {question.options.map((option, idx) => (
-            <li key={idx} className="flex items-center space-x-2">
-              <input type="radio" id={`${question.id}-${idx}`} name={`q-${question.id}`} />
-              <label htmlFor={`${question.id}-${idx}`} className="text-sm">{option}</label>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div
+      className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 z-50
+        ${visible ? 'bg-green-100 text-green-700 opacity-100' : 'opacity-0 pointer-events-none'}`}
+    >
+      {message}
     </div>
   );
 }
 
-// 🔹 Fill in the Blank Component
-function FillInTheBlank({ question }) {
+
+const getDifficultyColor = (level) => {
+  if (level === 'easy') return 'bg-green-100 text-green-700';
+  if (level === 'medium') return 'bg-yellow-100 text-yellow-700';
+  return 'bg-red-100 text-red-700';
+};
+
+
+async function submitQuestionAnswer({ question_id, answer_text, answer_option }) {
+  const token = localStorage.getItem('token');
+  const response = await fetch('http://localhost:8000/question-answers', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `${token}`, // pass token here
+    },
+    body: JSON.stringify({
+      question_id,
+      answer_text,
+      answer_option,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Failed to submit answer');
+  }
+
+  return await response.json();
+}
+
+const handleTextAnswerSubmit = async (questionId, answer, updateQuestionCount) => {
+  try {
+    await submitQuestionAnswer({
+      question_id: questionId,
+      answer_text: answer,
+    });
+    updateQuestionCount(-1);
+    onSuccessfulSubmit(question.id);
+    showSnackbar();
+  } catch (err) {
+    console.error('Failed to submit answer:', err.message);
+  }
+};
+
+
+function MCQQuestion({ question , updateQuestionCount, theme, showSnackbar, onSuccessfulSubmit}) {
+  const { question_text, option_1, option_2, option_3, option_4 , difficulty_level} = question.meta_data;
+  const options = [option_1, option_2, option_3, option_4];
+  const [selected, setSelected] = useState(null);
+
+  const handleSubmit = async () => {
+    if (selected !== null) {
+      try {
+        await submitQuestionAnswer({
+          question_id: question.id,
+          answer_option: options.indexOf(selected) + 1,
+        });
+        updateQuestionCount(-1);
+        onSuccessfulSubmit(question.id);
+        showSnackbar();
+      } catch (err) {
+        console.error('Failed to submit answer:', err.message);
+      }
+    }
+  };
+
+  
+
   return (
-    <div className="mt-4 p-4 rounded-lg bg-gray-50 border border-gray-200">
-      <p className="text-sm text-gray-700 mb-3">{question.question}</p>
+    <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
+      <div className="flex justify-between items-start mb-1">
+        <div className={`${theme.questionText} pr-4`}>{question_text}</div>
+        <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>
+          {difficulty_level}
+        </div>
+      </div>
+      <ul className="space-y-2">
+        {options.map((opt, idx) => (
+          <li key={idx} className="flex items-center space-x-2">
+            <input
+              type="radio"
+              id={`${question.id}-${idx}`}
+              name={`q-${question.id}`}
+              onChange={() => setSelected(opt)}
+            />
+            <label htmlFor={`${question.id}-${idx}`} className="text-sm">{opt}</label>
+          </li>
+        ))}
+      </ul>
+      {selected && (
+        <SendHorizontal
+          size={20}
+          className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
+          onClick={handleSubmit}
+        />
+      )}
+    </div>
+  );
+}
+
+
+function FillInTheBlank({ question, updateQuestionCount, theme , showSnackbar, onSuccessfulSubmit}) {
+  const { question_text, difficulty_level } = question.meta_data;
+  const [answer, setAnswer] = useState('');
+
+  return (
+    <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
+      <div className="flex justify-between items-start mb-1">
+        <div className={`${theme.questionText} pr-4`}>{question_text}</div>
+        <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>
+          {difficulty_level}
+        </div>
+      </div>
       <input
         type="text"
-        className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600"
+        className={`${theme.inputfield} mb-2`}
         placeholder="Your answer"
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
       />
+      {answer.trim() && (
+        <SendHorizontal
+          size={20}
+          className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
+          onClick={async () => {
+            await handleTextAnswerSubmit(question.id, answer, updateQuestionCount);
+            showSnackbar();
+            onSuccessfulSubmit(question.id);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-// 🔹 Subjective Component
-function SubjectiveQuestion({ question }) {
+
+function SubjectiveQuestion({ question, updateQuestionCount, theme , showSnackbar, onSuccessfulSubmit}) {
+  const { question_text, difficulty_level } = question.meta_data;
+  const [answer, setAnswer] = useState('');
+
   return (
-    <div className="mt-4 p-4 rounded-lg bg-gray-50 border border-gray-200">
-      <p className="text-sm text-gray-700 mb-3">{question.question}</p>
+    <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
+      <div className="flex justify-between items-start mb-1">
+        <div className={`${theme.questionText} pr-4`}>{question_text}</div>
+        <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>
+          {difficulty_level}
+        </div>
+      </div>
       <textarea
-        rows={4}
-        className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600"
+        rows={5}
+        className={`${theme.inputfield} mb-2`}
         placeholder="Write your answer here"
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
       />
+      {answer.trim() && (
+        <SendHorizontal
+          size={20}
+          className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
+          onClick={async () => {
+            await handleTextAnswerSubmit(question.id, answer, updateQuestionCount);
+            showSnackbar();
+            onSuccessfulSubmit(question.id);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-export default function QuestionView() {
-  const cfg = themeConfig;
+
+export default function QuestionView({updateQuestionCount}) {
+  const cfg = themeConfig.app;
+  const [questions, setQuestions] = useState([]);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [exitingQuestionIds, setExitingQuestionIds] = useState([]);
+
+
+  useEffect(() => {
+    const load = async () => {
+      const data = await fetchUnattemptedQuestions();
+      setQuestions(data);
+    };
+
+    load();
+  }, []);
+
+  const showSnackbar = () => {
+    setSnackbarVisible(true);
+    setTimeout(() => setSnackbarVisible(false), 3000); // Auto-hide after 3 seconds
+  };
+
+  const onSuccessfulSubmit = (questionId) => {
+    setExitingQuestionIds((prev) => [...prev, questionId]);
+  
+    setTimeout(() => {
+      setQuestions((prev) => prev.filter((q) => q.id !== questionId));
+      setExitingQuestionIds((prev) => prev.filter((id) => id !== questionId));
+    }, 300); // Match with CSS transition duration
+  };
+  
 
   const grouped = {
-    mcq: dummyQuestions.filter((q) => q.type === 'mcq'),
-    fill: dummyQuestions.filter((q) => q.type === 'fill'),
-    subjective: dummyQuestions.filter((q) => q.type === 'subjective'),
+    mcq: questions.filter((q) => q.type === 'mcq'),
+    fill: questions.filter((q) => q.type === 'fill_in_the_blanks'),
+    subjective: questions.filter((q) => q.type === 'subjective'),
   };
 
   return (
     <div className="flex flex-col h-full p-4 space-y-8 overflow-y-auto">
-      {/* MCQ Group */}
+      <Snackbar message="Response saved, will share feedback soon!" visible={snackbarVisible} />
       {grouped.mcq.length > 0 && (
         <div>
           <div className={`${cfg.cardHeadingSecondary} mb-2`}>MCQ</div>
           {grouped.mcq.map((q) => (
-            <MCQQuestion key={q.id} question={q} theme={cfg} />
+            <MCQQuestion key={q.id} question={q} updateQuestionCount={updateQuestionCount} theme={cfg} showSnackbar={showSnackbar} onSuccessfulSubmit={onSuccessfulSubmit} />
           ))}
         </div>
       )}
 
-      {/* Fill in the Blank Group */}
       {grouped.fill.length > 0 && (
         <div>
           <div className={`${cfg.cardHeadingSecondary} mb-2`}>Fill in the Blank</div>
           {grouped.fill.map((q) => (
-            <FillInTheBlank key={q.id} question={q} />
+            <FillInTheBlank key={q.id} question={q} updateQuestionCount={updateQuestionCount} theme={cfg} showSnackbar={showSnackbar} onSuccessfulSubmit={onSuccessfulSubmit} />
           ))}
         </div>
       )}
 
-      {/* Subjective Group */}
       {grouped.subjective.length > 0 && (
         <div>
           <div className={`${cfg.cardHeadingSecondary} mb-2`}>Subjective</div>
           {grouped.subjective.map((q) => (
-            <SubjectiveQuestion key={q.id} question={q} />
+            <SubjectiveQuestion key={q.id} question={q} updateQuestionCount={updateQuestionCount} theme={cfg} showSnackbar={showSnackbar} onSuccessfulSubmit={onSuccessfulSubmit} />
           ))}
         </div>
       )}
