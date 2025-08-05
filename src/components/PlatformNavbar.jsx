@@ -31,7 +31,7 @@ function UserAvatar({ profilePicture, emailPrefix }) {
 
 
 
-export default function PlatformNavbar({ defaultTab = 'Home' }) {
+export default function PlatformNavbar({ defaultTab = 'My Space' }) {
   const [selected, setSelected] = useState(defaultTab);
   const [userInfo, setUserInfo] = useState({ emailPrefix: '', profilePicture: '' });
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ export default function PlatformNavbar({ defaultTab = 'Home' }) {
   const handleTabClick = (tab) => {
     setSelected(tab);
     switch (tab) {
-      case 'Home':
+      case 'My Space':
         navigate('/platform');
         break;
       case 'Study Room':
@@ -94,9 +94,9 @@ export default function PlatformNavbar({ defaultTab = 'Home' }) {
 
       {/* Mid navigation */}
       <div className="flex-1 flex justify-center items-center space-x-8">
-        {['Home', 'Study Room', 'Library'].map((tab) => {
+        {['My Space', 'Study Room', 'Library'].map((tab) => {
           const emoji = {
-            'Home': '🏠',
+            'My Space': '🗂',
             'Study Room': '📚',
             'Library': '📖',
           }[tab];

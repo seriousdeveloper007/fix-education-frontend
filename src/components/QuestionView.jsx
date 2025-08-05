@@ -4,17 +4,6 @@ import { fetchUnattemptedQuestions, submitQuestionAnswer } from '../services/que
 import { SendHorizontal } from 'lucide-react';
 
 
-function Snackbar({ message, visible }) {
-  return (
-    <div
-      className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 z-50
-        ${visible ? 'bg-green-100 text-green-700 opacity-100' : 'opacity-0 pointer-events-none'}`}
-    >
-      {message}
-    </div>
-  );
-}
-
 
 const getDifficultyColor = (level) => {
   if (level === 'easy') return 'bg-green-100 text-green-700';
@@ -22,25 +11,11 @@ const getDifficultyColor = (level) => {
   return 'bg-red-100 text-red-700';
 };
 
-const handleTextAnswerSubmit = async (questionId, answer, updateQuestionCount) => {
-  try {
-    await submitQuestionAnswer({
-      question_id: questionId,
-      answer_text: answer,
-    });
-    updateQuestionCount(-1);
-    onSuccessfulSubmit(question.id);
-    showSnackbar();
-  } catch (err) {
-    console.error('Failed to submit answer:', err.message);
-  }
-};
-
-
-function MCQQuestion({ question , updateQuestionCount, theme, showSnackbar, onSuccessfulSubmit}) {
-  const { question_text, option_1, option_2, option_3, option_4 , difficulty_level} = question.meta_data;
+function MCQQuestion({ question, updateQuestionCount, theme }) {
+  const { question_text, option_1, option_2, option_3, option_4, difficulty_level, correct_option_number } = question.meta_data;
   const options = [option_1, option_2, option_3, option_4];
   const [selected, setSelected] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async () => {
     if (selected !== null) {
@@ -50,23 +25,18 @@ function MCQQuestion({ question , updateQuestionCount, theme, showSnackbar, onSu
           answer_option: options.indexOf(selected) + 1,
         });
         updateQuestionCount(-1);
-        onSuccessfulSubmit(question.id);
-        showSnackbar();
+        setSubmitted(true);
       } catch (err) {
         console.error('Failed to submit answer:', err.message);
       }
     }
   };
 
-  
-
   return (
     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
       <div className="flex justify-between items-start mb-1">
         <div className={`${theme.questionText} pr-4`}>{question_text}</div>
-        <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>
-          {difficulty_level}
-        </div>
+        <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
       </div>
       <ul className="space-y-2">
         {options.map((opt, idx) => (
@@ -76,34 +46,54 @@ function MCQQuestion({ question , updateQuestionCount, theme, showSnackbar, onSu
               id={`${question.id}-${idx}`}
               name={`q-${question.id}`}
               onChange={() => setSelected(opt)}
+              disabled={submitted}
+              checked={selected === opt}
             />
             <label htmlFor={`${question.id}-${idx}`} className="text-sm">{opt}</label>
           </li>
         ))}
       </ul>
-      {selected && (
+      {!submitted && selected && (
         <SendHorizontal
           size={20}
           className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
           onClick={handleSubmit}
         />
       )}
+      {submitted && (
+        <div className="mt-4 space-y-1 text-sm">
+          <div className="text-green-700 bg-green-50 border border-green-200 rounded p-2">
+            Correct Answer: <span className="font-semibold">{options[correct_option_number - 1]}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-
-function FillInTheBlank({ question, updateQuestionCount, theme , showSnackbar, onSuccessfulSubmit}) {
-  const { question_text, difficulty_level } = question.meta_data;
+function FillInTheBlank({ question, updateQuestionCount, theme }) {
+  const { question_text, difficulty_level, correct_answer } = question.meta_data;
   const [answer, setAnswer] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async () => {
+    try {
+      await submitQuestionAnswer({
+        question_id: question.id,
+        answer_text: answer,
+      });
+      updateQuestionCount(-1);
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Failed to submit answer:', err.message);
+    }
+  };
 
   return (
     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
       <div className="flex justify-between items-start mb-1">
         <div className={`${theme.questionText} pr-4`}>{question_text}</div>
-        <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>
-          {difficulty_level}
-        </div>
+        <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
       </div>
       <input
         type="text"
@@ -111,34 +101,49 @@ function FillInTheBlank({ question, updateQuestionCount, theme , showSnackbar, o
         placeholder="Your answer"
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
+        disabled={submitted}
       />
-      {answer.trim() && (
+      {!submitted && answer.trim() && (
         <SendHorizontal
           size={20}
           className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
-          onClick={async () => {
-            await handleTextAnswerSubmit(question.id, answer, updateQuestionCount);
-            showSnackbar();
-            onSuccessfulSubmit(question.id);
-          }}
+          onClick={handleSubmit}
         />
+      )}
+      {submitted && (
+        <div className="mt-4 space-y-1 text-sm">
+          <div className="text-green-700 bg-green-50 border border-green-200 rounded p-2">
+            Correct Answer: <span className="font-semibold">{correct_answer}</span>
+          </div>
+        </div>
       )}
     </div>
   );
 }
 
-
-function SubjectiveQuestion({ question, updateQuestionCount, theme , showSnackbar, onSuccessfulSubmit}) {
-  const { question_text, difficulty_level } = question.meta_data;
+function SubjectiveQuestion({ question, updateQuestionCount, theme }) {
+  const { question_text, difficulty_level, correct_answer } = question.meta_data;
   const [answer, setAnswer] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async () => {
+    try {
+      await submitQuestionAnswer({
+        question_id: question.id,
+        answer_text: answer,
+      });
+      updateQuestionCount(-1);
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Failed to submit answer:', err.message);
+    }
+  };
 
   return (
     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
       <div className="flex justify-between items-start mb-1">
         <div className={`${theme.questionText} pr-4`}>{question_text}</div>
-        <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>
-          {difficulty_level}
-        </div>
+        <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
       </div>
       <textarea
         rows={5}
@@ -146,55 +151,39 @@ function SubjectiveQuestion({ question, updateQuestionCount, theme , showSnackba
         placeholder="Write your answer here"
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
+        disabled={submitted}
       />
-      {answer.trim() && (
+      {!submitted && answer.trim() && (
         <SendHorizontal
           size={20}
           className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
-          onClick={async () => {
-            await handleTextAnswerSubmit(question.id, answer, updateQuestionCount);
-            showSnackbar();
-            onSuccessfulSubmit(question.id);
-          }}
+          onClick={handleSubmit}
         />
+      )}
+      {submitted && (
+        <div className="mt-4 space-y-1 text-sm">
+          <div className="text-green-700 bg-green-50 border border-green-200 rounded p-2">
+            Correct Answer: <span className="font-semibold">{correct_answer}</span>
+          </div>
+        </div>
       )}
     </div>
   );
 }
 
-
-export default function QuestionView({updateQuestionCount}) {
+export default function QuestionView({ updateQuestionCount }) {
   const cfg = themeConfig.app;
   const [questions, setQuestions] = useState([]);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [exitingQuestionIds, setExitingQuestionIds] = useState([]);
-
 
   useEffect(() => {
     const load = async () => {
       const data = await fetchUnattemptedQuestions();
       setQuestions(data);
     };
-
     load();
   }, []);
 
-  
-
-  const showSnackbar = () => {
-    setSnackbarVisible(true);
-    setTimeout(() => setSnackbarVisible(false), 3000); // Auto-hide after 3 seconds
-  };
-
-  const onSuccessfulSubmit = (questionId) => {
-    setExitingQuestionIds((prev) => [...prev, questionId]);
-  
-    setTimeout(() => {
-      setQuestions((prev) => prev.filter((q) => q.id !== questionId));
-      setExitingQuestionIds((prev) => prev.filter((id) => id !== questionId));
-    }, 300); // Match with CSS transition duration
-  };
-  
 
   const grouped = {
     mcq: questions.filter((q) => q.type === 'mcq'),
@@ -204,12 +193,11 @@ export default function QuestionView({updateQuestionCount}) {
 
   return (
     <div className="flex flex-col h-full p-4 space-y-8 overflow-y-auto">
-      <Snackbar message="Response saved, will share feedback soon!" visible={snackbarVisible} />
       {grouped.mcq.length > 0 && (
         <div>
           <div className={`${cfg.cardHeadingSecondary} mb-2`}>MCQ</div>
           {grouped.mcq.map((q) => (
-            <MCQQuestion key={q.id} question={q} updateQuestionCount={updateQuestionCount} theme={cfg} showSnackbar={showSnackbar} onSuccessfulSubmit={onSuccessfulSubmit} />
+            <MCQQuestion key={q.id} question={q} updateQuestionCount={updateQuestionCount} theme={cfg} />
           ))}
         </div>
       )}
@@ -218,7 +206,7 @@ export default function QuestionView({updateQuestionCount}) {
         <div>
           <div className={`${cfg.cardHeadingSecondary} mb-2`}>Fill in the Blank</div>
           {grouped.fill.map((q) => (
-            <FillInTheBlank key={q.id} question={q} updateQuestionCount={updateQuestionCount} theme={cfg} showSnackbar={showSnackbar} onSuccessfulSubmit={onSuccessfulSubmit} />
+            <FillInTheBlank key={q.id} question={q} updateQuestionCount={updateQuestionCount} theme={cfg} />
           ))}
         </div>
       )}
@@ -227,10 +215,12 @@ export default function QuestionView({updateQuestionCount}) {
         <div>
           <div className={`${cfg.cardHeadingSecondary} mb-2`}>Subjective</div>
           {grouped.subjective.map((q) => (
-            <SubjectiveQuestion key={q.id} question={q} updateQuestionCount={updateQuestionCount} theme={cfg} showSnackbar={showSnackbar} onSuccessfulSubmit={onSuccessfulSubmit} />
+            <SubjectiveQuestion key={q.id} question={q} updateQuestionCount={updateQuestionCount} theme={cfg} />
           ))}
         </div>
       )}
     </div>
   );
 }
+
+
