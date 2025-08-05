@@ -34,4 +34,34 @@ export async function updateTab(lastPlaybackTime, videoDuration) {
       return null;
     }
   }
+
+
+  export async function getTabs() {
+    const token = localStorage.getItem('token');
+  
+    if (!token) {
+      console.error('No auth token found');
+      return null;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:8000/tabs/', {
+        method: 'GET',
+        headers: {
+          Authorization: token,
+        },
+      });
+  
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to fetch tabs');
+      }
+  
+      const data = await response.json();
+      return data.tabs; // assuming your API returns { "tabs": [...] }
+    } catch (error) {
+      console.error('Error fetching tabs:', error);
+      return null;
+    }
+  }
   

@@ -101,7 +101,7 @@ export default function StudyRoom() {
   }, [showIframe]);
 
   return (
-    <div className="w-full h-full flex flex-col font-fraunces">
+    <div className="w-full h-full flex flex-col font-fraunces bg-white">
       {!showIframe ? (
         <>
           <PlatformNavbar defaultTab="Study Room" />

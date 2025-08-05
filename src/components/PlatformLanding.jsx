@@ -56,7 +56,7 @@ function BenefitsSection({ cfg }) {
 export default function PlatformLanding() {
   const cfg = themeConfig.app;
      return (
-      <div className='font-fraunces'>
+      <div className='font-fraunces bg-white'>
       <PlatformNavbar />
       <div className="flex flex-col items-center justify-start min-h-screen pt-20">
         <VideoLinkInputCard
