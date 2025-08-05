@@ -20,3 +20,50 @@ export async function fetchUnattemptedQuestions() {
     return [];
   }
 }
+
+
+
+export async function fetchQuestions(tabId) {
+  const token = localStorage.getItem('token');
+  if (!token || !tabId) return [];
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/questions/list/${tabId}`, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    if (!res.ok) throw new Error('Failed to fetch questions');
+    const data = await res.json();
+    return data
+  } catch (err) {
+    console.error('Error fetching questions:', err);
+    return [];
+  }
+}
+
+
+// In questionService.js
+export async function submitQuestionAnswer({ question_id, answer_text, answer_option }) {
+  const token = localStorage.getItem('token');
+  const response = await fetch('http://localhost:8000/question-answers', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `${token}`,
+    },
+    body: JSON.stringify({
+      question_id,
+      answer_text,
+      answer_option,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Failed to submit answer');
+  }
+
+  return await response.json();
+}

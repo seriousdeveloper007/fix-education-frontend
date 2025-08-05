@@ -13,6 +13,8 @@ import ErrorPage from './components/ErrorPage';
 import VerifyLearner from './components/VerifyLearner';
 import StudyRoom from './components/studyRoom';
 import Library from './components/Library';
+import LibraryDetail from './components/LibraryDetail'; // new file
+
 
 
 export default function App() {
@@ -83,6 +85,15 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <Library />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/library/:tabId"
+        element={
+          <PrivateRoute>
+            <LibraryDetail />
           </PrivateRoute>
         }
       />

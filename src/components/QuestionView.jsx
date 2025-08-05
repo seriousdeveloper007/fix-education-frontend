@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import themeConfig from './themeConfig';
-import { fetchUnattemptedQuestions } from '../services/questionService';
+import { fetchUnattemptedQuestions, submitQuestionAnswer } from '../services/questionService';
 import { SendHorizontal } from 'lucide-react';
 
 
@@ -21,30 +21,6 @@ const getDifficultyColor = (level) => {
   if (level === 'medium') return 'bg-yellow-100 text-yellow-700';
   return 'bg-red-100 text-red-700';
 };
-
-
-async function submitQuestionAnswer({ question_id, answer_text, answer_option }) {
-  const token = localStorage.getItem('token');
-  const response = await fetch('http://localhost:8000/question-answers', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `${token}`, // pass token here
-    },
-    body: JSON.stringify({
-      question_id,
-      answer_text,
-      answer_option,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Failed to submit answer');
-  }
-
-  return await response.json();
-}
 
 const handleTextAnswerSubmit = async (questionId, answer, updateQuestionCount) => {
   try {
@@ -202,6 +178,8 @@ export default function QuestionView({updateQuestionCount}) {
 
     load();
   }, []);
+
+  
 
   const showSnackbar = () => {
     setSnackbarVisible(true);
