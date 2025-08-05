@@ -10,65 +10,6 @@ const getDifficultyColor = (level) => {
   return 'bg-red-100 text-red-700';
 };
 
-// function MCQCard({ question, onAnswerSubmit, isAttempted }) {
-//   const [selected, setSelected] = useState(null);
-//   const [submitted, setSubmitted] = useState(isAttempted);
-//   const { question_text, option_1, option_2, option_3, option_4, difficulty_level, correct_option_number } = question.meta_data;
-//   const options = [option_1, option_2, option_3, option_4];
-
-//   useEffect(() => {
-//     if (isAttempted && question.answer_option) {
-//       setSelected(options[question.answer_option - 1]);
-//     }
-//   }, [isAttempted]);
-
-//   const handleSubmit = async () => {
-//     if (selected !== null && !submitted) {
-//       await submitQuestionAnswer({
-//         question_id: question.id,
-//         answer_option: options.indexOf(selected) + 1,
-//       });
-//       setSubmitted(true);
-//       onAnswerSubmit?.();
-//     }
-//   };
-
-//   return (
-//     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200 w-full">
-//       <div className="flex justify-between items-start mb-1">
-//         <div className="text-gray-800 text-sm pr-4 mb-3">{question_text}</div>
-//         <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
-//       </div>
-//       <ul className="space-y-2">
-//         {options.map((opt, idx) => (
-//           <li key={idx} className="flex items-center space-x-2">
-//             <input
-//               type="radio"
-//               id={`${question.id}-${idx}`}
-//               name={`q-${question.id}`}
-//               disabled={submitted}
-//               checked={selected === opt}
-//               onChange={() => setSelected(opt)}
-//             />
-//             <label htmlFor={`${question.id}-${idx}`} className="text-sm">{opt}</label>
-//           </li>
-//         ))}
-//       </ul>
-//       {!submitted && selected && (
-//         <SendHorizontal
-//           size={20}
-//           className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
-//           onClick={handleSubmit}
-//         />
-//       )}
-//       {submitted && (
-//         <div className="mt-4 text-sm text-green-700 bg-green-50 border border-green-200 rounded p-2">
-//           Correct Answer: <span className="font-semibold">{options[correct_option_number - 1]}</span>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
 
 function MCQCard({ question, onAnswerSubmit, isAttempted }) {
     const [selected, setSelected] = useState(null);
