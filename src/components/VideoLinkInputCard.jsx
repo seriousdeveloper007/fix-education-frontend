@@ -1,7 +1,8 @@
 // VideoLinkInputCard.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlayCircle, Loader2 } from 'lucide-react';
+import analytics from '../services/posthogService';
 
 function isValidYouTubeUrl(url) {
   try {
@@ -63,11 +64,12 @@ export default function VideoLinkInputCard({ cfg, initialUrl = '' }) {
         return;
       }
 
-      const tab = await createTab(user.id, trimmed, token);
-      localStorage.setItem('tabId', tab.id);
-      localStorage.removeItem('chatId');
-      navigate(`/study-room?video=${encodeURIComponent(trimmed)}&mode=play`);
-    } catch (err) {
+        const tab = await createTab(user.id, trimmed, token);
+        localStorage.setItem('tabId', tab.id);
+        localStorage.removeItem('chatId');
+        analytics.youtubeLearningStarted(trimmed);
+        navigate(`/study-room?video=${encodeURIComponent(trimmed)}&mode=play`);
+      } catch (err) {
       console.error(err);
       setError('Failed to initiate learning session. Please try again.');
       setLoading(false);

@@ -4,6 +4,7 @@ import PlatformNavbar from './PlatformNavbar';
 import { fetchQuestions, submitQuestionAnswer } from '../services/questionService';
 import { SendHorizontal, CheckCircle, AlertCircle } from 'lucide-react';
 import DesktopOnly from './DesktopOnly';
+import analytics from '../services/posthogService';
 
 const getDifficultyColor = (level) => {
   if (level === 'easy') return 'bg-green-100 text-green-700';
@@ -198,6 +199,10 @@ export default function LibraryDetail() {
   const [unattempted, setUnattempted] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [attemptedQuestions, setAttemptedQuestions] = useState([]);
+
+  useEffect(() => {
+    analytics.libraryDetailPageLoaded();
+  }, []);
 
   useEffect(() => {
     async function loadQuestions() {

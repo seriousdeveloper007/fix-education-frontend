@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { fetchQuestions } from '../services/questionService';
 import { useNavigate } from 'react-router-dom';
 import DesktopOnly from './DesktopOnly';
+import analytics from '../services/posthogService';
 
 
 function CompletionCircle({ percent }) {
@@ -59,6 +60,7 @@ export default function Library() {
 
 
   useEffect(() => {
+    analytics.libraryPageLoaded();
     async function fetchTabsWithQuestions() {
       const tabData = await getTabs();
       const enrichedTabs = await Promise.all(

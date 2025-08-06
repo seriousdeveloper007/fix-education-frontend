@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import themeConfig from './themeConfig'; // Import themeConfig
+import analytics from '../services/posthogService';
 
 const BACKEND_URL = 'http://localhost:8000';
 
@@ -44,6 +45,10 @@ export default function GoogleLogin() {
       url.searchParams.delete('from-extension');
       window.history.replaceState({}, '', url);
     }
+  }, []);
+
+  useEffect(() => {
+    analytics.loginPageLoaded();
   }, []);
 
   async function handleCredentialResponse(response) {
@@ -95,6 +100,7 @@ export default function GoogleLogin() {
     setLoading(true);
     setError(null);
     try {
+      analytics.loginEmailSubmitted(email);
       const res = await fetch(`${BACKEND_URL}/magic-link/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -1,11 +1,12 @@
 // export default LandingPage;
-import React from 'react';
+import { useEffect } from 'react';
 import { Download } from 'lucide-react';
 import themeConfig from './themeConfig';
 import { landingContent  } from './landingContent';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import Navbar from './Navbar';
+import analytics from '../services/posthogService';
 
 
 const CTAButtons = ({ center = false, showDownload = true }) => {
@@ -40,7 +41,9 @@ const CTAButtons = ({ center = false, showDownload = true }) => {
 
 const LandingPage = () => {
   const { useCases, faqs } = landingContent;
-
+  useEffect(() => {
+    analytics.websiteLoaded();
+  }, []);
 
   return (
     <div className="bg-white min-h-screen font-fraunces">
