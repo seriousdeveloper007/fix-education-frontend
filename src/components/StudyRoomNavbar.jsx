@@ -10,7 +10,8 @@ export default function StudyRoomNavbar({ videoUrl, onTabSelect, selectedTab, ge
   const tabs = [
     { label: 'Ask Doubt', emoji: '❓' },
     { label: 'Attempt Question', emoji: '📝' },
-    { label: 'Take Notes', emoji: '✍️' },
+    // TODO: Re-enable 'Take Notes' tab when notes feature is available
+    // { label: 'Take Notes', emoji: '✍️' },
   ];
   
 
