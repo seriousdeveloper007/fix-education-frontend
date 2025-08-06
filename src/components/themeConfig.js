@@ -13,7 +13,7 @@ export default {
     headerBorder: 'border-slate-200/50',
     borderTop: 'border-t border-slate-200/50',
     TextHoverEffect: 'text-black px-3 py-2 rounded-lg transition hover:bg-gray-200',
-    authHeading: 'text-3xl sm:text-4xl font-extrabold text-center text-gray-900',
+    authHeading: 'text-xl sm:text-3xl font-bold text-center text-gray-900',
     authSubheading: 'text-base sm:text-lg font-normal text-center text-gray-600 mt-2',
     authMuted: 'text-xs text-gray-500 text-center',
   },

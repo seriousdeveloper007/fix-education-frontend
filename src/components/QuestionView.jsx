@@ -99,7 +99,7 @@ function FillInTheBlank({ question, updateQuestionCount, theme }) {
       </div>
       <input
         type="text"
-        className={`${theme.inputfield} mb-2`}
+        className={`${theme.inputfield} mb-4`}
         placeholder="Your answer"
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}

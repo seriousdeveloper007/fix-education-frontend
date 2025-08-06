@@ -7,6 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import Navbar from './Navbar';
 import analytics from '../services/posthogService';
+import mobileComparison from '../assets/mobile-youtube-vs-ilon.png';
+import desktopComparison from '../assets/desktop-youtube-vs-ilon.png';
+
+
 
 
 const CTAButtons = ({ center = false, showDownload = true }) => {
@@ -53,9 +57,9 @@ const LandingPage = () => {
         className="bg-[#F4DEC2] shadow-md px-4 sm:px-6 md:px-[100px] pt-20 pb-16"
       >
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug">
-          Stop passively watching,{' '}
+          Make learning from youtube,{' '}
           <br className="hidden sm:block" />
-          Start interactive learning on YouTube.
+          interactive with ilon AI.
         </h1>
 
         <p className="mt-3 text-base sm:text-lg text-slate-700 max-w-2xl">
@@ -74,6 +78,27 @@ const LandingPage = () => {
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug text-center mb-12">
           Why use ilon ai?
         </h2>
+        {/* Comparison Images */}
+        <div className="mb-8">
+          {/* Mobile Image: visible only on small screens */}
+          <div className="sm:hidden flex justify-center">
+            <img
+              src={mobileComparison}
+              alt="YouTube vs ilon AI Comparison"
+              className="rounded-xl w-full max-w-xs"
+            />
+          </div>
+
+          {/* Desktop Image: visible only on sm and above */}
+          <div className="hidden sm:flex justify-center px-4 sm:px-6 md:px-[150px]">
+            <img
+              src={desktopComparison}
+              alt="YouTube vs ilon AI Comparison"
+              className="rounded-xl w-full max-w-full"
+            />
+          </div>
+        </div>
+
         <div className="flex flex-col gap-16">
           {useCases.map((useCase, index) => {
             const Icon = useCase.icon;
@@ -106,7 +131,7 @@ const LandingPage = () => {
                   <img
                     src={useCase.image}
                     alt={useCase.title}
-                    className="w-full max-w-md rounded-xl md:w-[400px] md:max-w-none md:rounded-xl"
+                    className="w-full max-w-md rounded-xl md:w-[550px] md:max-w-none md:rounded-xl"
                   />
                 </div>
               </div>

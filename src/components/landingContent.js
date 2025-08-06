@@ -1,6 +1,6 @@
 
-import doubtsImg from '../assets/doubts.png';
-import feedbackImg from '../assets/feedback.png';
+import doubtsImg from '../assets/ask-doubts.png';
+import feedbackImg from '../assets/attempt-questions.png';
 import rawNotesImg from '../assets/raw_notes.png';
 import { ClipboardList, FileText, HelpCircle } from 'lucide-react';
 
@@ -328,11 +328,11 @@ faqs : [
     answer:
       "Absolutely. We only process tab audio during active learning sessions and delete it immediately after processing. No personal data is stored without your explicit consent, and we're fully GDPR compliant.",
   },
-  {
-    question: "Will it record my audio?",
-    answer:
-      "No. It only listens to audio coming from the YouTube video tab. Your microphone or personal audio is never accessed or recorded.",
-  },
+  // {
+  //   question: "Will it record my audio?",
+  //   answer:
+  //     "No. It only listens to audio coming from the YouTube video tab. Your microphone or personal audio is never accessed or recorded.",
+  // },
   {
     question: "Will it always be free?",
     answer:
