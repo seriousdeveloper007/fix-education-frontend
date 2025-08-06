@@ -72,12 +72,15 @@ const Navbar = ({
             <div className="flex items-center gap-4">
               {childrenButtons ?? (
                 <>
+                  {/* TODO: Re-enable Chrome Extension download button */}
+                  {/*
                   <button
                     className={`hidden md:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-2 font-medium transition`}
                   >
                     <Download size={16} />
                     Chrome Extension
                   </button>
+                  */}
                   <button
                     onClick={() => navigate('/login')}
                     className={`${cfg.primaryBtn} transition font-medium px-3 md:px-5 py-1.5 md:py-2 text-sm md:text-base`}

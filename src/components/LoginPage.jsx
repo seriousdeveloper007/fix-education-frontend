@@ -180,13 +180,17 @@ export default function GoogleLogin() {
           </p>
 
           <div className="login-options mt-6 space-y-6 flex flex-col items-center">
-            <div id="google-signin-button" />
+            {/* TODO: Re-enable Google Sign-In button */}
+            {/* <div id="google-signin-button" /> */}
 
+            {/* TODO: Restore separator when multiple login options are available */}
+            {/*
             <div className="w-[280px] flex items-center text-gray-400 text-sm">
               <hr className="flex-grow border-gray-300" />
               <span className="px-2">or</span>
               <hr className="flex-grow border-gray-300" />
             </div>
+            */}
 
             <input
               type="email"
