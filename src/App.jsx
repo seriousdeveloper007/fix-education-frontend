@@ -11,8 +11,8 @@ import PlatformLanding from './components/PlatformLanding';
 import GoogleLogin from './components/LoginPage';
 import ErrorPage from './components/ErrorPage';
 import VerifyLearner from './components/VerifyLearner';
-import StudyRoom from './components/studyRoom';
 import Library from './components/Library';
+import StudyRoom from './components/StudyRoom'; // ✅ correct
 import LibraryDetail from './components/LibraryDetail'; // new file
 
 
