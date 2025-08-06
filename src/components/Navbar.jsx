@@ -3,6 +3,8 @@ import themeConfig from './themeConfig';
 import { Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import Logo from '../assets/logo-without-bg.png';
+
 
 
 const Navbar = ({
@@ -45,8 +47,13 @@ const Navbar = ({
         >
           {/* Left: Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-300 rounded-full" />
-            <span className="text-lg font-semibold text-gray-800">ilon ai</span>
+          <img
+              src={Logo}
+              alt="ilon ai logo"
+              className="w-10 h-10 object-contain select-none"
+              draggable="false"
+            />
+            <span className="text-lg font-semibold text-gray-800">ilon AI</span>
           </Link>
 
           {/* Center: Nav Links (hide on mobile) */}

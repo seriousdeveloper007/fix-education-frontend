@@ -174,7 +174,7 @@ export default function GoogleLogin() {
 
       <div className="flex-grow flex items-start justify-center px-4 pt-16">
         <div className="bg-white rounded-xl shadow-md px-6 py-8 w-full max-w-md text-center">
-          <h1 className={cfg.authHeading}>Welcome to ilon ai</h1>
+          <h1 className={cfg.authHeading}>Signup / Login in secs</h1>
           <p className={`${cfg.authSubheading} mt-2`}>
             ilon ai helps you learn faster by converting your notes into structured, actionable content.
           </p>
