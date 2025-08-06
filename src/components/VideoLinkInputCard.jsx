@@ -1,4 +1,3 @@
-// VideoLinkInputCard.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlayCircle, Loader2 } from 'lucide-react';
@@ -28,7 +27,6 @@ async function createTab(userId, url, token) {
       captured_from_url: url,
     }),
   });
-
   if (!response.ok) throw new Error('Failed to create tab');
   return (await response.json()).tab;
 }
@@ -46,30 +44,26 @@ export default function VideoLinkInputCard({ cfg, initialUrl = '' }) {
   const handleClick = async () => {
     setError('');
     setLoading(true);
-
     const trimmed = url.trim();
     if (!isValidYouTubeUrl(trimmed)) {
       setError('Please enter a valid YouTube URL');
       setLoading(false);
       return;
     }
-
     try {
       const user = JSON.parse(localStorage.getItem('user'));
       const token = localStorage.getItem('token');
-
       if (!user || !token) {
         setError('User not authenticated');
         setLoading(false);
         return;
       }
-
-        const tab = await createTab(user.id, trimmed, token);
-        localStorage.setItem('tabId', tab.id);
-        localStorage.removeItem('chatId');
-        analytics.youtubeLearningStarted(trimmed);
-        navigate(`/study-room?video=${encodeURIComponent(trimmed)}&mode=play`);
-      } catch (err) {
+      const tab = await createTab(user.id, trimmed, token);
+      localStorage.setItem('tabId', tab.id);
+      localStorage.removeItem('chatId');
+      analytics.youtubeLearningStarted(trimmed);
+      navigate(`/study-room?video=${encodeURIComponent(trimmed)}&mode=play`);
+    } catch (err) {
       console.error(err);
       setError('Failed to initiate learning session. Please try again.');
       setLoading(false);
@@ -78,8 +72,8 @@ export default function VideoLinkInputCard({ cfg, initialUrl = '' }) {
 
   return (
     <div id="videolink-input-card" className={`w-full max-w-[600px] ${cfg.card} min-h-[250px]`}>
-      <div className={`${cfg.cardHeadinglarge}`}>Enter YouTube Video URL</div>
-      <div className={`${cfg.cardSubheading}`}>
+      <div className={cfg.cardHeadinglarge}>Enter YouTube Video URL</div>
+      <div className={cfg.cardSubheading}>
         ilon AI helps you resolve doubts, test your knowledge, and generate structured notes from raw input.
       </div>
       <input
@@ -90,22 +84,16 @@ export default function VideoLinkInputCard({ cfg, initialUrl = '' }) {
           setUrl(e.target.value);
           if (error) setError('');
         }}
-        className={`${cfg.inputfield}`}
+        className={cfg.inputfield}
       />
-      <button
-        onClick={handleClick}
-        disabled={!url.trim() || loading}
-        className={`${cfg.primaryButton}`}
-      >
+      <button onClick={handleClick} disabled={!url.trim() || loading} className={cfg.primaryButton}>
         {loading ? (
           <div className="flex items-center justify-center gap-2">
-            <Loader2 size={20} className="animate-spin" />
-            Preparing Study Room...
+            <Loader2 size={20} className="animate-spin" /> Preparing Study Room...
           </div>
         ) : (
           <div className="flex items-center justify-center gap-2">
-            <PlayCircle size={24} />
-            Start Learning
+            <PlayCircle size={24} /> Start Learning
           </div>
         )}
       </button>

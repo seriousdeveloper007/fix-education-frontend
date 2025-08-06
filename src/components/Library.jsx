@@ -5,6 +5,8 @@ import { fetchQuestions } from '../services/questionService';
 import { useNavigate } from 'react-router-dom';
 import DesktopOnly from './DesktopOnly';
 import analytics from '../services/posthogService';
+import themeConfig from './themeConfig';
+
 
 
 function CompletionCircle({ percent }) {
@@ -57,6 +59,7 @@ function CompletionCircle({ percent }) {
 export default function Library() {
   const [tabs, setTabs] = useState([]);
   const navigate = useNavigate();
+  const cfg = themeConfig.app;
 
 
   useEffect(() => {
@@ -113,42 +116,41 @@ export default function Library() {
             return (
               <div
                 key={idx}
-                className="flex flex-col bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 h-full w-full"
+                className="flex flex-col bg-white/40 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg overflow-hidden h-full w-full transition-transform hover:-translate-y-1 hover:shadow-xl group"
               >
                 <img
                   src={tab.thumbnail}
                   alt={tab.page_title}
-                  className="w-full h-56 object-cover transition-transform duration-300 ease-in-out transform hover:scale-105 hover:brightness-90 cursor-pointer"
+                  className="w-full h-56 object-cover transition-transform duration-300 ease-in-out transform group-hover:scale-105 group-hover:brightness-90 cursor-pointer"
                   onClick={() => handleThumbnailClick(tab)}
                 />
                 <div className="p-4 flex-grow flex flex-col items-start">
-                  <div className="text-[15px] font-medium text-black-500 leading-tight line-clamp-2 h-[3.5em]">
+                  <div className="text-[15px] font-medium text-black-500 leading-tight line-clamp-2 h-[3.5em] group-hover:text-cyan-700 transition-colors duration-300">
                     {tab.page_title}
                   </div>
-                  <div className="mt-4 w-full grid grid-cols-3 gap-2 items-center bg-gray-50 px-4 py-4 rounded-lg shadow-inner group">
-                    <CompletionCircle percent={percent} />
+                  <div className="mt-4 w-full grid grid-cols-3 gap-2 items-center bg-gray-50/70 backdrop-blur-sm px-4 py-4 rounded-lg shadow-inner relative group/stats">
+                <CompletionCircle percent={percent} />
 
-                    <div className="flex flex-col items-center justify-center text-sm text-gray-700 col-span-2 relative">
-                      <div className="text-base font-bold">
-                        {attempted} / {attempted + unattempted}
-                      </div>
-                      <div className="text-xs text-center">Questions Attempted</div>
-
-                      {/* Hover Button */}
-                      <button
-                        className="mt-2 px-2 py-[2px] text-[11px] bg-cyan-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                        onClick={() => {
-                          navigate(`/library/${tab.id}`, {
-                            state: {
-                              pageTitle: tab.page_title,
-                            },
-                          });
-                        }}
-                      >
-                        View Questions
-                      </button>
-                    </div>
+                <div className="flex flex-col items-center justify-center text-sm text-gray-700 col-span-2">
+                  <div className="text-base font-bold">
+                    {attempted} / {attempted + unattempted}
                   </div>
+                  <div className="text-xs text-center">Questions Attempted</div>
+
+                  {/* Hover Button (small, centered) */}
+                  <button
+                    className="mt-2 px-3 py-1 text-xs bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white font-medium rounded-lg shadow transition-transform hover:-translate-y-0.5 opacity-0 group-hover/stats:opacity-100 pointer-events-auto"
+                    onClick={() => {
+                      navigate(`/library/${tab.id}`, {
+                        state: { pageTitle: tab.page_title },
+                      });
+                    }}
+                  >
+                    View Questions
+                  </button>
+                </div>
+              </div>
+
                 </div>
               </div>
             );
