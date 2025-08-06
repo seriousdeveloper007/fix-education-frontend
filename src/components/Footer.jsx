@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; // import Link
 import themeConfig from './themeConfig';
+import icon from '../assets/logo-without-bg.png';
 
 const Footer = () => {
   const cfg = themeConfig.website;
@@ -11,12 +12,12 @@ const Footer = () => {
         {/* Left: Logo */}
         <div className="flex justify-between items-start w-full sm:w-auto">
           <div className="flex items-center space-x-2">
-            <img
-              src="https://via.placeholder.com/40"
-              alt="Company Logo"
+          <img
+              src={icon}
+              alt="ilon ai logo"
               className="h-10 w-10"
             />
-            <span className="font-semibold text-base">ilon ai</span>
+            <span className="font-semibold text-base">ilon AI</span>
           </div>
 
           {/* Right: Links (mobile only stacked vertically) */}

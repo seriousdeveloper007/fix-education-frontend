@@ -50,7 +50,6 @@ function BenefitsSection({ cfg }) {
     </div>
   );
 }
-
 export default function PlatformLanding() {
   const cfg = themeConfig.app;
   useEffect(() => {
@@ -64,9 +63,24 @@ export default function PlatformLanding() {
         <PlatformNavbar />
         <div className="flex flex-col items-center justify-start min-h-screen pt-20">
           <VideoLinkInputCard cfg={cfg} />
-          <div id="how-to-use" className="mt-10 border-2 border-dashed border-gray-400/60 rounded-xl bg-white/40 backdrop-blur-lg flex items-center justify-center text-gray-600 text-base sm:text-lg h-[300px] sm:h-[400px] md:h-[500px] w-[1000px]">
-            How to use — there will be a video here in future
+
+          {/* How to use video section */}
+          <div
+            id="how-to-use"
+            className="mt-10 rounded-xl overflow-hidden bg-white/40 backdrop-blur-lg border-2 border-dashed border-gray-400/60"
+          >
+            <iframe
+              width="1000"
+              height="500"
+              src="https://www.youtube.com/embed/-P1Y8AGWbD4?si=q_SKwkgOZyl4VJPO"
+              title="How to use ilon AI"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            ></iframe>
           </div>
+
           <BenefitsSection cfg={cfg} />
         </div>
       </div>
