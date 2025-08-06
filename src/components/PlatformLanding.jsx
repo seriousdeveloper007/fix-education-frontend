@@ -8,7 +8,7 @@ import VideoLinkInputCard from './VideoLinkInputCard';
 
 function OfferingCard({ icon, iconBg, iconColor, title, description, cfg }) {
   return (
-    <div className={`${cfg.card} h-[250px] flex flex-col justify-between p-5`}>
+    <div className={`${cfg.card} h-[270px] flex flex-col justify-between p-5`}>
       <div className="flex flex-col items-center space-y-4 text-center">
         <div className={`p-3 rounded-full ${iconBg}`}>
           {React.cloneElement(icon, { size: 28, className: iconColor })}
@@ -33,19 +33,19 @@ function BenefitsSection({ cfg }) {
         cfg={cfg}
       />
       <OfferingCard
+        icon={<Video />}
+        iconBg="bg-purple-100"
+        iconColor="text-purple-600"
+        title="Get timely feedback"
+        description="Get questions every 3 to 5 minutes based on the video to check your understanding as you learn."
+        cfg={cfg}
+      />
+      <OfferingCard
         icon={<PlayCircle />}
         iconBg="bg-blue-100"
         iconColor="text-blue-600"
         title="Smart Notes"
         description="Take timestamped notes that sync with the video for better retention and review."
-        cfg={cfg}
-      />
-      <OfferingCard
-        icon={<Video />}
-        iconBg="bg-purple-100"
-        iconColor="text-purple-600"
-        title="Get timely feedback"
-        description="Take AI-generated quizzes based on the video content to test your understanding."
         cfg={cfg}
       />
     </div>

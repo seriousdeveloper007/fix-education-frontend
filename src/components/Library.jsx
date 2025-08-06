@@ -77,7 +77,7 @@ export default function Library() {
 
   function getCompletionPercent(tab) {
     const { last_playback_time, video_length } = tab;
-    if (!last_playback_time || !video_length || video_length === 0) return 100;
+    if (!last_playback_time || !video_length || video_length === 0) return 0;
     return Math.min(100, Math.floor((last_playback_time / video_length) * 100));
   }
 
