@@ -3,6 +3,7 @@ import { getTabs } from '../services/tabService';
 import { useEffect, useState } from 'react';
 import { fetchQuestions } from '../services/questionService';
 import { useNavigate } from 'react-router-dom';
+import DesktopOnly from './DesktopOnly';
 
 
 function CompletionCircle({ percent }) {
@@ -97,6 +98,7 @@ export default function Library() {
   
 
   return (
+    <DesktopOnly>
     <div className="font-fraunces bg-white">
       <PlatformNavbar defaultTab="Library" />
       <div className="px-[100px] py-[60px]">
@@ -152,5 +154,6 @@ export default function Library() {
         </div>
       </div>
     </div>
+    </DesktopOnly>
   );
 }
