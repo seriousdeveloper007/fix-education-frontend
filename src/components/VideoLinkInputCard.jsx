@@ -16,7 +16,7 @@ function isValidYouTubeUrl(url) {
 }
 
 async function createTab(userId, url, token) {
-  const response = await fetch('http://localhost:8000/tabs', {
+  const response = await fetch('https://api.ilonai.in//tabs', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

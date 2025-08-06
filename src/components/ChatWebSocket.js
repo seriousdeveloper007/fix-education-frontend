@@ -19,7 +19,7 @@ export function useChatWebSocket({ onMessage, onToken, getPlaybackTime } = {}) {
       params.append('chatId', storedChatId);
     }
 
-    const ws = new WebSocket(`ws://localhost:8000/ws/chat?${params.toString()}`);
+    const ws = new WebSocket(`wss://api.ilonai.in/ws/chat?${params.toString()}`);
     wsRef.current = ws;
 
     ws.onmessage = (event) => {

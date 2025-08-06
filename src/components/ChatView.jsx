@@ -41,7 +41,7 @@ export default function ChatView({ getCurrentTime }) {
     const token = localStorage.getItem('token');
     if (!chatId || !token) return;
 
-    fetch(`http://localhost:8000/messages/${chatId}`, {
+    fetch(`https://api.ilonai.in//messages/${chatId}`, {
       headers: {
         Authorization: token,
       },

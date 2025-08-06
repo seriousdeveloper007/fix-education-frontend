@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import themeConfig from './themeConfig';
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = 'https://api.ilonai.in/';
 
 export default function VerifyLearner() {
   const navigate = useNavigate();

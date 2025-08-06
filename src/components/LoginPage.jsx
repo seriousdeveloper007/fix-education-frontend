@@ -4,7 +4,7 @@ import Navbar from './Navbar';
 import themeConfig from './themeConfig'; // Import themeConfig
 import analytics from '../services/posthogService';
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = 'https://api.ilonai.in/';
 
 export default function GoogleLogin() {
   const [loading, setLoading] = useState(false);
