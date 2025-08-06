@@ -1,7 +1,7 @@
 import themeConfig from './themeConfig';
+import { useEffect, useRef, useState } from 'react';
 import { updateTab } from '../services/tabService';
 import { ArrowLeft, MessageSquare, PencilLine } from 'lucide-react';
-
 
 export default function StudyRoomNavbar({
   videoUrl,
@@ -12,10 +12,27 @@ export default function StudyRoomNavbar({
   unattemptedQuestionCount,
 }) {
   const cfg = themeConfig.app;
+  const prevCountRef = useRef(unattemptedQuestionCount);
+  const [animateAttemptTab, setAnimateAttemptTab] = useState(false);
+
+  useEffect(() => {
+    if (unattemptedQuestionCount > prevCountRef.current) {
+      setAnimateAttemptTab(true);
+      const timeout = setTimeout(() => setAnimateAttemptTab(false), 1200);
+      return () => clearTimeout(timeout);
+    }
+    prevCountRef.current = unattemptedQuestionCount;
+  }, [unattemptedQuestionCount]);
 
   const tabs = [
-    { label: 'Ask Doubt', icon: <MessageSquare className="w-5 h-5 text-indigo-600 group-hover:text-indigo-800" /> },
-    { label: 'Attempt Question', icon: <PencilLine className="w-5 h-5 text-cyan-600 group-hover:text-cyan-800" /> },
+    {
+      label: 'Ask Doubt',
+      icon: <MessageSquare className="w-5 h-5 text-indigo-600 group-hover:text-indigo-800" />,
+    },
+    {
+      label: 'Attempt Question',
+      icon: <PencilLine className="w-5 h-5 text-cyan-600 group-hover:text-cyan-800" />,
+    },
     // Future tab (example): { label: 'Take Notes', icon: <StickyNote /> }
   ];
 
@@ -31,7 +48,7 @@ export default function StudyRoomNavbar({
   };
 
   return (
-    <header className={`sticky top-0 z-50 w-full h-16 px-6 flex items-center justify-between shadow-md bg-white/40 backdrop-blur-lg font-fraunces`}>
+    <header className="sticky top-0 z-50 w-full h-16 px-6 flex items-center justify-between shadow-md bg-white/40 backdrop-blur-lg font-fraunces">
       {/* LEFT: Back Button */}
       <div className="flex-1 flex items-center pl-[50px]">
         <div
@@ -47,21 +64,25 @@ export default function StudyRoomNavbar({
       <div className="flex-1 flex justify-center items-center space-x-8">
         {tabs.map((tab) => {
           const isAttemptTab = tab.label === 'Attempt Question';
-          const displayLabel =
-            isAttemptTab && unattemptedQuestionCount > 0
-              ? `${tab.label} (${unattemptedQuestionCount})`
-              : tab.label;
+          const hasCount = isAttemptTab && unattemptedQuestionCount > 0;
 
           return (
             <div
               key={tab.label}
               onClick={() => onTabSelect(tab.label)}
-              className="flex flex-col items-center group cursor-pointer transition-transform duration-150 hover:-translate-y-0.5"
+              className={`flex flex-col items-center group cursor-pointer transition-transform duration-150 hover:-translate-y-0.5 ${
+                isAttemptTab && animateAttemptTab ? 'animate-bounce animate-pulse' : ''
+              }`}
             >
               <div className="flex items-center space-x-2">
                 {tab.icon}
                 <span className={selectedTab === tab.label ? cfg.tabActive : cfg.tabInactive}>
-                  {displayLabel}
+                  {tab.label}
+                  {hasCount && (
+                    <span className="text-red-600 font-semibold ml-1">
+                      ({unattemptedQuestionCount})
+                    </span>
+                  )}
                 </span>
               </div>
               {selectedTab === tab.label && (
@@ -72,7 +93,7 @@ export default function StudyRoomNavbar({
         })}
       </div>
 
-      {/* RIGHT: Spacer for symmetry */}
+      {/* RIGHT: Spacer */}
       <div className="flex-1 pr-[50px]" />
     </header>
   );

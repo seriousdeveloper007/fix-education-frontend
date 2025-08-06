@@ -1,33 +1,4 @@
 export default {
-  light: {
-    root: 'min-h-screen bg-gradient-to-br from-white via-slate-50 to-emerald-50/50 text-slate-900 selection:bg-emerald-300/30',
-    // headerBg: 'bg-white/70 ring-slate-200/50 text-slate-900',
-    navLink: 'text-slate-700 hover:text-emerald-600',
-    primaryBtn: 'bg-emerald-500 hover:bg-emerald-600 text-white',
-    secondaryBtn: 'border border-slate-300 hover:border-emerald-500 bg-white/30 text-slate-900',
-    cardBg: 'bg-white/70 ring-slate-200/50',
-    text: 'text-slate-600',
-    statText: 'text-sm text-slate-500',
-    icon: 'text-slate-700 hover:text-emerald-600',
-    headerBg: 'bg-white/70 backdrop-blur-lg shadow-md',
-    headerBorder: 'border-slate-200/50',
-    borderTop: 'border-t border-slate-200/50',
-  },
-  dark: {
-    root: 'min-h-screen bg-gradient-to-br from-[#10141f] via-[#0c1424] to-[#05080f] text-white selection:bg-emerald-400/30',
-    //headerBg: 'bg-white/5 ring-white/10 text-white',
-    navLink: 'text-white hover:text-emerald-400',
-    primaryBtn: 'bg-emerald-400 hover:bg-emerald-300 text-slate-900',
-    secondaryBtn: 'border border-white/20 hover:border-emerald-400 backdrop-blur-sm text-white',
-    cardBg: 'bg-white/10 ring-white/10',
-    text: 'text-slate-300',
-    statText: 'text-sm text-slate-300',
-    icon: 'text-white hover:text-emerald-400',
-    headerBg: 'bg-[#0c1424]/70 backdrop-blur-lg shadow-md',
-    headerBorder: 'border-white/10',
-    borderTop: 'border-t border-white/10',
-  },
-
   website: {
     root: 'min-h-screen bg-[#F4DEC2] text-slate-900 selection:bg-emerald-300/30 font-fraunces',
     navLink: 'text-slate-700 hover:text-emerald-600',
@@ -64,6 +35,10 @@ export default {
     dropdownIconButton: 'w-4 h-4 mr-2',
     avatarImage: 'w-8 h-8 rounded-full object-cover ring-2 ring-white',
     avatarFallback: 'w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold',
+    submitButton: 'absolute bottom-4 right-4 px-3 py-1 text-xs bg-gradient-to-r \
+    from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] \
+    hover:to-[#06b6d4] text-white font-medium shadow-lg \
+    rounded-md transition-transform hover:-translate-y-0.5 disabled:opacity-50',
 
     // cards + misc
     card: 'bg-white/40 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg px-6 py-4 transition-transform hover:-translate-y-1 hover:shadow-xl',
@@ -74,7 +49,7 @@ export default {
 
     // actions / inputs
     primaryButton: 'w-full max-w-[250px] px-4 py-2 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white font-medium rounded-xl disabled:opacity-50 mt-5 transition-transform hover:-translate-y-0.5 shadow-lg',
-    inputfield: 'w-full bg-white/60 backdrop-blur-sm border border-white/30 rounded px-3 py-2 mt-5 placeholder-gray-500 focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600',
+    inputfield: 'w-full bg-white/60 backdrop-blur-sm border border-gray-300 rounded px-3 py-2 mt-5 placeholder-gray-500 focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600',
 
     questionText: 'mt-2 text-sm text-gray-700 mb-1',
 
