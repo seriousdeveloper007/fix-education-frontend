@@ -20,22 +20,22 @@ export default function GoogleLogin() {
   // Initialize Google Identity Services
   useEffect(() => {
 
-    window.google.accounts.id.initialize({
-      client_id: '711989652397-ffcq8cuqec6o2hlr4p7tqc5f8t78aa6c.apps.googleusercontent.com',
-      callback: handleCredentialResponse,
-      auto_select: false,
-      cancel_on_tap_outside: false,
-    });
-    window.google.accounts.id.renderButton(
-      document.getElementById('google-signin-button'),
-      {
-        theme: 'outline',
-        size: 'large',
-        width: 280, // increase width
-      }
+    // window.google.accounts.id.initialize({
+    //   client_id: '711989652397-ffcq8cuqec6o2hlr4p7tqc5f8t78aa6c.apps.googleusercontent.com',
+    //   callback: handleCredentialResponse,
+    //   auto_select: false,
+    //   cancel_on_tap_outside: false,
+    // });
+    // window.google.accounts.id.renderButton(
+    //   document.getElementById('google-signin-button'),
+    //   {
+    //     theme: 'outline',
+    //     size: 'large',
+    //     width: 280, // increase width
+    //   }
   
-    );
-    window.google.accounts.id.prompt();
+    // );
+    // window.google.accounts.id.prompt();
     const params = new URLSearchParams(window.location.search);
     if (params.get('from-extension') === 'true') {
       setFromExtension(true);
@@ -174,9 +174,9 @@ export default function GoogleLogin() {
 
       <div className="flex-grow flex items-start justify-center px-4 pt-16">
         <div className="bg-white rounded-xl shadow-md px-6 py-8 w-full max-w-md text-center">
-          <h1 className={cfg.authHeading}>Signup / Login in secs</h1>
+          <h1 className={cfg.authHeading}>Signup / Login in seconds</h1>
           <p className={`${cfg.authSubheading} mt-2`}>
-            ilon ai helps you learn faster by converting your notes into structured, actionable content.
+            ilon ai helps you learn faster and keeping your brain active while learning.
           </p>
 
           <div className="login-options mt-6 space-y-6 flex flex-col items-center">
@@ -216,13 +216,13 @@ export default function GoogleLogin() {
             <p className={`${cfg.authMuted} text-xs mt-1`}>
               By continuing, you agree to our{' '}
               <a
-                href="/terms"
+                href="/privacy-policy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-gray-700"
               >
                 T&C and Privacy Policy
-              </a>.
+              </a>
             </p>
           </div>
         </div>
