@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, LogOut } from 'lucide-react';
 import analytics from '../services/posthogService';
+import Logo from '../assets/logo-without-bg.png';
+
 
 
 function UserAvatar({ profilePicture, emailPrefix }) {
@@ -80,18 +82,27 @@ export default function PlatformNavbar({ defaultTab = 'My Space' }) {
     }
   };
 
+  const handleBrandClick = () => {
+    setSelected('My Space');          // keep navbar highlight in sync
+    analytics.navbarOptionClicked('My Space');
+    navigate('/platform');
+  };
   
   return (
     <header
       className={`sticky top-0 z-50 w-full h-16 px-6 flex items-center justify-between shadow-md ${cfg.appHeader} font-fraunces`}
     >
       {/* Left: Logo and Brand */}
-      <div className="flex-1 flex items-center space-x-2 text-left pl-[50px]">
-        <img
-          alt="Ilon Logo"
-          className="w-8 h-8 rounded"
-        />
-        <span className="font-semibold text-lg">ilon AI</span>
+      <div className="flex-1 flex items-center space-x-2 text-left pl-[50px]" onClick={handleBrandClick}>
+      <img
+        src={Logo}
+        alt="ilon ai logo"
+        className="w-12 h-12 object-contain cursor-pointer" 
+        draggable="false"
+      />
+        <span className="font-semibold text-lg cursor-pointer">
+          ilon AI
+        </span>
       </div>
 
       {/* Mid navigation */}

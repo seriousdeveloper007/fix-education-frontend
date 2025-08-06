@@ -26,14 +26,14 @@ const CTAButtons = ({ center = false, showDownload = true }) => {
         Start learning for Free
       </button>
 
-      {showDownload && (
+      {/* {showDownload && (
         <button
           className={`hidden sm:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-3 sm:py-3.5 font-medium transition`}
         >
           <Download size={16} />
           Chrome Extension
         </button>
-      )}
+      )} */}
     </div>
   );
 };
