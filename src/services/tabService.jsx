@@ -58,6 +58,7 @@ export async function updateTab(lastPlaybackTime, videoDuration) {
       }
   
       const data = await response.json();
+      console.log("tabs", data)
       return data.tabs; // assuming your API returns { "tabs": [...] }
     } catch (error) {
       console.error('Error fetching tabs:', error);

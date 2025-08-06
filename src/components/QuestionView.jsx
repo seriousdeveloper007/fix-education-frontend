@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import themeConfig from './themeConfig';
 import { fetchUnattemptedQuestions, submitQuestionAnswer } from '../services/questionService';
-import { SendHorizontal } from 'lucide-react';
 
 
 
@@ -54,16 +53,19 @@ function MCQQuestion({ question, updateQuestionCount, theme }) {
         ))}
       </ul>
       {!submitted && selected && (
-        <SendHorizontal
-          size={20}
-          className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
+        <button
+          type="button"
           onClick={handleSubmit}
-        />
+          disabled={submitted}
+          className={theme.submitButton}
+        >
+          Submit
+        </button>
       )}
       {submitted && (
         <div className="mt-4 space-y-1 text-sm">
-          <div className="text-green-700 bg-green-50 border border-green-200 rounded p-2">
-            Correct Answer: <span className="font-semibold">{options[correct_option_number - 1]}</span>
+          <div className="text-yellow-800 bg-yellow-50 border border-yellow-200 rounded p-2">
+            Correct answer is: <span className="font-semibold">{options[correct_option_number - 1]}</span>
           </div>
         </div>
       )}
@@ -104,16 +106,20 @@ function FillInTheBlank({ question, updateQuestionCount, theme }) {
         disabled={submitted}
       />
       {!submitted && answer.trim() && (
-        <SendHorizontal
-          size={20}
-          className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
+        <button
+          type="button"
           onClick={handleSubmit}
-        />
+          disabled={submitted}
+          className={theme.submitButton}
+        >
+          Submit
+        </button>
       )}
+
       {submitted && (
         <div className="mt-4 space-y-1 text-sm">
-          <div className="text-green-700 bg-green-50 border border-green-200 rounded p-2">
-            Correct Answer: <span className="font-semibold">{correct_answer}</span>
+          <div className="text-yellow-800 bg-yellow-50 border border-yellow-200 rounded p-2">
+             Correct Answer is: <span className="font-semibold">{correct_answer}</span>
           </div>
         </div>
       )}
@@ -154,16 +160,19 @@ function SubjectiveQuestion({ question, updateQuestionCount, theme }) {
         disabled={submitted}
       />
       {!submitted && answer.trim() && (
-        <SendHorizontal
-          size={20}
-          className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
+        <button
+          type="button"
           onClick={handleSubmit}
-        />
+          disabled={submitted}
+          className={theme.submitButton}
+        >
+          Submit
+        </button>
       )}
       {submitted && (
         <div className="mt-4 space-y-1 text-sm">
-          <div className="text-green-700 bg-green-50 border border-green-200 rounded p-2">
-            Correct Answer: <span className="font-semibold">{correct_answer}</span>
+          <div className="text-yellow-800 bg-yellow-50 border border-yellow-200 rounded p-2">
+             Correct Answer is: <span className="font-semibold">{correct_answer}</span>
           </div>
         </div>
       )}
@@ -174,7 +183,6 @@ function SubjectiveQuestion({ question, updateQuestionCount, theme }) {
 export default function QuestionView({ updateQuestionCount }) {
   const cfg = themeConfig.app;
   const [questions, setQuestions] = useState([]);
-  const [exitingQuestionIds, setExitingQuestionIds] = useState([]);
 
   useEffect(() => {
     const load = async () => {

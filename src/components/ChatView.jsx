@@ -124,23 +124,23 @@ export default function ChatView({ getCurrentTime }) {
           }}
         />
         <div className="ml-2 flex flex-col items-center space-y-2">
-            <button
-                onClick={handleSend}
-                className="p-2 rounded-full bg-black text-white bg-cyan-600 hover:bg-cyan-700 h-[40px] w-[40px] flex items-center justify-center"
-            >
-                <ArrowRight size={20} />
-            </button>
-            <span
-                onClick={() => {
-                    setMessages([]);
-                    localStorage.removeItem('chatId');
-                    hasConnectedRef.current = false
-                    close();
-                  }}
-                className="text-xs text-cyan-600 hover:underline cursor-pointer"
-            >
-                + New
-            </span>
+          <button
+            onClick={handleSend}
+            className="p-2 rounded-full bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white h-[40px] w-[40px] flex items-center justify-center transition-all"
+          >
+            <ArrowRight size={20} />
+          </button>
+          <span
+            onClick={() => {
+              setMessages([]);
+              localStorage.removeItem('chatId');
+              hasConnectedRef.current = false;
+              close();
+            }}
+            className="text-xs font-medium bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] bg-clip-text text-transparent hover:underline cursor-pointer"
+          >
+            + New
+          </span>
         </div>
       </div>
     </div>

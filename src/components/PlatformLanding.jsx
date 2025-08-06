@@ -13,8 +13,8 @@ function OfferingCard({ icon, iconBg, iconColor, title, description, cfg }) {
         <div className={`p-3 rounded-full ${iconBg}`}>
           {React.cloneElement(icon, { size: 28, className: iconColor })}
         </div>
-        <div className={`${cfg.cardHeadingSecondary}`}>{title}</div>
-        <p className={`${cfg.cardSubheading}`}>{description}</p>
+        <div className={cfg.cardHeadingSecondary}>{title}</div>
+        <p className={cfg.cardSubheading}>{description}</p>
       </div>
     </div>
   );
@@ -25,7 +25,7 @@ function BenefitsSection({ cfg }) {
     <div className="grid gap-20 mt-16 mb-16 px-4 w-full max-w-[900px] md:grid-cols-3">
       <OfferingCard
         icon={<AlertCircle />}
-        iconBg="bg-emerald-100"
+        iconBg="bg-emerald-100/60"
         iconColor="text-emerald-600"
         title="Ask AI Doubt"
         description="Get instant answers to your questions about the video content from our AI assistant."
@@ -33,7 +33,7 @@ function BenefitsSection({ cfg }) {
       />
       <OfferingCard
         icon={<Video />}
-        iconBg="bg-purple-100"
+        iconBg="bg-purple-100/60"
         iconColor="text-purple-600"
         title="Get timely feedback"
         description="Get questions every 3 to 5 minutes based on the video to check your understanding as you learn."
@@ -41,7 +41,7 @@ function BenefitsSection({ cfg }) {
       />
       <OfferingCard
         icon={<PlayCircle />}
-        iconBg="bg-blue-100"
+        iconBg="bg-blue-100/60"
         iconColor="text-blue-600"
         title="Smart Notes"
         description="Take timestamped notes that sync with the video for better retention and review."
@@ -56,16 +56,15 @@ export default function PlatformLanding() {
   useEffect(() => {
     analytics.desktopViewLoaded();
   }, []);
+  const backgroundClasses = 'min-h-screen bg-white';
+
   return (
     <DesktopOnly>
-      <div className="font-fraunces bg-white">
+      <div className={`font-fraunces ${backgroundClasses}`}>
         <PlatformNavbar />
         <div className="flex flex-col items-center justify-start min-h-screen pt-20">
           <VideoLinkInputCard cfg={cfg} />
-          <div
-            id="how-to-use"
-            className="mt-10 border-2 border-dashed border-gray-400 rounded-xl bg-white flex items-center justify-center text-gray-600 text-base sm:text-lg h-[300px] sm:h-[400px] md:h-[500px] w-[1000px]"
-          >
+          <div id="how-to-use" className="mt-10 border-2 border-dashed border-gray-400/60 rounded-xl bg-white/40 backdrop-blur-lg flex items-center justify-center text-gray-600 text-base sm:text-lg h-[300px] sm:h-[400px] md:h-[500px] w-[1000px]">
             How to use — there will be a video here in future
           </div>
           <BenefitsSection cfg={cfg} />

@@ -2,9 +2,11 @@ import { useParams, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import PlatformNavbar from './PlatformNavbar';
 import { fetchQuestions, submitQuestionAnswer } from '../services/questionService';
-import { SendHorizontal, CheckCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle } from 'lucide-react';
 import DesktopOnly from './DesktopOnly';
 import analytics from '../services/posthogService';
+import themeConfig from './themeConfig';
+
 
 const getDifficultyColor = (level) => {
   if (level === 'easy') return 'bg-green-100 text-green-700';
@@ -13,7 +15,7 @@ const getDifficultyColor = (level) => {
 };
 
 
-function MCQCard({ question, onAnswerSubmit, isAttempted }) {
+function MCQCard({ question, onAnswerSubmit, isAttempted, theme }) {
     const [selected, setSelected] = useState(null);
     const [submitted, setSubmitted] = useState(isAttempted);
     const { question_text, option_1, option_2, option_3, option_4, difficulty_level, correct_option_number } = question.meta_data;
@@ -59,25 +61,28 @@ function MCQCard({ question, onAnswerSubmit, isAttempted }) {
           ))}
         </ul>
         {!submitted && selected && (
-          <SendHorizontal
-            size={20}
-            className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
+          <button
+            type="button"
             onClick={handleSubmit}
-          />
-        )}
-        {submitted && (
-          <div className="mt-4 space-y-1 text-sm">
-            <div className="text-green-700 bg-green-50 border border-green-200 rounded p-2">
-              Correct Answer: <span className="font-semibold">{options[correct_option_number - 1]}</span>
-            </div>
+            disabled={submitted}
+            className={theme.submitButton}
+          >
+            Submit
+          </button>
+       )}
+         {submitted && (
+        <div className="mt-4 space-y-1 text-sm">
+          <div className="text-yellow-800 bg-yellow-50 border border-yellow-200 rounded p-2">
+            Correct answer is: <span className="font-semibold">{options[correct_option_number - 1]}</span>
           </div>
-        )}
+        </div>
+      )}
       </div>
     );
   }
 
 
-  function FillInTheBlankCard({ question, onAnswerSubmit, isAttempted }) {
+  function FillInTheBlankCard({ question, onAnswerSubmit, isAttempted, theme }) {
     const [answer, setAnswer] = useState('');
     const [submitted, setSubmitted] = useState(isAttempted);
     const { question_text, difficulty_level, correct_answer } = question.meta_data;
@@ -107,33 +112,36 @@ function MCQCard({ question, onAnswerSubmit, isAttempted }) {
         </div>
         <input
           type="text"
-          className="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2"
+          className="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-4"
           placeholder="Your answer"
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
           disabled={submitted}
         />
         {!submitted && answer.trim() && (
-          <SendHorizontal
-            size={20}
-            className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
+          <button
+            type="button"
             onClick={handleSubmit}
-          />
+            disabled={submitted}
+            className={theme.submitButton}
+          >
+            Submit
+          </button>
         )}
-        {submitted && (
-          <div className="mt-4 space-y-1 text-sm">
-            <div className="text-green-700 bg-green-50 border border-green-200 rounded p-2">
-              Correct Answer: <span className="font-semibold">{correct_answer}</span>
-            </div>
+      {submitted && (
+        <div className="mt-4 space-y-1 text-sm">
+          <div className="text-yellow-800 bg-yellow-50 border border-yellow-200 rounded p-2">
+             Correct Answer is: <span className="font-semibold">{correct_answer}</span>
           </div>
-        )}
+        </div>
+      )}
       </div>
     );
   }
   
 
 
-function SubjectiveCard({ question, onAnswerSubmit, isAttempted }) {
+function SubjectiveCard({ question, onAnswerSubmit, isAttempted , theme}) {
     console.log(question)
     const [answer, setAnswer] = useState('');
     const [submitted, setSubmitted] = useState(isAttempted);
@@ -172,19 +180,22 @@ function SubjectiveCard({ question, onAnswerSubmit, isAttempted }) {
             disabled={submitted}
         />
         {!submitted && answer.trim() && (
-          <SendHorizontal
-            size={20}
-            className="absolute bottom-4 right-4 text-cyan-600 cursor-pointer hover:scale-110 transition-transform"
-            onClick={handleSubmit}
-          />
-        )}
-        {submitted && (
-          <div className="mt-4 space-y-1 text-sm">
-            <div className="text-green-700 bg-green-50 border border-green-200 rounded p-2">
-              Correct Answer: <span className="font-semibold">{correct_answer}</span>
-            </div>
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={submitted}
+          className={theme.submitButton}
+        >
+          Submit
+        </button>
+      )}
+      {submitted && (
+        <div className="mt-4 space-y-1 text-sm">
+          <div className="text-yellow-800 bg-yellow-50 border border-yellow-200 rounded p-2">
+             Correct Answer is: <span className="font-semibold">{correct_answer}</span>
           </div>
-        )}
+        </div>
+      )}
       </div>
     );
   }
@@ -199,6 +210,7 @@ export default function LibraryDetail() {
   const [unattempted, setUnattempted] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [attemptedQuestions, setAttemptedQuestions] = useState([]);
+  const cfg = themeConfig.app;
 
   useEffect(() => {
     analytics.libraryDetailPageLoaded();
@@ -259,7 +271,7 @@ export default function LibraryDetail() {
                 <div className="mb-8">
                   <div className="text-lg font-semibold mb-2 text-gray-700">MCQ</div>
                   {grouped.mcq.map((q) => (
-                    <MCQCard key={q.id} question={q} onAnswerSubmit={handleCountUpdate} />
+                    <MCQCard key={q.id} question={q} onAnswerSubmit={handleCountUpdate} theme={cfg} />
                   ))}
                 </div>
               )}
@@ -268,7 +280,7 @@ export default function LibraryDetail() {
                 <div className="mb-8">
                   <div className="text-lg font-semibold mb-2 text-gray-700">Fill in the Blank</div>
                   {grouped.fill.map((q) => (
-                    <FillInTheBlankCard key={q.id} question={q} onAnswerSubmit={handleCountUpdate} />
+                    <FillInTheBlankCard key={q.id} question={q} onAnswerSubmit={handleCountUpdate} theme={cfg} />
                   ))}
                 </div>
               )}
@@ -277,7 +289,7 @@ export default function LibraryDetail() {
                 <div className="mb-8">
                   <div className="text-lg font-semibold mb-2 text-gray-700">Subjective</div>
                   {grouped.subjective.map((q) => (
-                    <SubjectiveCard key={q.id} question={q} onAnswerSubmit={handleCountUpdate} />
+                    <SubjectiveCard key={q.id} question={q} onAnswerSubmit={handleCountUpdate} theme={cfg} />
                   ))}
                 </div>
               )}
@@ -292,7 +304,7 @@ export default function LibraryDetail() {
                     <div className="mb-8">
                       <div className="text-base font-medium mb-2 text-gray-600">MCQ</div>
                       {groupedAttempted.mcq.map((q) => (
-                        <MCQCard key={q.id} question={q} isAttempted />
+                        <MCQCard key={q.id} question={q} isAttempted theme={cfg} />
                       ))}
                     </div>
                   )}
@@ -301,7 +313,7 @@ export default function LibraryDetail() {
                     <div className="mb-8">
                       <div className="text-base font-medium mb-2 text-gray-600">Fill in the Blank</div>
                       {groupedAttempted.fill.map((q) => (
-                        <FillInTheBlankCard key={q.id} question={q} isAttempted />
+                        <FillInTheBlankCard key={q.id} question={q} isAttempted theme={cfg} />
                       ))}
                     </div>
                   )}
@@ -310,7 +322,7 @@ export default function LibraryDetail() {
                     <div className="mb-8">
                       <div className="text-base font-medium mb-2 text-gray-600">Subjective</div>
                       {groupedAttempted.subjective.map((q) => (
-                        <SubjectiveCard key={q.id} question={q} isAttempted />
+                        <SubjectiveCard key={q.id} question={q} isAttempted theme={cfg} />
                       ))}
                     </div>
                   )}
