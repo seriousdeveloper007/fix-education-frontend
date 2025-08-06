@@ -1,5 +1,5 @@
 import analytics from './posthogService';
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://api.ilonai.in/';
 
 export async function fetchUnattemptedQuestions() {
   const token = localStorage.getItem('token');
@@ -48,7 +48,7 @@ export async function fetchQuestions(tabId) {
 // In questionService.js
   export async function submitQuestionAnswer({ question_id, answer_text, answer_option }) {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8000/question-answers', {
+    const response = await fetch('https://api.ilonai.in//question-answers', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -74,7 +74,7 @@ export default function StudyRoom() {
       if (!isPlaying() || playbackTime <= 120) return;
   
       try {
-        const res = await fetch('http://localhost:8000/questions/create', {
+        const res = await fetch('https://api.ilonai.in//questions/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

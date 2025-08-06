@@ -9,7 +9,7 @@ export async function updateTab(lastPlaybackTime, videoDuration) {
     }
   
     try {
-      const response = await fetch('http://localhost:8000/tabs', {
+      const response = await fetch('https://api.ilonai.in//tabs', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ export async function updateTab(lastPlaybackTime, videoDuration) {
     }
   
     try {
-      const response = await fetch('http://localhost:8000/tabs/', {
+      const response = await fetch('https://api.ilonai.in//tabs/', {
         method: 'GET',
         headers: {
           Authorization: token,
