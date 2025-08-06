@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import themeConfig from './themeConfig'; // Import themeConfig
+import analytics from '../services/posthogService';
 
 const BACKEND_URL = 'http://localhost:8000';
 
@@ -44,6 +45,10 @@ export default function GoogleLogin() {
       url.searchParams.delete('from-extension');
       window.history.replaceState({}, '', url);
     }
+  }, []);
+
+  useEffect(() => {
+    analytics.loginPageLoaded();
   }, []);
 
   async function handleCredentialResponse(response) {
@@ -95,6 +100,7 @@ export default function GoogleLogin() {
     setLoading(true);
     setError(null);
     try {
+      analytics.loginEmailSubmitted(email);
       const res = await fetch(`${BACKEND_URL}/magic-link/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -118,7 +124,7 @@ export default function GoogleLogin() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#ffe9cc] font-fraunces">
+    <div className="min-h-screen flex flex-col bg-[#F4DEC2] font-fraunces">
       <Navbar showNav={false} showButtons={false} />
 
 
@@ -174,13 +180,17 @@ export default function GoogleLogin() {
           </p>
 
           <div className="login-options mt-6 space-y-6 flex flex-col items-center">
-            <div id="google-signin-button" />
+            {/* TODO: Re-enable Google Sign-In button */}
+            {/* <div id="google-signin-button" /> */}
 
+            {/* TODO: Restore separator when multiple login options are available */}
+            {/*
             <div className="w-[280px] flex items-center text-gray-400 text-sm">
               <hr className="flex-grow border-gray-300" />
               <span className="px-2">or</span>
               <hr className="flex-grow border-gray-300" />
             </div>
+            */}
 
             <input
               type="email"

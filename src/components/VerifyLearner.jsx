@@ -49,7 +49,7 @@ export default function VerifyLearner() {
   }, [location.search, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#ffe9cc] font-fraunces">
+    <div className="min-h-screen flex flex-col bg-[#F4DEC2] font-fraunces">
       <Navbar showNav={false} showButtons={false} />
 
       <div className="bg-[#fdebd0] flex-grow px-2 pt-12 flex justify-center">

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight } from 'lucide-react';
 import { useChatWebSocket } from './ChatWebSocket';
+import analytics from '../services/posthogService';
 
 
 export default function ChatView({ getCurrentTime }) {
@@ -58,9 +59,9 @@ export default function ChatView({ getCurrentTime }) {
       });
   }, []);
 
-  const handleSend = () => {
-    const trimmed = input.trim();
-    if (!trimmed) return;
+    const handleSend = () => {
+      const trimmed = input.trim();
+      if (!trimmed) return;
 
     if (!hasConnectedRef.current) {
       connect();
@@ -71,14 +72,15 @@ export default function ChatView({ getCurrentTime }) {
         setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
         sendMessage(trimmed);
       }, 3000);
-    } else {
-      // For subsequent messages, no delay needed
-      setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
-      sendMessage(trimmed);
-    }
-    
-    setInput('');
-  };
+      } else {
+        // For subsequent messages, no delay needed
+        setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
+        sendMessage(trimmed);
+      }
+      analytics.doubtAsked();
+
+      setInput('');
+    };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {

@@ -11,29 +11,33 @@ const Navbar = ({
   childrenNav = null,
   childrenButtons = null,
 }) => {
+
   const cfg = themeConfig.website;
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
-      console.log('scrollY:', window.scrollY); // DEBUG
-      setScrolled(window.scrollY > 10);
+      const hasScrolled = window.scrollY > 10;
+      setScrolled(hasScrolled); // ✅ simplified update
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
-  useEffect(() => {
-    console.log('scrolled state changed:', scrolled); // DEBUG
-  }, [scrolled]);
-  
 
+  useEffect(() => {
+    console.log('scrolled state changed:', scrolled); // ✅ debug log
+  }, [scrolled]);
 
   return (
     <>
       {/* Top Navbar */}
-      <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${cfg.navbarBg}`}> 
+      <header
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+          scrolled ? 'bg-white' : `${cfg.navbarBg}`
+        }`}
+      >
         <div
           className={`flex items-center justify-between h-[80px] transition-all duration-300 ${
             scrolled ? 'px-2 md:px-[100px]' : 'px-4 md:px-[100px]'
@@ -68,12 +72,15 @@ const Navbar = ({
             <div className="flex items-center gap-4">
               {childrenButtons ?? (
                 <>
+                  {/* TODO: Re-enable Chrome Extension download button */}
+                  {/*
                   <button
                     className={`hidden md:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-2 font-medium transition`}
                   >
                     <Download size={16} />
                     Chrome Extension
                   </button>
+                  */}
                   <button
                     onClick={() => navigate('/login')}
                     className={`${cfg.primaryBtn} transition font-medium px-3 md:px-5 py-1.5 md:py-2 text-sm md:text-base`}

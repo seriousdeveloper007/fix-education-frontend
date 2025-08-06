@@ -3,6 +3,8 @@ import { getTabs } from '../services/tabService';
 import { useEffect, useState } from 'react';
 import { fetchQuestions } from '../services/questionService';
 import { useNavigate } from 'react-router-dom';
+import DesktopOnly from './DesktopOnly';
+import analytics from '../services/posthogService';
 
 
 function CompletionCircle({ percent }) {
@@ -58,6 +60,7 @@ export default function Library() {
 
 
   useEffect(() => {
+    analytics.libraryPageLoaded();
     async function fetchTabsWithQuestions() {
       const tabData = await getTabs();
       const enrichedTabs = await Promise.all(
@@ -77,7 +80,7 @@ export default function Library() {
 
   function getCompletionPercent(tab) {
     const { last_playback_time, video_length } = tab;
-    if (!last_playback_time || !video_length || video_length === 0) return 100;
+    if (!last_playback_time || !video_length || video_length === 0) return 0;
     return Math.min(100, Math.floor((last_playback_time / video_length) * 100));
   }
 
@@ -97,6 +100,7 @@ export default function Library() {
   
 
   return (
+    <DesktopOnly>
     <div className="font-fraunces bg-white">
       <PlatformNavbar defaultTab="Library" />
       <div className="px-[100px] py-[60px]">
@@ -152,5 +156,6 @@ export default function Library() {
         </div>
       </div>
     </div>
+    </DesktopOnly>
   );
 }

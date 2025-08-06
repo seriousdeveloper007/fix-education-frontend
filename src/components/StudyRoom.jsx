@@ -7,6 +7,8 @@ import VideoLinkInputCard from './VideoLinkInputCard.jsx';
 import themeConfig from './themeConfig';
 import SidePanel from './SidePanel.jsx';
 import { fetchUnattemptedQuestions } from '../services/questionService';
+import DesktopOnly from './DesktopOnly';
+import analytics from '../services/posthogService';
 
 
 function extractId(url) {
@@ -101,6 +103,7 @@ export default function StudyRoom() {
   }, [showIframe]);
 
   return (
+    <DesktopOnly>
     <div className="w-full h-full flex flex-col font-fraunces bg-white">
       {!showIframe ? (
         <>
@@ -111,15 +114,16 @@ export default function StudyRoom() {
         </>
       ) : (
         <>
-          <StudyRoomNavbar videoUrl={videoUrl}
-            onTabSelect={(tab) => {
-            pause(); // 👈 Pause video before opening side panel
-            setSidePanelTab(tab);
-          }}
-            unattemptedQuestionCount={unattemptedQuestionCount}
-            getCurrentTime={getCurrentTime}
-            getDuration={getDuration}
-            selectedTab={sidePanelTab}/>
+            <StudyRoomNavbar videoUrl={videoUrl}
+              onTabSelect={(tab) => {
+              pause(); // 👈 Pause video before opening side panel
+              setSidePanelTab(tab);
+              analytics.sideNavbarOpened(tab);
+            }}
+              unattemptedQuestionCount={unattemptedQuestionCount}
+              getCurrentTime={getCurrentTime}
+              getDuration={getDuration}
+              selectedTab={sidePanelTab}/>
           <div className="flex flex-1 overflow-hidden"> {/* Main row: video + side panel */}
             <iframe
               ref={iframeRef}
@@ -143,5 +147,6 @@ export default function StudyRoom() {
         </>
       )}
     </div>
+    </DesktopOnly>
   );
 }

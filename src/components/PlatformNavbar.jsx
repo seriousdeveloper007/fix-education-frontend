@@ -2,6 +2,7 @@ import themeConfig from './themeConfig';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, LogOut } from 'lucide-react';
+import analytics from '../services/posthogService';
 
 
 function UserAvatar({ profilePicture, emailPrefix }) {
@@ -61,12 +62,13 @@ export default function PlatformNavbar({ defaultTab = 'My Space' }) {
     window.location.reload(); // or redirect to login
   };
 
-  const handleTabClick = (tab) => {
-    setSelected(tab);
-    switch (tab) {
-      case 'My Space':
-        navigate('/platform');
-        break;
+    const handleTabClick = (tab) => {
+      setSelected(tab);
+      analytics.navbarOptionClicked(tab);
+      switch (tab) {
+        case 'My Space':
+          navigate('/platform');
+          break;
       case 'Study Room':
         navigate('/study-room');
         break;
