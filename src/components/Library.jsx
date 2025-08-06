@@ -1,7 +1,6 @@
 import PlatformNavbar from './PlatformNavbar';
 import { getTabs } from '../services/tabService';
 import { useEffect, useState } from 'react';
-import { fetchQuestions } from '../services/questionService';
 import { useNavigate } from 'react-router-dom';
 import DesktopOnly from './DesktopOnly';
 import analytics from '../services/posthogService';
@@ -66,16 +65,7 @@ export default function Library() {
     analytics.libraryPageLoaded();
     async function fetchTabsWithQuestions() {
       const tabData = await getTabs();
-      const enrichedTabs = await Promise.all(
-        tabData.map(async (tab) => {
-          const questionStats = await fetchQuestions(tab.id);
-          return {
-            ...tab,
-            questions: questionStats, // should contain attempted and unattempted
-          };
-        })
-      );
-      setTabs(enrichedTabs);
+      setTabs(tabData);
     }
 
     fetchTabsWithQuestions();
@@ -110,8 +100,8 @@ export default function Library() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-10">
           {tabs.map((tab, idx) => {
             const percent = getCompletionPercent(tab);
-            const attempted = tab.questions?.attempted?.length || 0;
-            const unattempted = tab.questions?.unattempted?.length || 0;
+            const attempted = 0;
+            const unattempted = 0;
 
             return (
               <div
