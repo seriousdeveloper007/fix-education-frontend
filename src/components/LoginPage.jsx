@@ -21,7 +21,6 @@ export default function GoogleLogin() {
   useEffect(() => {
 
     // window.google.accounts.id.initialize({
-    //   client_id: '711989652397-ffcq8cuqec6o2hlr4p7tqc5f8t78aa6c.apps.googleusercontent.com',
     //   callback: handleCredentialResponse,
     //   auto_select: false,
     //   cancel_on_tap_outside: false,

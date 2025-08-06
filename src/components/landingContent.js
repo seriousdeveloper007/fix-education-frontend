@@ -346,7 +346,7 @@ faqs : [
   {
     question: "How accurate are the AI-generated questions?",
     answer:
-      "Our AI achieves 95%+ accuracy in question relevance. It's trained on educational content and continuously improves based on user interactions and feedback.",
+      "Our AI achieves 99%+ accuracy in question relevance. It's trained on educational content and continuously improves based on user interactions and feedback.",
   }
 ]
 

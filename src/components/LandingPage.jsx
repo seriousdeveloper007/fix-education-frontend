@@ -66,9 +66,18 @@ const LandingPage = () => {
           Ask doubts while watching, answer ilon AI questions in every 5–10 mins, and auto-organize your notes.
         </p>
         <CTAButtons />
-        <div id="how-to-use" className="mt-10 border-2 border-dashed border-gray-400 rounded-xl bg-white flex items-center justify-center text-gray-600 text-base sm:text-lg 
-          h-[300px] sm:h-[400px] md:h-[500px]">
-          How to use — there will be a video here in future
+        <div id="how-to-use" className="mt-10">
+          <div className="relative w-full overflow-hidden rounded-xl" style={{ paddingTop: '56.25%' }}>
+            <iframe
+              className="absolute top-0 left-0 w-full h-full rounded-xl"
+              src="https://www.youtube.com/embed/-P1Y8AGWbD4?si=j5HencGGvVhRp4Lx"
+              title="How to use ilon AI"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            ></iframe>
+          </div>
         </div>
       </div>
       <div
