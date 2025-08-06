@@ -50,7 +50,7 @@ const LandingPage = () => {
       <Navbar />
       <div
         id="hero"
-        className="bg-[#ffe9cc] shadow-md px-4 sm:px-6 md:px-[100px] pt-20 pb-16"
+        className="bg-[#F4DEC2] shadow-md px-4 sm:px-6 md:px-[100px] pt-20 pb-16"
       >
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug">
           Stop passively watching,{' '}
@@ -86,7 +86,7 @@ const LandingPage = () => {
                 <div className="flex-1 flex items-start gap-4">
                   {/* Icon */}
                   <div className="mt-1">
-                    <div className="p-2 rounded-lg bg-[#ffe9cc] inline-flex items-center justify-center">
+                    <div className="p-2 rounded-lg bg-[#F4DEC2] inline-flex items-center justify-center">
                       <Icon className="w-8 h-8 text-[#f2542d]" />
                     </div>
                   </div>

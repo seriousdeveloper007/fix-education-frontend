@@ -124,7 +124,7 @@ export default function GoogleLogin() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#ffe9cc] font-fraunces">
+    <div className="min-h-screen flex flex-col bg-[#F4DEC2] font-fraunces">
       <Navbar showNav={false} showButtons={false} />
 
 
