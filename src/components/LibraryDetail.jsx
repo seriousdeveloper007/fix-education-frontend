@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import PlatformNavbar from './PlatformNavbar';
 import { fetchQuestions, submitQuestionAnswer } from '../services/questionService';
 import { SendHorizontal, CheckCircle, AlertCircle } from 'lucide-react';
+import DesktopOnly from './DesktopOnly';
 
 const getDifficultyColor = (level) => {
   if (level === 'easy') return 'bg-green-100 text-green-700';
@@ -228,6 +229,7 @@ export default function LibraryDetail() {
   };
 
   return (
+    <DesktopOnly>
     <div className="min-h-screen bg-white flex flex-col font-fraunces">
       <PlatformNavbar defaultTab="Library" />
 
@@ -318,5 +320,6 @@ export default function LibraryDetail() {
         </div>
       </div>
     </div>
+    </DesktopOnly>
   );
 }

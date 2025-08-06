@@ -7,6 +7,7 @@ import VideoLinkInputCard from './VideoLinkInputCard.jsx';
 import themeConfig from './themeConfig';
 import SidePanel from './SidePanel.jsx';
 import { fetchUnattemptedQuestions } from '../services/questionService';
+import DesktopOnly from './DesktopOnly';
 
 
 function extractId(url) {
@@ -101,6 +102,7 @@ export default function StudyRoom() {
   }, [showIframe]);
 
   return (
+    <DesktopOnly>
     <div className="w-full h-full flex flex-col font-fraunces bg-white">
       {!showIframe ? (
         <>
@@ -143,5 +145,6 @@ export default function StudyRoom() {
         </>
       )}
     </div>
+    </DesktopOnly>
   );
 }

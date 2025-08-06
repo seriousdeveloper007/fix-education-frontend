@@ -3,6 +3,7 @@ import { AlertCircle, PlayCircle, Video } from 'lucide-react';
 import themeConfig from './themeConfig';
 import PlatformNavbar from './PlatformNavbar';
 import VideoLinkInputCard from './VideoLinkInputCard';
+import DesktopOnly from './DesktopOnly';
 
 
 
@@ -56,19 +57,21 @@ function BenefitsSection({ cfg }) {
 export default function PlatformLanding() {
   const cfg = themeConfig.app;
      return (
+      <DesktopOnly>
       <div className='font-fraunces bg-white'>
       <PlatformNavbar />
       <div className="flex flex-col items-center justify-start min-h-screen pt-20">
         <VideoLinkInputCard
           cfg={cfg}
         />
-        <div id="how-to-use" className="mt-10 border-2 border-dashed border-gray-400 rounded-xl bg-white flex items-center justify-center text-gray-600 text-base sm:text-lg 
+        <div id="how-to-use" className="mt-10 border-2 border-dashed border-gray-400 rounded-xl bg-white flex items-center justify-center text-gray-600 text-base sm:text-lg
           h-[300px] sm:h-[400px] md:h-[500px] w-[1000px]">
           How to use — there will be a video here in future
         </div>
         <BenefitsSection cfg={cfg} />
       </div>
       </div>
+      </DesktopOnly>
 );
    
 }

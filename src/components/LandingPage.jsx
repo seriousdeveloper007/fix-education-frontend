@@ -6,6 +6,7 @@ import { landingContent  } from './landingContent';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import Navbar from './Navbar';
+import DesktopOnly from './DesktopOnly';
 
 
 const CTAButtons = ({ center = false, showDownload = true }) => {
@@ -43,6 +44,7 @@ const LandingPage = () => {
 
 
   return (
+    <DesktopOnly>
     <div className="bg-white min-h-screen font-fraunces">
       <Navbar />
       <div
@@ -152,6 +154,7 @@ const LandingPage = () => {
     </div>
     <Footer />
     </div>
+    </DesktopOnly>
   );
 };
 
