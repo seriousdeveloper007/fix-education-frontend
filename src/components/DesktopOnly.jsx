@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import themeConfig from './themeConfig';
+import analytics from '../services/posthogService';
 
 export default function DesktopOnly({ children }) {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -11,6 +12,7 @@ export default function DesktopOnly({ children }) {
     };
 
     handleResize();
+    analytics.desktopViewLoaded();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
