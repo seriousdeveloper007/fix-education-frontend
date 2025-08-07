@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../config.js';
+
 export async function updateTab(lastPlaybackTime, videoDuration) {
     const token = localStorage.getItem('token');
     const tabId = localStorage.getItem('tabId');
@@ -9,7 +11,7 @@ export async function updateTab(lastPlaybackTime, videoDuration) {
     }
   
     try {
-      const response = await fetch('https://api.ilonai.in//tabs', {
+        const response = await fetch(`${API_BASE_URL}/tabs`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +47,7 @@ export async function updateTab(lastPlaybackTime, videoDuration) {
     }
   
     try {
-      const response = await fetch('https://api.ilonai.in//tabs/', {
+        const response = await fetch(`${API_BASE_URL}/tabs/`, {
         method: 'GET',
         headers: {
           Authorization: token,

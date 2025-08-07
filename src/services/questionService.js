@@ -1,5 +1,5 @@
 import analytics from './posthogService';
-const API_BASE_URL = 'https://api.ilonai.in/';
+import { API_BASE_URL } from '../config.js';
 
 export async function fetchUnattemptedQuestions() {
   const token = localStorage.getItem('token');
@@ -7,7 +7,7 @@ export async function fetchUnattemptedQuestions() {
   if (!token || !tabId) return [];
 
   try {
-    const res = await fetch(`${API_BASE_URL}/questions/list/${tabId}`, {
+      const res = await fetch(`${API_BASE_URL}/questions/list/${tabId}`, {
       headers: {
         Authorization: token,
       },
@@ -29,7 +29,7 @@ export async function fetchQuestions(tabId) {
   if (!token || !tabId) return [];
 
   try {
-    const res = await fetch(`${API_BASE_URL}/questions/list/${tabId}`, {
+      const res = await fetch(`${API_BASE_URL}/questions/list/${tabId}`, {
       headers: {
         Authorization: token,
       },
@@ -48,7 +48,7 @@ export async function fetchQuestions(tabId) {
 // In questionService.js
   export async function submitQuestionAnswer({ question_id, answer_text, answer_option }) {
     const token = localStorage.getItem('token');
-    const response = await fetch('https://api.ilonai.in//question-answers', {
+      const response = await fetch(`${API_BASE_URL}/question-answers`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

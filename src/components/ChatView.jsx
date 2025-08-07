@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { ArrowRight } from 'lucide-react';
 import { useChatWebSocket } from './ChatWebSocket';
 import analytics from '../services/posthogService';
+import { API_BASE_URL } from '../config.js';
 
 
 export default function ChatView({ getCurrentTime }) {
@@ -41,7 +42,7 @@ export default function ChatView({ getCurrentTime }) {
     const token = localStorage.getItem('token');
     if (!chatId || !token) return;
 
-    fetch(`https://api.ilonai.in//messages/${chatId}`, {
+      fetch(`${API_BASE_URL}/messages/${chatId}`, {
       headers: {
         Authorization: token,
       },
