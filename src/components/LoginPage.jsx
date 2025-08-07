@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import themeConfig from './themeConfig'; // Import themeConfig
 import analytics from '../services/posthogService';
-
-const BACKEND_URL = 'https://api.ilonai.in/';
+import { API_BASE_URL } from '../config.js';
 
 export default function GoogleLogin() {
   const [loading, setLoading] = useState(false);
@@ -50,12 +49,13 @@ export default function GoogleLogin() {
     analytics.loginPageLoaded();
   }, []);
 
-  async function handleCredentialResponse(response) {
+    // eslint-disable-next-line no-unused-vars
+    async function handleCredentialResponse(response) {
     setLoading(true);
     setError(null);
     try {
       const googleIdToken = response.credential;
-      const res = await fetch(`${BACKEND_URL}/user/auth/web/google`, {
+        const res = await fetch(`${API_BASE_URL}/user/auth/web/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: googleIdToken }),
@@ -100,7 +100,7 @@ export default function GoogleLogin() {
     setError(null);
     try {
       analytics.loginEmailSubmitted(email);
-      const res = await fetch(`${BACKEND_URL}/magic-link/`, {
+        const res = await fetch(`${API_BASE_URL}/magic-link/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

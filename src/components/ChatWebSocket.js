@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { WS_BASE_URL } from '../config.js';
 
 export function useChatWebSocket({ onMessage, onToken, getPlaybackTime } = {}) {
   const wsRef = useRef(null);
@@ -19,7 +20,7 @@ export function useChatWebSocket({ onMessage, onToken, getPlaybackTime } = {}) {
       params.append('chatId', storedChatId);
     }
 
-    const ws = new WebSocket(`wss://api.ilonai.in/ws/chat?${params.toString()}`);
+      const ws = new WebSocket(`${WS_BASE_URL}/ws/chat?${params.toString()}`);
     wsRef.current = ws;
 
     ws.onmessage = (event) => {

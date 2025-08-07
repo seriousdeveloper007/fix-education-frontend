@@ -1,7 +1,9 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlayCircle, Loader2 } from 'lucide-react';
 import analytics from '../services/posthogService';
+import { API_BASE_URL } from '../config.js';
 
 function isValidYouTubeUrl(url) {
   try {
@@ -15,8 +17,8 @@ function isValidYouTubeUrl(url) {
   }
 }
 
-async function createTab(userId, url, token) {
-  const response = await fetch('https://api.ilonai.in//tabs', {
+  async function createTab(userId, url, token) {
+    const response = await fetch(`${API_BASE_URL}/tabs`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
