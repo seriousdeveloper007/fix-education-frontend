@@ -124,7 +124,7 @@ export default function GoogleLogin() {
       }
   
       console.log('Magic link sent successfully');
-      setSuccess('We’ve sent a link you an email to verify your address.');
+      setSuccess('A verification link has been sent to your email.');
     } catch (err) {
       console.error('Error during email verification:', err);
       setError(err.message);
