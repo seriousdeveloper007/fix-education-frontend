@@ -52,6 +52,7 @@ export default function StudyRoom() {
   const startTime = extractStartTime(videoUrl);
   const [unattemptedQuestionCount, setUnattemptedQuestionCount] = useState(0);
   const { iframeRef, pause, getCurrentTime, isPlaying, getDuration } = useYouTubePlayer(videoId);
+  const isLoggedIn = Boolean(localStorage.getItem('token'));
 
   const showIframe = videoId && mode === 'play';
 
@@ -105,7 +106,7 @@ export default function StudyRoom() {
 
   return (
     <DesktopOnly>
-    <div className="w-full h-full flex flex-col font-fraunces bg-white">
+    <div className="relative w-full h-full flex flex-col font-fraunces bg-white">
       {!showIframe ? (
         <>
           <PlatformNavbar defaultTab="Study Room" />
@@ -146,6 +147,9 @@ export default function StudyRoom() {
             )}
           </div>
         </>
+      )}
+      {!isLoggedIn && (
+        <div className="absolute inset-0 bg-black/30 z-50 pointer-events-auto cursor-not-allowed" />
       )}
     </div>
     </DesktopOnly>

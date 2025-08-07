@@ -73,11 +73,7 @@ function AppRoutes() {
 
       <Route
         path="/study-room"
-        element={
-          <PrivateRoute>
-            <StudyRoom />
-          </PrivateRoute>
-        }
+        element={<StudyRoom />}
       />
 
       <Route
