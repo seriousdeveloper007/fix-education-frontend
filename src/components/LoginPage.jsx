@@ -5,6 +5,9 @@ import themeConfig from './themeConfig'; // Import themeConfig
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
 
+
+const BACKEND_URL = 'https://api.ilonai.in/';
+
 export default function GoogleLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -49,13 +52,12 @@ export default function GoogleLogin() {
     analytics.loginPageLoaded();
   }, []);
 
-    // eslint-disable-next-line no-unused-vars
-    async function handleCredentialResponse(response) {
+  async function handleCredentialResponse(response) {
     setLoading(true);
     setError(null);
     try {
       const googleIdToken = response.credential;
-        const res = await fetch(`${API_BASE_URL}/user/auth/web/google`, {
+      const res = await fetch(`${BACKEND_URL}/user/auth/web/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: googleIdToken }),
@@ -85,22 +87,26 @@ export default function GoogleLogin() {
       setLoading(false);
     }
   }
-
   const handleVerifyEmail = async () => {
     setEmailError('');
     setError(null);
+    console.log('Verifying email:', email);
+  
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     if (!isValidEmail) {
+      console.log('Invalid email format');
       setEmailError('Please enter a valid email address');
       return;
     }
-
+  
     setEmailError('');
     setLoading(true);
     setError(null);
+  
     try {
       analytics.loginEmailSubmitted(email);
-        const res = await fetch(`${API_BASE_URL}/magic-link/`, {
+      console.log('Sending request to:', `${API_BASE_URL}/magic-link/`);
+      const res = await fetch(`${API_BASE_URL}/magic-link/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -108,19 +114,27 @@ export default function GoogleLogin() {
           login_via: 'website',
         }),
       });
-
+  
+      console.log('Response status:', res.status);
+  
       if (!res.ok) {
         const errData = await res.json();
+        console.error('Error response from server:', errData);
         throw new Error(errData.detail || 'Request failed');
       }
+  
+      console.log('Magic link sent successfully');
       setSuccess('We’ve sent a link you an email to verify your address.');
     } catch (err) {
+      console.error('Error during email verification:', err);
       setError(err.message);
       setSuccess('');
     } finally {
       setLoading(false);
+      console.log('Finished verification process');
     }
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F4DEC2] font-fraunces">
