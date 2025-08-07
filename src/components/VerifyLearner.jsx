@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import themeConfig from './themeConfig';
-
-const BACKEND_URL = 'https://api.ilonai.in/';
+import { API_BASE_URL } from '../config.js';
 
 export default function VerifyLearner() {
   const navigate = useNavigate();
@@ -22,8 +21,8 @@ export default function VerifyLearner() {
         setTimeout(() => navigate('/login'), 2000);
         return;
       }
-      try {
-        const res = await fetch(`${BACKEND_URL}/magic-link/verify`, {
+        try {
+          const res = await fetch(`${API_BASE_URL}/magic-link/verify`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -39,10 +38,11 @@ export default function VerifyLearner() {
         } else {
           throw new Error('Invalid response: missing token');
         }
-      } catch (err) {
-        setError('Verification failed. Redirecting...');
-        setTimeout(() => navigate('/login'), 3000);
-      }
+        } catch (err) {
+          console.error(err);
+          setError('Verification failed. Redirecting...');
+          setTimeout(() => navigate('/login'), 3000);
+        }
     };
 
     verifyToken();

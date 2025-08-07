@@ -9,6 +9,7 @@ import SidePanel from './SidePanel.jsx';
 import { fetchUnattemptedQuestions } from '../services/questionService';
 import DesktopOnly from './DesktopOnly';
 import analytics from '../services/posthogService';
+import { API_BASE_URL } from '../config.js';
 
 
 function extractId(url) {
@@ -73,8 +74,8 @@ export default function StudyRoom() {
 
       if (!isPlaying() || playbackTime <= 120) return;
   
-      try {
-        const res = await fetch('https://api.ilonai.in//questions/create', {
+        try {
+          const res = await fetch(`${API_BASE_URL}/questions/create`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
