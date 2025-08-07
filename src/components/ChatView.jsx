@@ -96,15 +96,19 @@ export default function ChatView({ getCurrentTime }) {
       <div className="flex-1 overflow-y-auto space-y-3 pr-1 mt-2 scrollbar-hide">
         {messages.map((msg, idx) => (
           <div
-            key={idx}
-            className={`${
-              msg.role === 'user'
-                ? 'ml-auto w-fit max-w-[75%] bg-blue-100 text-right'
-                : 'mr-auto w-fit max-w-full bg-gray-100 text-left'
-            } px-3 py-2 rounded-xl text-sm whitespace-pre-line`}
-          >
+          key={idx}
+          className={`${
+            msg.role === 'user'
+              ? 'ml-auto w-fit max-w-[75%] bg-blue-100'
+              : 'mr-auto w-fit max-w-full bg-gray-100'
+          } px-3 py-2 rounded-xl text-sm break-words`}
+        >
+          <div className='text-left'>
             {msg.text}
           </div>
+        </div>
+        
+        
         ))}
         <div ref={bottomRef} />
       </div>
@@ -116,7 +120,7 @@ export default function ChatView({ getCurrentTime }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type your doubt..."
+          placeholder="Paste screenshot or type your doubt.."
           className="flex-1 resize-none px-3 py-1 text-sm focus:outline-none focus:ring-0 border-none scrollbar-hide"
           style={{
             maxHeight: '120px',
