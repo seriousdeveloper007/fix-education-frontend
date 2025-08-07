@@ -98,7 +98,7 @@ export default function StudyRoom() {
       }
     };
     createQuestions();
-    const interval = setInterval(createQuestions, 30000);
+    const interval = setInterval(createQuestions, 180000);
     return () => clearInterval(interval);   
 
   }, [showIframe]);
