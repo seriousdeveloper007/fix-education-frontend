@@ -67,4 +67,27 @@ export async function updateTab(lastPlaybackTime, videoDuration) {
       return null;
     }
   }
+
+  export async function createTab(userId, url, token) {
+    const res = await fetch(`${API_BASE_URL}/tabs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,             // keep exactly as your backend expects
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        captured_from_url: url,
+      }),
+    });
+  
+    if (!res.ok) {
+      // Propagate a more descriptive error message
+      const { message } = await res.json().catch(() => ({}));
+      throw new Error(message || 'Failed to create tab');
+    }
+  
+    const { tab } = await res.json();
+    return tab;
+  }
   
