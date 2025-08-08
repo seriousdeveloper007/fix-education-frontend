@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { createTab } from '../services/tabService';
 import { useYouTubePlayer } from './useYouTubePlayer.js';
 import PlatformNavbar from './PlatformNavbar';
 import StudyRoomNavbar from './StudyRoomNavbar.jsx';
@@ -10,6 +11,9 @@ import { fetchUnattemptedQuestions } from '../services/questionService';
 import DesktopOnly from './DesktopOnly';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
+import LoginCard from './LoginCard';
+import { Loader2 } from 'lucide-react';
+
 
 
 function extractId(url) {
@@ -52,8 +56,40 @@ export default function StudyRoom() {
   const startTime = extractStartTime(videoUrl);
   const [unattemptedQuestionCount, setUnattemptedQuestionCount] = useState(0);
   const { iframeRef, pause, getCurrentTime, isPlaying, getDuration } = useYouTubePlayer(videoId);
-
+  const isLoggedIn = Boolean(localStorage.getItem('token'));
+  const storedTabId = localStorage.getItem('tabId');
   const showIframe = videoId && mode === 'play';
+  const [isPreparingRoom, setIsPreparingRoom] = useState(
+    showIframe && isLoggedIn && !storedTabId
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const attemptCreateTab = async () => {
+      const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
+      const token = localStorage.getItem('token');
+      if (!userId || !token) return console.error('Missing user or token');
+    
+      try {
+        const { id } = await createTab(userId, videoUrl, token);
+        localStorage.setItem('tabId', id);
+        setIsPreparingRoom(false);
+      } catch (err) {
+        console.error('createTab failed, retrying in 5s', err);
+        setTimeout(attemptCreateTab, 5000);
+      }
+    };
+
+    if (isPreparingRoom) {
+      attemptCreateTab();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isPreparingRoom, isLoggedIn]);
+
 
   useEffect(() => {
     if (!showIframe) return;
@@ -105,7 +141,7 @@ export default function StudyRoom() {
 
   return (
     <DesktopOnly>
-    <div className="w-full h-full flex flex-col font-fraunces bg-white">
+    <div className="relative w-full h-full flex flex-col font-fraunces bg-white">
       {!showIframe ? (
         <>
           <PlatformNavbar defaultTab="Study Room" />
@@ -147,6 +183,19 @@ export default function StudyRoom() {
           </div>
         </>
       )}
+      {!isLoggedIn && (
+        <div className="absolute inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <LoginCard redirectUri={window.location.href} />
+        </div>
+      )}
+
+       {/* preparing-room loader overlay */}
+       {isLoggedIn && isPreparingRoom && (
+          <div className="absolute inset-0 z-50 bg-black/40 flex flex-col items-center justify-center space-y-4">
+            <Loader2 className="animate-spin h-12 w-12 text-white" />
+            <p className="text-white text-lg">Preparing study room…</p>
+          </div>
+        )}
     </div>
     </DesktopOnly>
   );
