@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DesktopOnly from './DesktopOnly';
 import analytics from '../services/posthogService';
-import { Loader2 } from 'lucide-react';
-import notesIcon from '../assets/raw_notes.png';
+import { Loader2, Notebook } from 'lucide-react';
 
 
 
@@ -141,7 +140,7 @@ export default function Library() {
                         {tab.page_title}
                       </div>
 
-                      <div className="mt-4 w-full grid grid-cols-3 gap-2 items-center bg-gray-50/70 backdrop-blur-sm px-4 py-4 rounded-lg shadow-inner relative group/stats">
+                      <div className="mt-4 w-full grid grid-cols-3 gap-2 items-start bg-gray-50/70 backdrop-blur-sm px-4 py-4 rounded-lg shadow-inner relative group/stats">
                         <CompletionCircle
                           percent={percent}
                           onClick={() => handleThumbnailClick(tab)}
@@ -165,8 +164,9 @@ export default function Library() {
                           </button>
                         </div>
 
-                        <div className="flex flex-col items-center justify-center">
-                          <img src={notesIcon} alt="Notes" className="w-10 h-10" />
+                        <div className="flex flex-col items-center justify-center text-sm text-gray-700">
+                          <Notebook className="w-10 h-10 text-gray-700" />
+                          <div className="text-xs text-center mt-1">Saved Notes</div>
                           <button
                             className="mt-2 px-3 py-1 text-xs bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white font-medium rounded-lg shadow transition-transform hover:-translate-y-0.5 opacity-0 group-hover/stats:opacity-100 pointer-events-auto"
                             onClick={() => {
