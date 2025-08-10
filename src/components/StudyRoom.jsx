@@ -101,6 +101,7 @@ export default function StudyRoom() {
     load();
   
     const createQuestions = async () => {
+      console.log("create questions")
       const token = localStorage.getItem('token');
       const tabId = localStorage.getItem('tabId');
 
@@ -108,7 +109,9 @@ export default function StudyRoom() {
 
       const playbackTime = getCurrentTime ? Math.floor(getCurrentTime()) : 0;
 
-      if (!isPlaying() || playbackTime <= 120) return;
+      if (!isPlaying() || playbackTime <= 60) return;
+
+      console.log(playbackTime)
   
         try {
           const res = await fetch(`${API_BASE_URL}/questions/create`, {
@@ -134,7 +137,7 @@ export default function StudyRoom() {
       }
     };
     createQuestions();
-    const interval = setInterval(createQuestions, 180000);
+    const interval = setInterval(createQuestions, 100000);
     return () => clearInterval(interval);   
 
   }, [showIframe]);
