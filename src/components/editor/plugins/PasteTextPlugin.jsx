@@ -1,6 +1,13 @@
+// components/editor/plugins/PasteTextPlugin.jsx
 import { useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { COMMAND_PRIORITY_LOW, INSERT_TEXT_COMMAND, $insertNodes, PASTE_COMMAND } from 'lexical';
+import {
+  COMMAND_PRIORITY_LOW,
+  PASTE_COMMAND,
+  $getSelection,
+  $isRangeSelection,
+  $insertNodes,
+} from 'lexical';
 import { $generateNodesFromDOM } from '@lexical/html';
 
 export default function PasteTextPlugin() {
@@ -16,7 +23,7 @@ export default function PasteTextPlugin() {
         const html = cd.getData('text/html');
         const text = cd.getData('text/plain');
 
-        // If there's HTML, insert as nodes
+        // Prefer HTML if available
         if (html) {
           event.preventDefault();
           editor.update(() => {
@@ -28,14 +35,19 @@ export default function PasteTextPlugin() {
           return true;
         }
 
-        // Fallback: plain text
+        // Fallback to plain text
         if (text) {
           event.preventDefault();
-          editor.dispatchCommand(INSERT_TEXT_COMMAND, text);
+          editor.update(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              selection.insertText(text);
+            }
+          });
           return true;
         }
 
-        return false; // let others handle if nothing we understand
+        return false; // nothing we handle; let others try
       },
       COMMAND_PRIORITY_LOW
     );
