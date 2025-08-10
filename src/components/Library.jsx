@@ -54,7 +54,7 @@ function CompletionCircle({ percent, onClick }) {
         <div className="text-xs text-center leading-tight mt-1">
           Tutorial<br />Completed
         </div>
-        <div className="text-[10px] text-gray-400 mt-1">View</div>
+        <div className="text-[10px] text-gray-400 mt-1 text-center">View</div>
       </div>
     );
   }
@@ -141,7 +141,7 @@ export default function Library() {
                         {tab.page_title}
                       </div>
 
-              <div className="mt-4 w-full grid grid-cols-3 gap-2 items-start bg-gray-50/70 backdrop-blur-sm px-4 py-4 rounded-lg shadow-inner relative">
+              <div className="mt-4 w-full grid grid-cols-3 gap-2 items-center bg-gray-50/70 backdrop-blur-sm px-4 py-4 rounded-lg shadow-inner relative">
                 <CompletionCircle
                   percent={percent}
                   onClick={() => handleThumbnailClick(tab)}
@@ -155,12 +155,12 @@ export default function Library() {
                     });
                   }}
                 >
-                  <BookCheck className="w-14 h-14 text-gray-700" strokeWidth={1.5} />
+                  <BookCheck className="w-14 h-14 text-gray-500" strokeWidth={1} />
                   <div className="text-base font-medium mt-1">
                     {attempted} / {attempted + unattempted}
                   </div>
-                  <div className="text-xs text-center">Questions Attempted</div>
-                  <div className="text-[10px] text-gray-400 mt-1">View</div>
+                  <div className="text-xs text-center mt-1">Questions Attempted</div>
+                  <div className="text-[10px] text-gray-400 mt-1 text-center">View</div>
                 </div>
 
                 <div
@@ -171,9 +171,9 @@ export default function Library() {
                     });
                   }}
                 >
-                  <Notebook className="w-14 h-14 text-gray-700" strokeWidth={1.5} />
+                  <Notebook className="w-14 h-14 text-gray-500" strokeWidth={1} />
                   <div className="text-xs text-center mt-1">Saved Notes</div>
-                  <div className="text-[10px] text-gray-400 mt-1">View</div>
+                  <div className="text-[10px] text-gray-400 mt-1 text-center">View</div>
                 </div>
               </div>
             </div>
