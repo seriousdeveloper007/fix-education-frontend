@@ -154,12 +154,14 @@ export default function Library() {
                       state: { pageTitle: tab.page_title },
                     });
                   }}
-                >
+                > 
+               
                   <BookCheck className="w-14 h-14 text-gray-500" strokeWidth={1} />
-                  <div className="text-base font-medium mt-1">
-                    {attempted} / {attempted + unattempted}
-                  </div>
-                  <div className="text-xs text-center mt-1">Questions Attempted</div>
+                 
+                  <div className="text-xs text-center mt-1">Quiz Results</div>
+                   <div className="text-xs font-small mt-1">
+                  {attempted} / {attempted + unattempted}
+                </div>
                   <div className="text-[10px] text-gray-400 mt-1 text-center">View</div>
                 </div>
 
@@ -172,7 +174,7 @@ export default function Library() {
                   }}
                 >
                   <Notebook className="w-14 h-14 text-gray-500" strokeWidth={1} />
-                  <div className="text-xs text-center mt-1">Saved Notes</div>
+                  <div className="text-xs text-center mt-1">Saved <br/> Notes</div>
                   <div className="text-[10px] text-gray-400 mt-1 text-center">View</div>
                 </div>
               </div>
