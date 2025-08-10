@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createTab } from '../services/tabService';
 import { useYouTubePlayer } from './useYouTubePlayer.js';
 import PlatformNavbar from './PlatformNavbar';
@@ -7,12 +7,13 @@ import StudyRoomNavbar from './StudyRoomNavbar.jsx';
 import VideoLinkInputCard from './VideoLinkInputCard.jsx';
 import themeConfig from './themeConfig';
 import SidePanel from './SidePanel.jsx';
-import { fetchUnattemptedQuestions } from '../services/questionService';
+import { fetchUnattemptedQuestions, createQuestions } from '../services/questionService';
 import DesktopOnly from './DesktopOnly';
 import analytics from '../services/posthogService';
-import { API_BASE_URL } from '../config.js';
 import LoginCard from './LoginCard';
 import { Loader2 } from 'lucide-react';
+import { createVideoChunk } from '../services/videoChunkService';
+
 
 
 
@@ -62,6 +63,10 @@ export default function StudyRoom() {
   const [isPreparingRoom, setIsPreparingRoom] = useState(
     showIframe && isLoggedIn && !storedTabId
   );
+  const [lastQuestionCreated, setLastQuestionCreated] = useState(0)
+  const lastCreatedRef = useRef(0);
+  useEffect(() => { lastCreatedRef.current = lastQuestionCreated; }, [lastQuestionCreated]);
+
 
   useEffect(() => {
     let cancelled = false;
@@ -90,57 +95,72 @@ export default function StudyRoom() {
     };
   }, [isPreparingRoom, isLoggedIn]);
 
-
   useEffect(() => {
     if (!showIframe) return;
-
-    const load = async () => {
+  
+    // initial load
+    (async () => {
       const data = await fetchUnattemptedQuestions();
       setUnattemptedQuestionCount(data.length);
-    };
-    load();
+    })();
   
-    const createQuestions = async () => {
-      console.log("create questions")
-      const token = localStorage.getItem('token');
+    const tickCreateQuestions = async () => {
+      if (!isPlaying || !isPlaying()) return;
+  
       const tabId = localStorage.getItem('tabId');
-
-      if (!token || !tabId) return;
-
-      const playbackTime = getCurrentTime ? Math.floor(getCurrentTime()) : 0;
-
-      if (!isPlaying() || playbackTime <= 60) return;
-
-      console.log(playbackTime)
+      if (!tabId || !getCurrentTime) return;
   
-        try {
-          const res = await fetch(`${API_BASE_URL}/questions/create`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token,
-          },
-          body: JSON.stringify({
-            tab_id: tabId,
-            playback_time: playbackTime,
-          }),
-        });
+      const playbackTime = Math.floor(getCurrentTime());
+      if (playbackTime <= 60) return;
+      const diff = playbackTime - (lastCreatedRef.current || 0);
+      if (diff < 180) return;
+
   
-        if (!res.ok) return;
-        const data = await res.json();
-        console.log(data)
-        const totalNew = Object.values(data.questions).reduce((sum, arr) => sum + arr.length, 0);
+      const { totalNew } = await createQuestions(tabId, playbackTime);
+      if (totalNew > 0) {
         setUnattemptedQuestionCount((prev) => prev + totalNew);
-        console.log(unattemptedQuestionCount)
-      } catch (err) {
-        console.error('Failed to fetch questions', err);
+        setLastQuestionCreated(playbackTime);
       }
     };
-    createQuestions();
-    const interval = setInterval(createQuestions, 100000);
-    return () => clearInterval(interval);   
-
+  
+    const intervalId = setInterval(tickCreateQuestions, 20000);
+  
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [showIframe]);
+  
+
+
+  // call create video chunk every 10s with playback_time and (playback_time + 180) as duration
+  useEffect(() => {
+    console.log("create chunk")
+    if (!showIframe) return;
+
+    let intervalId;
+
+    const tickCreateChunk = async () => {
+
+      const playbackTime = Math.floor(getCurrentTime());
+      let playback_time = playbackTime + 180
+      try {
+        await createVideoChunk(playback_time); // assuming service accepts the payload object
+      } catch (err) {
+        console.error('createVideoChunk failed:', err);
+      }
+    };
+
+    tickCreateChunk()
+
+    intervalId = setInterval(tickCreateChunk, 150000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  
+  
 
   return (
     <DesktopOnly>
