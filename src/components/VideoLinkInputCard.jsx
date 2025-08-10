@@ -75,11 +75,11 @@ export default function VideoLinkInputCard({ cfg, initialUrl = '' }) {
   return (
     <div id="videolink-input-card" className={`w-full max-w-[600px] ${cfg.card} min-h-[250px]`}>
       <div className={`${cfg.cardHeadinglarge} flex items-center gap-2`}>
-        <Youtube size={32} />
+        <Youtube size={48} />
         Enter YouTube Video URL
       </div>
       <div className={cfg.cardSubheading}>
-        ilon AI helps you resolve doubts, test your knowledge, and generate structured notes from raw input.
+      ILON AI clears the doubts, tickles your brain with quizzes, and lines up your notes like a pro librarian on caffeine.
       </div>
       <input
         type="text"
