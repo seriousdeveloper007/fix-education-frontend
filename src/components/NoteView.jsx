@@ -24,45 +24,44 @@ function StatusChip({ state }) {
 }
 
 export default function NoteView({ tabId }) {
-  const [status, setStatus] = useState('idle'); // 'saving' | 'saved' | 'error' | 'idle'
+  const [status, setStatus] = useState('idle');
   const [title, setTitle] = useState('Untitled');
   const [initialDocState, setInitialDocState] = useState(null);
 
-  // server bookkeeping
   const noteIdRef = useRef(getStoredNoteId(tabId));
   const versionRef = useRef(0);
+  const lastContentRef = useRef({ plain_text: '', html: '', document_state: {} });
 
-  // sequential save queue (prevents parallel PUTs → 409 loops)
   const savingRef = useRef(false);
   const pendingRef = useRef(null);
 
-  // --- Bootstrapping: fetch if we have an id, otherwise create once ---
   useEffect(() => {
     let active = true;
-
     async function bootstrap() {
       try {
         setStatus('saving');
 
         const existingId = noteIdRef.current;
         if (existingId) {
-          // Try fetch first → avoids duplicate POST
           try {
             const n = await fetchNote(tabId, existingId);
             if (!active) return;
             versionRef.current = n.version ?? 0;
             setTitle(n.title || 'Untitled');
             setInitialDocState(n.document_state || null);
+            lastContentRef.current = {
+              plain_text: n.plain_text || '',
+              html: n.html || '',
+              document_state: n.document_state || {},
+            };
             setStatus('saved');
             setTimeout(() => active && setStatus('idle'), 800);
             return;
           } catch (e) {
             console.warn('Stored note_id invalid, will create a fresh note', e);
-            // fall through to create
           }
         }
 
-        // Create only when we truly don't have a valid note_id for this tab
         const payload = { title: 'Untitled', plain_text: '', html: '', document_state: {} };
         const note = await ensureNote(tabId, payload);
         if (!active) return;
@@ -73,13 +72,15 @@ export default function NoteView({ tabId }) {
 
         setTitle(note.title || 'Untitled');
         setInitialDocState(note.document_state || null);
+        lastContentRef.current = {
+          plain_text: note.plain_text || '',
+          html: note.html || '',
+          document_state: note.document_state || {},
+        };
 
         setStatus('saved');
         setTimeout(() => active && setStatus('idle'), 800);
       } catch (e) {
-        // If backend still returns a duplicate error here, it means localStorage
-        // didn’t have the id and there’s no id-by-tab fetch route yet.
-        // Once you add an UPSERT on POST, this won’t happen.
         console.error(e);
         setStatus('error');
       }
@@ -91,7 +92,6 @@ export default function NoteView({ tabId }) {
     };
   }, [tabId]);
 
-  // --- Single-flight save pump: drains pending updates sequentially ---
   const pumpQueue = useMemo(
     () => async () => {
       if (savingRef.current) return;
@@ -112,13 +112,11 @@ export default function NoteView({ tabId }) {
         } catch (e) {
           console.error('save failed', e);
           if (e.status === 409) {
-            // version mismatch → refresh latest, then retry once
             try {
               const fresh = await fetchNote(tabId, noteIdRef.current);
               versionRef.current = fresh.version ?? versionRef.current;
-              // put the same payload back if nothing newer arrived
               if (!pendingRef.current) pendingRef.current = payload;
-              continue; // retry loop
+              continue;
             } catch (e2) {
               console.error('refresh after 409 failed', e2);
             }
@@ -133,13 +131,10 @@ export default function NoteView({ tabId }) {
     [status, tabId]
   );
 
-  // Coalesce rapid edits; latest wins
   const scheduleSave = useMemo(
     () =>
       debounce((payload) => {
         pendingRef.current = payload;
-        // fire and forget; pump drains queue sequentially
-        // (no parallel PUTs → no version thrash)
         pumpQueue();
       }, 400),
     [pumpQueue]
@@ -147,32 +142,37 @@ export default function NoteView({ tabId }) {
 
   useEffect(() => () => scheduleSave.cancel(), [scheduleSave]);
 
-  // editor → save
   const handleEditorChange = ({ plain_text, html, document_state }) => {
+    lastContentRef.current = { plain_text, html, document_state };
     scheduleSave({ title, plain_text, html, document_state });
   };
 
-  // title edits
-  const onTitleChange = (e) => setTitle(e.target.value || 'Untitled');
+  const onTitleChange = (e) => {
+    const t = e.target.value || 'Untitled';
+    setTitle(t);
+    const { plain_text, html, document_state } = lastContentRef.current;
+    scheduleSave({ title: t, plain_text, html, document_state });
+  };
   const onTitleBlur = () => scheduleSave.flush();
 
   return (
-    <div className="w-full h-full p-2 overflow-hidden flex flex-col gap-3">
+    <div className="w-full h-full overflow-hidden flex flex-col gap-3 p-2 relative">
+      {/* Fixed title row (no chip here anymore) */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 flex-1">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
           <label className="text-sm text-slate-600 shrink-0">Title</label>
           <input
             type="text"
             value={title}
             onChange={onTitleChange}
             onBlur={onTitleBlur}
-            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full min-w-0 rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
             placeholder="Untitled"
           />
         </div>
-        <StatusChip state={status} />
       </div>
 
+      {/* Editor fills the rest; internal area scrolls */}
       <div className="flex-1 min-h-0">
         <LexicalEditor
           initialDocState={initialDocState}
@@ -180,6 +180,11 @@ export default function NoteView({ tabId }) {
           noteId={noteIdRef.current}
           onChange={handleEditorChange}
         />
+      </div>
+
+      {/* Status chip at bottom-right, always visible */}
+      <div className="absolute bottom-2 right-2 pointer-events-none">
+        <StatusChip state={status} />
       </div>
     </div>
   );

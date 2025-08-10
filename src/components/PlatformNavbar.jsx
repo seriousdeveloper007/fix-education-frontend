@@ -94,7 +94,7 @@ export default function PlatformNavbar({ defaultTab = 'My Space' }) {
       {/* LEFT: logo + brand */}
       <div className="flex-1 flex items-center space-x-2 text-left pl-[50px] cursor-pointer" onClick={handleBrandClick}>
         <img src={Logo} alt="ilon ai logo" className="w-12 h-12 object-contain select-none" draggable="false" />
-        <span className="font-semibold text-lg">ilon AI</span>
+        <span className="font-semibold text-lg"> ILON AI</span>
       </div>
 
       {/* MID: navigation */}

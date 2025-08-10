@@ -11,17 +11,20 @@ export default function PasteImagePlugin({ tabId, noteId, onUploaded }) {
     return editor.registerCommand(
       PASTE_COMMAND,
       async (event) => {
-        // Only handle if clipboard contains images; otherwise keep default paste
         const clipboard = event.clipboardData;
         if (!clipboard) return false;
+
         const items = Array.from(clipboard.items || []);
         const imageFiles = items
           .filter((it) => it.kind === 'file')
           .map((it) => it.getAsFile())
           .filter((f) => f && f.type?.startsWith('image/'));
 
-        if (imageFiles.length === 0) return false; // let text paste work normally
-        if (!noteId) return true; // prevent default until note exists (avoid inserting raw data)
+        // If no images → let default paste (text/HTML) proceed.
+        if (imageFiles.length === 0) return false;
+
+        // If images present but note doesn't exist yet, don't block text paste.
+        if (!noteId) return false;
 
         event.preventDefault();
         for (const file of imageFiles) {
@@ -30,7 +33,10 @@ export default function PasteImagePlugin({ tabId, noteId, onUploaded }) {
             onUploaded?.(url);
             editor.update(() => {
               const parser = new DOMParser();
-              const dom = parser.parseFromString(`<img src="${url}" alt=""/>`, 'text/html');
+              const dom = parser.parseFromString(
+                `<img src="${url}" alt="" style="max-width:100%;height:auto;" />`,
+                'text/html'
+              );
               const nodes = $generateNodesFromDOM(editor, dom);
               $insertNodes(nodes);
             });
@@ -40,7 +46,7 @@ export default function PasteImagePlugin({ tabId, noteId, onUploaded }) {
         }
         return true;
       },
-      COMMAND_PRIORITY_LOW,
+      COMMAND_PRIORITY_LOW
     );
   }, [editor, tabId, noteId, onUploaded]);
 
