@@ -8,14 +8,17 @@ import { Loader2 } from 'lucide-react';
 
 
 
-function CompletionCircle({ percent }) {
+function CompletionCircle({ percent, onClick }) {
   const radius = 20; // smaller radius
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference - (percent / 100) * circumference;
   const strokeColor = percent < 50 ? '#ef4444' : '#10b981'; // red / green
 
   return (
-    <div className="flex flex-col items-center justify-center text-sm text-gray-600">
+    <div
+      className="flex flex-col items-center justify-center text-sm text-gray-600 cursor-pointer"
+      onClick={onClick}
+    >
       <svg className="w-14 h-14" viewBox="0 0 60 60">
         <circle
           cx="30"
@@ -137,7 +140,10 @@ export default function Library() {
                       </div>
 
                       <div className="mt-4 w-full grid grid-cols-3 gap-2 items-center bg-gray-50/70 backdrop-blur-sm px-4 py-4 rounded-lg shadow-inner relative group/stats">
-                        <CompletionCircle percent={percent} />
+                        <CompletionCircle
+                          percent={percent}
+                          onClick={() => handleThumbnailClick(tab)}
+                        />
 
                         <div className="flex flex-col items-center justify-center text-sm text-gray-700 col-span-2">
                           <div className="text-base font-bold">
