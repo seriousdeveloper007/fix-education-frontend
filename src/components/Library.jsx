@@ -100,13 +100,14 @@ export default function Library() {
       <div className="font-fraunces bg-white">
         <PlatformNavbar defaultTab="Library" />
         {loading ? (
-          <div className="flex items-center justify-center h-[80vh]">
+          <div className="flex flex-col items-center justify-center h-[80vh] space-y-4">
             <Loader2 className="w-12 h-12 text-cyan-700 animate-spin" />
+            <p className="text-gray-600 text-lg">Synchronizing your Library records…</p>
           </div>
         ) : tabs.length === 0 ? (
           <div className="flex items-center justify-center h-[80vh] px-4">
             <p className="text-center text-gray-500 text-lg">
-              You have not watched any videos yet. Watch videos and they will appear here.
+              Your Library is empty. Watch a video in the Study Room and your viewing history will appear here for easy revisits.
             </p>
           </div>
         ) : (
