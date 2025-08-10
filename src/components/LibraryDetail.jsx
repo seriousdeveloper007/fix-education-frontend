@@ -6,6 +6,7 @@ import { CheckCircle, AlertCircle } from 'lucide-react';
 import DesktopOnly from './DesktopOnly';
 import analytics from '../services/posthogService';
 import themeConfig from './themeConfig';
+import NoteView from './NoteView';
 
 
 const getDifficultyColor = (level) => {
@@ -205,6 +206,7 @@ export default function LibraryDetail() {
   const { tabId } = useParams();
   const location = useLocation();
   const pageTitle = location.state?.pageTitle;
+  const view = new URLSearchParams(location.search).get('view') || 'questions';
 
   const [attempted, setAttempted] = useState(0);
   const [unattempted, setUnattempted] = useState(0);
@@ -217,6 +219,7 @@ export default function LibraryDetail() {
   }, []);
 
   useEffect(() => {
+    if (view === 'notes') return;
     async function loadQuestions() {
       if (!tabId) return;
       const result = await fetchQuestions(tabId);
@@ -226,7 +229,7 @@ export default function LibraryDetail() {
       setAttemptedQuestions(result.attempted || []);
     }
     loadQuestions();
-  }, [tabId]);
+  }, [tabId, view]);
 
   const grouped = {
     mcq: questions.filter((q) => q.type === 'mcq'),
@@ -244,6 +247,31 @@ export default function LibraryDetail() {
     setAttempted((prev) => prev + 1);
     setUnattempted((prev) => Math.max(prev - 1, 0));
   };
+
+  if (view === 'notes') {
+    return (
+      <DesktopOnly>
+        <div className="min-h-screen bg-white flex flex-col font-fraunces">
+          <PlatformNavbar defaultTab="Library" />
+
+          <div className="flex justify-center mt-[60px] mb-[60px]">
+            <div className="w-full max-w-4xl px-4">
+              {pageTitle ? (
+                <>
+                  <div className="text-2xl font-medium text-black-500 mb-4 text-center">{pageTitle}</div>
+                  <NoteView tabId={tabId} />
+                </>
+              ) : (
+                <p className="text-red-500 text-center">
+                  Page title not available. Please navigate from the Library page.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </DesktopOnly>
+    );
+  }
 
   return (
     <DesktopOnly>
