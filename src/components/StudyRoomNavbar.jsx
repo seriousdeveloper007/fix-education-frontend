@@ -1,7 +1,7 @@
 import themeConfig from './themeConfig';
 import { useEffect, useRef, useState } from 'react';
 import { updateTab } from '../services/tabService';
-import { ArrowLeft, MessageSquare, PencilLine } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Notebook, PencilLine } from 'lucide-react';
 
 export default function StudyRoomNavbar({
   videoUrl,
@@ -27,11 +27,15 @@ export default function StudyRoomNavbar({
   const tabs = [
     {
       label: 'Ask Doubt',
-      icon: <MessageSquare className="w-5 h-5 text-indigo-600 group-hover:text-indigo-800" />,
+      icon: <MessageSquare className="w-7 h-5 text-indigo-600 group-hover:text-indigo-800" />,
     },
     {
       label: 'Attempt Question',
-      icon: <PencilLine className="w-5 h-5 text-cyan-600 group-hover:text-cyan-800" />,
+      icon: <PencilLine className="w-7 h-5 text-cyan-600 group-hover:text-cyan-800" />,
+    },
+    {
+      label: 'Take Notes',
+      icon: <Notebook className="w-7 h-5 text-cyan-600 group-hover:text-cyan-800" />,
     },
     // Future tab (example): { label: 'Take Notes', icon: <StickyNote /> }
   ];
