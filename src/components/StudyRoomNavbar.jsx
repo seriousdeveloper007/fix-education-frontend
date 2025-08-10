@@ -37,6 +37,7 @@ export default function StudyRoomNavbar({
   ];
 
   const handleBack = async () => {
+    console.log("Back clicked")
     const last_playback_time = Math.floor(getCurrentTime?.() || 0);
     const video_length = getDuration?.() || 0;
     await updateTab(last_playback_time, video_length);

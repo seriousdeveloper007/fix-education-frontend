@@ -18,8 +18,8 @@ const getDifficultyColor = (level) => {
 function MCQCard({ question, onAnswerSubmit, isAttempted, theme }) {
     const [selected, setSelected] = useState(null);
     const [submitted, setSubmitted] = useState(isAttempted);
-    const { question_text, option_1, option_2, option_3, option_4, difficulty_level, correct_option_number } = question.meta_data;
-    const options = [option_1, option_2, option_3, option_4];
+    const { question_text, option_1, option_2, option_3, difficulty_level, correct_option_number } = question.meta_data;
+    const options = [option_1, option_2, option_3];
 
 
     useEffect(() => {
