@@ -6,6 +6,7 @@ import { CheckCircle, AlertCircle } from 'lucide-react';
 import DesktopOnly from './DesktopOnly';
 import analytics from '../services/posthogService';
 import themeConfig from './themeConfig';
+import MarkdownRenderer from './MarkdownRenderer';
 
 
 const getDifficultyColor = (level) => {
@@ -42,7 +43,7 @@ function MCQCard({ question, onAnswerSubmit, isAttempted, theme }) {
     return (
       <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200 w-full">
         <div className="flex justify-between items-start mb-1">
-          <div className="text-gray-800 text-sm pr-4 mb-3">{question_text}</div>
+          <MarkdownRenderer text={question_text} className="text-gray-800 text-sm pr-4 mb-3" />
           <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
         </div>
         <ul className="space-y-2">
@@ -107,7 +108,7 @@ function MCQCard({ question, onAnswerSubmit, isAttempted, theme }) {
     return (
       <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200 w-full">
         <div className="flex justify-between items-start mb-1">
-          <div className="text-gray-800 text-sm pr-4 mb-3">{question_text}</div>
+          <MarkdownRenderer text={question_text} className="text-gray-800 text-sm pr-4 mb-3" />
           <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
         </div>
         <input
@@ -168,7 +169,7 @@ function SubjectiveCard({ question, onAnswerSubmit, isAttempted , theme}) {
     return (
       <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200 w-full">
         <div className="flex justify-between items-start mb-1">
-          <div className="text-gray-800 text-sm pr-4 mb-3">{question_text}</div>
+          <MarkdownRenderer text={question_text} className="text-gray-800 text-sm pr-4 mb-3" />
           <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
         </div>
         <textarea

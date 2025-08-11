@@ -87,6 +87,7 @@ export default function Library() {
   
       navigate(`/study-room?video=${encodedUrl}&mode=play`);
       localStorage.setItem('tabId', tab.id);
+      localStorage.removeItem('chatId');
     } catch (error) {
       console.error("Invalid video URL:", tab.captured_from_url, error);
     }

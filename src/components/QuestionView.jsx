@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import themeConfig from './themeConfig';
 import { fetchUnattemptedQuestions, submitQuestionAnswer } from '../services/questionService';
+import MarkdownRenderer from './MarkdownRenderer';
 
 
 
@@ -34,7 +35,7 @@ function MCQQuestion({ question, updateQuestionCount, theme }) {
   return (
     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
       <div className="flex justify-between items-start mb-1">
-        <div className={`${theme.questionText} pr-4`}>{question_text}</div>
+        <MarkdownRenderer text={question_text} className={`${theme.questionText} pr-4`} />
         <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
       </div>
       <ul className="space-y-2">
@@ -94,7 +95,7 @@ function FillInTheBlank({ question, updateQuestionCount, theme }) {
   return (
     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
       <div className="flex justify-between items-start mb-1">
-        <div className={`${theme.questionText} pr-4`}>{question_text}</div>
+        <MarkdownRenderer text={question_text} className={`${theme.questionText} pr-4`} />
         <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
       </div>
       <input
@@ -148,7 +149,7 @@ function SubjectiveQuestion({ question, updateQuestionCount, theme }) {
   return (
     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
       <div className="flex justify-between items-start mb-1">
-        <div className={`${theme.questionText} pr-4`}>{question_text}</div>
+        <MarkdownRenderer text={question_text} className={`${theme.questionText} pr-4`} />
         <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
       </div>
       <textarea
