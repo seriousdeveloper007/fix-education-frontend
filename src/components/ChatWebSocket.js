@@ -48,24 +48,14 @@ export function useChatWebSocket({ onMessage, onToken, getPlaybackTime } = {}) {
     wsRef.current?.close();
   };
 
-  // const sendMessage = (text) => {
-  //   if (wsRef.current?.readyState === WebSocket.OPEN) {
-  //     const playbackTime = getPlaybackTime ? Math.floor(getPlaybackTime()) : 0;
-  //     wsRef.current.send(JSON.stringify({
-  //       message_type: 'text',
-  //       text,
-  //       currentPlaybackTime: playbackTime,
-  //     }));
-  //   }
-  // };
-
-  const sendMessage = (text) => {
+  const sendMessage = (data) => {
     try {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         const playbackTime = getPlaybackTime ? Math.floor(getPlaybackTime()) : 0;
+        
+        // Merge playback time with the data object and send
         wsRef.current.send(JSON.stringify({
-          message_type: 'text',
-          text,
+          ...data,
           currentPlaybackTime: playbackTime,
         }));
       } else {
@@ -75,7 +65,6 @@ export function useChatWebSocket({ onMessage, onToken, getPlaybackTime } = {}) {
       console.error("Error sending WebSocket message:", error);
     }
   };
-  
 
   return { connect, sendMessage, close };
 }
