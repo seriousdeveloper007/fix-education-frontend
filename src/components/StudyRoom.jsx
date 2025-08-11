@@ -113,8 +113,9 @@ export default function StudyRoom() {
       const playbackTime = Math.floor(getCurrentTime());
       if (playbackTime <= 60) return;
       const diff = playbackTime - (lastCreatedRef.current || 0);
-      if (diff < 180) return;
+      if (diff < 160) return;
 
+      console.log("creating question", playbackTime)
   
       const { totalNew } = await createQuestions(tabId, playbackTime);
       if (totalNew > 0) {
@@ -123,7 +124,7 @@ export default function StudyRoom() {
       }
     };
   
-    const intervalId = setInterval(tickCreateQuestions, 20000);
+    const intervalId = setInterval(tickCreateQuestions, 10000);
   
     return () => {
       clearInterval(intervalId);
@@ -142,7 +143,7 @@ export default function StudyRoom() {
     const tickCreateChunk = async () => {
 
       const playbackTime = Math.floor(getCurrentTime());
-      let playback_time = playbackTime + 180
+      let playback_time = playbackTime
       try {
         await createVideoChunk(playback_time); // assuming service accepts the payload object
       } catch (err) {
