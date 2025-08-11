@@ -4,6 +4,8 @@ import { ArrowRight } from 'lucide-react';
 import { useChatWebSocket } from './ChatWebSocket';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
+import MarkdownRenderer from './MarkdownRenderer';
+
 
 
 export default function ChatView({ getCurrentTime }) {
@@ -103,9 +105,7 @@ export default function ChatView({ getCurrentTime }) {
               : 'mr-auto w-fit max-w-full bg-gray-100'
           } px-3 py-2 rounded-xl text-sm break-words`}
         >
-          <div className='text-left'>
-            {msg.text}
-          </div>
+          <MarkdownRenderer text={msg.text} />
         </div>
         
         

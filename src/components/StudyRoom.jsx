@@ -63,9 +63,6 @@ export default function StudyRoom() {
   const [isPreparingRoom, setIsPreparingRoom] = useState(
     showIframe && isLoggedIn && !storedTabId
   );
-  const [lastQuestionCreated, setLastQuestionCreated] = useState(0)
-  const lastCreatedRef = useRef(0);
-  useEffect(() => { lastCreatedRef.current = lastQuestionCreated; }, [lastQuestionCreated]);
 
 
   useEffect(() => {
@@ -112,28 +109,24 @@ export default function StudyRoom() {
   
       const playbackTime = Math.floor(getCurrentTime());
       if (playbackTime <= 60) return;
-      const diff = playbackTime - (lastCreatedRef.current || 0);
-      if (diff < 160) return;
 
       console.log("creating question", playbackTime)
   
       const { totalNew } = await createQuestions(tabId, playbackTime);
       if (totalNew > 0) {
         setUnattemptedQuestionCount((prev) => prev + totalNew);
-        setLastQuestionCreated(playbackTime);
       }
     };
   
-    const intervalId = setInterval(tickCreateQuestions, 10000);
+    const intervalId = setInterval(tickCreateQuestions, 150000);
   
     return () => {
       clearInterval(intervalId);
     };
-  }, [showIframe]);
+  }, [showIframe]);  
+
+
   
-
-
-  // call create video chunk every 10s with playback_time and (playback_time + 180) as duration
   useEffect(() => {
     console.log("create chunk")
     if (!showIframe) return;
@@ -152,8 +145,7 @@ export default function StudyRoom() {
     };
 
     tickCreateChunk()
-
-    intervalId = setInterval(tickCreateChunk, 150000);
+    intervalId = setInterval(tickCreateChunk, 60000);
 
     return () => {
       clearInterval(intervalId);
