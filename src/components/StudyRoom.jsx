@@ -126,31 +126,27 @@ export default function StudyRoom() {
   }, [showIframe]);  
 
 
-  
   useEffect(() => {
-    console.log("create chunk")
-    if (!showIframe) return;
-
-    let intervalId;
-
+    if (!showIframe || !getCurrentTime) return;
+  
     const tickCreateChunk = async () => {
-
-      const playbackTime = Math.floor(getCurrentTime());
-      let playback_time = playbackTime
       try {
-        await createVideoChunk(playback_time); // assuming service accepts the payload object
+        const playbackTime = Math.floor(getCurrentTime());
+        console.log("Creating video chunk for time:", playbackTime);
+        await createVideoChunk(playbackTime);
       } catch (err) {
         console.error('createVideoChunk failed:', err);
       }
     };
-
-    tickCreateChunk()
-    intervalId = setInterval(tickCreateChunk, 60000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
+  
+    // Call immediately
+    tickCreateChunk();
+    
+    // Set up interval
+    const intervalId = setInterval(tickCreateChunk, 60000);
+  
+    return () => clearInterval(intervalId);
+  }, [showIframe, getCurrentTime]); // ✅ Include dependencies  
 
   
   

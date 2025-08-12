@@ -6,12 +6,24 @@ import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
 import MarkdownRenderer from './MarkdownRenderer';
 
+
+const LoadingDots = () => (
+  <div className="mr-auto w-fit max-w-full bg-gray-100 px-3 py-2 rounded-xl text-sm">
+    <div className="flex space-x-1">
+      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+    </div>
+  </div>
+);
+
 export default function ChatView({ getCurrentTime }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
 
   // CHANGE: store images as an array (we’ll still restrict to 1 for now)
   const [attachedImages, setAttachedImages] = useState([]); 
+  const [isLoading, setIsLoading] = useState(false);
 
   const hasConnectedRef = useRef(false);
   const bottomRef = useRef(null);
@@ -87,8 +99,8 @@ export default function ChatView({ getCurrentTime }) {
   const { sendMessage, connect, close } = useChatWebSocket({
     // unchanged stream handlers
     onMessage: (msg) => {
-      // CHANGE: support messages arriving as { text, images: [...] }
-      // If your server sends a string, parse here conditionally.
+      setIsLoading(false);
+
       let parsed = msg;
       try {
         parsed = typeof msg === 'string' ? JSON.parse(msg) : msg;
@@ -104,6 +116,7 @@ export default function ChatView({ getCurrentTime }) {
       ]);
     },
     onToken: (token) => {
+      setIsLoading(false)
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (!last || last.role === 'user') {
@@ -169,24 +182,24 @@ export default function ChatView({ getCurrentTime }) {
     attachedImages.forEach((img) => img?.url && URL.revokeObjectURL(img.url));
     setAttachedImages([]);
   
-    const sendPayloadNow = () => {
-      // optimistic append (message already prepared above)
-      setMessages((prev) => [...prev, messagesToAdd]);
-      sendMessage(payload);
-      analytics.doubtAsked();
-    };
+    // CHANGE: Always add message to UI instantly
+    setMessages((prev) => [...prev, messagesToAdd]);
+    setIsLoading(true);
   
     if (!hasConnectedRef.current) {
-      // First time: connect, mark as connected, and delay the send by 3s
+      // First time: connect, add message instantly, but delay WebSocket send by 3s
       connect();
       hasConnectedRef.current = true;
-  
+      
       setTimeout(() => {
-        sendPayloadNow();
+
+        sendMessage(payload);
+        analytics.doubtAsked();
       }, 3000);
     } else {
       // Subsequent messages: send immediately
-      sendPayloadNow();
+      sendMessage(payload);
+      analytics.doubtAsked();
     }
   };
   
@@ -233,6 +246,7 @@ export default function ChatView({ getCurrentTime }) {
             <MarkdownRenderer text={msg.text} />
           </div>
         ))}
+        {isLoading && <LoadingDots />}
         <div ref={bottomRef} />
       </div>
 
