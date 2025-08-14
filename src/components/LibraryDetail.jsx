@@ -193,7 +193,10 @@ function SubjectiveCard({ question, onAnswerSubmit, isAttempted , theme}) {
       {submitted && (
         <div className="mt-4 space-y-1 text-sm">
           <div className="text-yellow-800 bg-yellow-50 border border-yellow-200 rounded p-2">
-             Correct Answer is: <span className="font-semibold">{correct_answer}</span>
+            <span className="font-semibold">Correct Answer is:</span>
+            <div className="mt-1">
+              <MarkdownRenderer text={correct_answer} />
+            </div>
           </div>
         </div>
       )}

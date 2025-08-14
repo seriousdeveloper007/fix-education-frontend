@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { ArrowRight, X } from 'lucide-react'; // CHANGE: import X
+import { ArrowRight, X } from 'lucide-react';
 import { useChatWebSocket } from './ChatWebSocket';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
@@ -20,13 +20,12 @@ const LoadingDots = () => (
 export default function ChatView({ getCurrentTime }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-
-  // CHANGE: store images as an array (we’ll still restrict to 1 for now)
   const [attachedImages, setAttachedImages] = useState([]); 
   const [isLoading, setIsLoading] = useState(false);
 
   const hasConnectedRef = useRef(false);
   const bottomRef = useRef(null);
+  const messageContainerRef = useRef(null); // Add ref for the message container
   const [error, setError] = useState('');
   const errorTimerRef = useRef(null);
 
@@ -44,13 +43,12 @@ export default function ChatView({ getCurrentTime }) {
       reader.readAsDataURL(file);
     });
 
-  // CHANGE: paste handler writes into array, enforces 1 image
   const handlePaste = async (e) => {
     const items = e.clipboardData?.items || [];
     const imgItem = Array.from(items).find((it) => it.type?.startsWith('image/'));
     if (!imgItem) return;
 
-    if (attachedImages.length >= 1) { // enforce single image for now
+    if (attachedImages.length >= 1) {
       showError('Only one image is allowed. Remove the current one to paste another.');
       e.preventDefault();
       return;
@@ -78,7 +76,6 @@ export default function ChatView({ getCurrentTime }) {
     }
   };
 
-  // CHANGE: remove by index (future-proof for multi-images)
   const removeImageAt = (idx) => {
     setAttachedImages((prev) => {
       const next = [...prev];
@@ -97,7 +94,6 @@ export default function ChatView({ getCurrentTime }) {
   }, []);
 
   const { sendMessage, connect, close } = useChatWebSocket({
-    // unchanged stream handlers
     onMessage: (msg) => {
       setIsLoading(false);
 
@@ -105,7 +101,6 @@ export default function ChatView({ getCurrentTime }) {
       try {
         parsed = typeof msg === 'string' ? JSON.parse(msg) : msg;
       } catch {
-        // fallback: treat as plain text
         parsed = { text: String(msg), images: [] };
       }
 
@@ -130,16 +125,19 @@ export default function ChatView({ getCurrentTime }) {
     getPlaybackTime: getCurrentTime,
   });
 
+  // FIX: Use container scrolling instead of scrollIntoView
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messageContainerRef.current) {
+      // Directly set scrollTop to scroll to bottom within the container
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  }, [messages, isLoading]); // Also trigger on isLoading to scroll when dots appear
 
   useEffect(() => {
     const chatId = localStorage.getItem('chatId');
     const token = localStorage.getItem('token');
     if (!chatId || !token) return;
 
-    // CHANGE: fixed template string + map images
     fetch(`${API_BASE_URL}/messages/${chatId}`, {
       headers: {
         Authorization: token,
@@ -150,7 +148,6 @@ export default function ChatView({ getCurrentTime }) {
         const loaded = (data.messages || []).map((m) => ({
           role: m.message_from === 'assistant' ? 'agent' : 'user',
           text: m.text,
-          // CHANGE: accept list from backend
           images: Array.isArray(m.images) ? m.images : [], 
         }));
         setMessages(loaded);
@@ -174,30 +171,24 @@ export default function ChatView({ getCurrentTime }) {
           : undefined,
     };
   
-    // CHANGE: Clear input and images immediately for instant UI feedback
     const messagesToAdd = { role: 'user', text: trimmed, images: payload.images };
     setInput('');
     
-    // cleanup image object URLs and clear selection immediately
     attachedImages.forEach((img) => img?.url && URL.revokeObjectURL(img.url));
     setAttachedImages([]);
   
-    // CHANGE: Always add message to UI instantly
     setMessages((prev) => [...prev, messagesToAdd]);
     setIsLoading(true);
   
     if (!hasConnectedRef.current) {
-      // First time: connect, add message instantly, but delay WebSocket send by 3s
       connect();
       hasConnectedRef.current = true;
       
       setTimeout(() => {
-
         sendMessage(payload);
         analytics.doubtAsked();
       }, 3000);
     } else {
-      // Subsequent messages: send immediately
       sendMessage(payload);
       analytics.doubtAsked();
     }
@@ -211,7 +202,7 @@ export default function ChatView({ getCurrentTime }) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       {error && (
         <div className="absolute left-0 right-0 top-0 z-20 px-4">
           <div className="mt-2 rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700 shadow-sm">
@@ -220,8 +211,11 @@ export default function ChatView({ getCurrentTime }) {
         </div>
       )}
 
-      {/* Scrollable message list */}
-      <div className="flex-1 overflow-y-auto space-y-3 pr-1 mt-2 scrollbar-hide">
+      {/* Scrollable message list with ref */}
+      <div 
+        ref={messageContainerRef}
+        className="flex-1 overflow-y-auto space-y-3 pr-1 mt-2 scrollbar-hide"
+      >
         {messages.map((msg, idx) => (
           <div
             key={idx}
@@ -230,7 +224,6 @@ export default function ChatView({ getCurrentTime }) {
               : 'mr-auto w-fit max-w-full bg-gray-100'
               } px-3 py-2 rounded-xl text-sm break-words`}
           >
-            {/* CHANGE: render images[] */}
             {Array.isArray(msg.images) && msg.images.length > 0 && (
               <div className="mb-2 space-y-2">
                 {msg.images.map((img, i) => (
@@ -252,7 +245,6 @@ export default function ChatView({ getCurrentTime }) {
 
       {/* Input area pinned at bottom */}
       <div className="mt-2 pt-1 pr-1 border rounded-xl flex items-start relative">
-        {/* CHANGE: preview the (single) attached image */}
         {attachedImages.length > 0 && (
           <div className="absolute left-3 bottom-full mb-2 bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
             <div className="relative w-28 h-20">
@@ -298,7 +290,6 @@ export default function ChatView({ getCurrentTime }) {
               localStorage.removeItem('chatId');
               hasConnectedRef.current = false;
               close();
-              // CHANGE: clear images on new chat
               attachedImages.forEach((img) => img?.url && URL.revokeObjectURL(img.url));
               setAttachedImages([]);
             }}
