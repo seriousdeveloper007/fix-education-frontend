@@ -188,6 +188,14 @@ export default function NoteView({ tabId }) {
   useEffect(() => () => scheduleSave.cancel(), [scheduleSave]);
 
   const handleEditorChange = useCallback(({ plain_text, html, document_state }) => {
+    // Debug logging to verify images are being saved
+    if (document_state && JSON.stringify(document_state).includes('"type":"image"')) {
+      console.log('Document state contains images, preparing to save...');
+      console.log('Image nodes found in state:', 
+        JSON.stringify(document_state).match(/"type":"image"/g)?.length || 0
+      );
+    }
+    
     lastContentRef.current = { plain_text, html, document_state };
     scheduleSave({ title, plain_text, html, document_state });
   }, [title, scheduleSave]);
