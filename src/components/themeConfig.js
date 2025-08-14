@@ -20,15 +20,9 @@ export default {
 
   app: {
     root: 'min-h-screen bg-gradient-to-br from-cyan-50 via-emerald-50 to-white text-slate-900 selection:bg-emerald-300/30 font-fraunces',
-
-    // header now has a subtle glass effect
     appHeader: 'bg-white/50 backdrop-blur-md shadow-md font-semibold text-lg h-20 flex items-center',
-    
-    // navigation
     tabActive: 'font-semibold text-black',
     tabInactive: 'text-gray-600 hover:text-black transition-colors duration-200',
-
-    // user‑area
     dropdownIcon: 'w-5 h-5 cursor-pointer text-gray-700 hover:text-black transition-colors duration-200',
     dropdownMenu: 'absolute right-0 mt-2 w-36 bg-white/70 backdrop-blur-md border border-white/30 rounded-xl shadow-lg z-50 overflow-hidden',
     dropdownButton: 'w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-white/20 transition-colors duration-150',
@@ -39,19 +33,13 @@ export default {
     from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] \
     hover:to-[#06b6d4] text-white font-medium shadow-lg \
     rounded-md transition-transform hover:-translate-y-0.5 disabled:opacity-50',
-
-    // cards + misc
     card: 'bg-white/40 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg px-6 py-4 transition-transform hover:-translate-y-1 hover:shadow-xl',
     cardHeadinglarge: 'text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight',
     cardHeadingSecondary: 'text-base sm:text-lg font-medium text-slate-800',
     cardSubheading: 'mt-2 text-sm text-gray-600',
     primarytext: 'text-sm text-slate-700',
-
-    // actions / inputs
     primaryButton: 'w-full max-w-[250px] px-4 py-2 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white font-medium rounded-xl disabled:opacity-50 mt-5 transition-transform hover:-translate-y-0.5 shadow-lg',
     inputfield: 'w-full bg-white/60 backdrop-blur-sm border border-gray-300 rounded px-3 py-2 mt-5 placeholder-gray-500 focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600',
-
     questionText: 'mt-2 text-sm text-gray-700 mb-1',
-
   }
 };

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import themeConfig from './themeConfig';
 import { fetchUnattemptedQuestions, submitQuestionAnswer } from '../services/questionService';
+import MarkdownRenderer from './MarkdownRenderer';
 
 
 
@@ -11,8 +12,8 @@ const getDifficultyColor = (level) => {
 };
 
 function MCQQuestion({ question, updateQuestionCount, theme }) {
-  const { question_text, option_1, option_2, option_3, option_4, difficulty_level, correct_option_number } = question.meta_data;
-  const options = [option_1, option_2, option_3, option_4];
+  const { question_text, option_1, option_2, option_3, difficulty_level, correct_option_number } = question.meta_data;
+  const options = [option_1, option_2, option_3];
   const [selected, setSelected] = useState(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -34,7 +35,7 @@ function MCQQuestion({ question, updateQuestionCount, theme }) {
   return (
     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
       <div className="flex justify-between items-start mb-1">
-        <div className={`${theme.questionText} pr-4`}>{question_text}</div>
+        <MarkdownRenderer text={question_text} className={`${theme.questionText} pr-4`} />
         <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
       </div>
       <ul className="space-y-2">
@@ -94,7 +95,7 @@ function FillInTheBlank({ question, updateQuestionCount, theme }) {
   return (
     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
       <div className="flex justify-between items-start mb-1">
-        <div className={`${theme.questionText} pr-4`}>{question_text}</div>
+        <MarkdownRenderer text={question_text} className={`${theme.questionText} pr-4`} />
         <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
       </div>
       <input
@@ -148,7 +149,7 @@ function SubjectiveQuestion({ question, updateQuestionCount, theme }) {
   return (
     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
       <div className="flex justify-between items-start mb-1">
-        <div className={`${theme.questionText} pr-4`}>{question_text}</div>
+        <MarkdownRenderer text={question_text} className={`${theme.questionText} pr-4`} />
         <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
       </div>
       <textarea
@@ -172,7 +173,10 @@ function SubjectiveQuestion({ question, updateQuestionCount, theme }) {
       {submitted && (
         <div className="mt-4 space-y-1 text-sm">
           <div className="text-yellow-800 bg-yellow-50 border border-yellow-200 rounded p-2">
-             Correct Answer is: <span className="font-semibold">{correct_answer}</span>
+            <span className="font-semibold">Correct Answer is:</span>
+            <div className="mt-1">
+              <MarkdownRenderer text={correct_answer} />
+            </div>
           </div>
         </div>
       )}

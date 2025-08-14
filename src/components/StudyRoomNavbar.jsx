@@ -39,17 +39,31 @@ export default function StudyRoomNavbar({
     },
     // Future tab (example): { label: 'Take Notes', icon: <StickyNote /> }
   ];
-
-  const handleBack = async () => {
+  // General function to update tab details - called by all clickable elements
+  const handleUpdateTabDetails = async () => {
+    console.log("Updating tab details...");
     const last_playback_time = Math.floor(getCurrentTime?.() || 0);
     const video_length = getDuration?.() || 0;
     await updateTab(last_playback_time, video_length);
+  };
 
+  // Wrapper function for back button - updates tab details then navigates
+  const handleBack = async () => {
+    console.log("Back clicked");
+    await handleUpdateTabDetails();
+
+    const last_playback_time = Math.floor(getCurrentTime?.() || 0);
     const url = new URL(videoUrl);
     url.searchParams.set('t', `${last_playback_time}s`);
     const encodedUrl = encodeURIComponent(url.toString());
     window.location.href = `/study-room?video=${encodedUrl}`;
   };
+
+  // Wrapper function for tab selection - updates tab details then selects tab
+  const handleTabSelect = async (tabLabel) => {
+    onTabSelect(tabLabel);
+  };
+
 
   return (
     <header className="sticky top-0 z-50 w-full h-16 px-6 flex items-center justify-between shadow-md bg-white/40 backdrop-blur-lg font-fraunces">
@@ -73,7 +87,7 @@ export default function StudyRoomNavbar({
           return (
             <div
               key={tab.label}
-              onClick={() => onTabSelect(tab.label)}
+              onClick={() => handleTabSelect(tab.label)}
               className={`flex flex-col items-center group cursor-pointer transition-transform duration-150 hover:-translate-y-0.5 ${
                 isAttemptTab && animateAttemptTab ? 'animate-bounce animate-pulse' : ''
               }`}

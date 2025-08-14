@@ -53,10 +53,10 @@ export default function PlatformNavbar({ defaultTab = 'My Space' }) {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    localStorage.clear();
     window.location.reload();
   };
+  
 
   const handleTabClick = (tab) => {
     setSelected(tab);

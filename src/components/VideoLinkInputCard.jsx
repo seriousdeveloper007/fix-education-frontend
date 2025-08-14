@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlayCircle, Loader2, Youtube } from 'lucide-react';
 import analytics from '../services/posthogService';
-import { API_BASE_URL } from '../config.js';
+import { createTab } from '../services/tabService';
+
 
 function isValidYouTubeUrl(url) {
   try {
@@ -17,21 +18,6 @@ function isValidYouTubeUrl(url) {
   }
 }
 
-  async function createTab(userId, url, token) {
-    const response = await fetch(`${API_BASE_URL}/tabs`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token,
-    },
-    body: JSON.stringify({
-      user_id: userId,
-      captured_from_url: url,
-    }),
-  });
-  if (!response.ok) throw new Error('Failed to create tab');
-  return (await response.json()).tab;
-}
 
 export default function VideoLinkInputCard({ cfg, initialUrl = '' }) {
   const [url, setUrl] = useState('');

@@ -70,3 +70,38 @@ export async function fetchQuestions(tabId) {
     analytics.questionAttempted(question_id);
     return data;
   }
+
+
+  export async function createQuestions(tabId, playbackTime) {
+    const token = localStorage.getItem('token');
+    if (!token || !tabId) return { totalNew: 0, data: null };
+  
+    try {
+      const res = await fetch(`${API_BASE_URL}/questions/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token,
+        },
+        body: JSON.stringify({
+          tab_id: Number(tabId),
+          playback_time: Math.floor(playbackTime || 0),
+        }),
+      });
+  
+      if (!res.ok) return { totalNew: 0, data: null };
+  
+      const data = await res.json();
+      const totalNew = data?.questions
+        ? Object.values(data.questions).reduce(
+            (sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0),
+            0
+          )
+        : 0;
+  
+      return { totalNew, data };
+    } catch (err) {
+      console.error('Failed to create questions', err);
+      return { totalNew: 0, data: null };
+    }
+  }

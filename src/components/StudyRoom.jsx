@@ -1,15 +1,20 @@
 import { useSearchParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { createTab , updateTab} from '../services/tabService';
 import { useYouTubePlayer } from './useYouTubePlayer.js';
 import PlatformNavbar from './PlatformNavbar';
 import StudyRoomNavbar from './StudyRoomNavbar.jsx';
 import VideoLinkInputCard from './VideoLinkInputCard.jsx';
 import themeConfig from './themeConfig';
 import SidePanel from './SidePanel.jsx';
-import { fetchUnattemptedQuestions } from '../services/questionService';
+import { fetchUnattemptedQuestions, createQuestions } from '../services/questionService';
 import DesktopOnly from './DesktopOnly';
 import analytics from '../services/posthogService';
-import { API_BASE_URL } from '../config.js';
+import LoginCard from './LoginCard';
+import { Loader2 } from 'lucide-react';
+import { createVideoChunk } from '../services/videoChunkService';
+
+
 
 
 function extractId(url) {
@@ -49,63 +54,157 @@ export default function StudyRoom() {
   const cfg = themeConfig.app;
   const [sidePanelTab, setSidePanelTab] = useState(null);
   const isSidePanelOpen = !!sidePanelTab;
-  const startTime = extractStartTime(videoUrl);
+  const urlStartTime = extractStartTime(videoUrl);
+  const savedStartTime = videoId ? parseInt(localStorage.getItem(`playbackTime_${videoId}`) || '0', 10) : 0;
+  const startTime = savedStartTime > 0 ? savedStartTime : urlStartTime;
   const [unattemptedQuestionCount, setUnattemptedQuestionCount] = useState(0);
-  const { iframeRef, pause, getCurrentTime, isPlaying, getDuration } = useYouTubePlayer(videoId);
-
+  const isLoggedIn = Boolean(localStorage.getItem('token'));
+  const storedTabId = localStorage.getItem('tabId');
   const showIframe = videoId && mode === 'play';
+  const [isPreparingRoom, setIsPreparingRoom] = useState(
+    showIframe && isLoggedIn && !storedTabId
+  );
+
+  const handleUpdateTabDetails = useCallback(async (getCurrentTime, getDuration) => {
+    if (!getCurrentTime || !getDuration) return;
+    
+    console.log("Updating tab details from video state change...");
+    const last_playback_time = Math.floor(getCurrentTime() || 0);
+    const video_length = getDuration() || 0;
+    
+    try {
+      await updateTab(last_playback_time, video_length);
+    } catch (error) {
+      console.error('Failed to update tab details:', error);
+    }
+  }, []);
+
+  // Handle YouTube player state changes (play/pause)
+  const handlePlayerStateChange = useCallback((state) => {
+    console.log('Player state changed to:', state);
+    
+    // Update tab details on play (1) or pause (2) events
+    if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.PAUSED) {
+      handleUpdateTabDetails(getCurrentTime, getDuration);
+    }
+  }, [handleUpdateTabDetails]);
+
+  const { iframeRef, pause, getCurrentTime, isPlaying, getDuration } = useYouTubePlayer(
+    videoId, 
+    handlePlayerStateChange
+  );
+
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const attemptCreateTab = async () => {
+      const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
+      const token = localStorage.getItem('token');
+      if (!userId || !token) return console.error('Missing user or token');
+    
+      try {
+        const { id } = await createTab(userId, videoUrl, token);
+        localStorage.setItem('tabId', id);
+        setIsPreparingRoom(false);
+      } catch (err) {
+        console.error('createTab failed, retrying in 5s', err);
+        setTimeout(attemptCreateTab, 5000);
+      }
+    };
+
+    if (isPreparingRoom) {
+      attemptCreateTab();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isPreparingRoom, isLoggedIn]);
 
   useEffect(() => {
     if (!showIframe) return;
-
-    const load = async () => {
+  
+    // initial load
+    (async () => {
       const data = await fetchUnattemptedQuestions();
       setUnattemptedQuestionCount(data.length);
-    };
-    load();
+    })();
   
-    const createQuestions = async () => {
-      const token = localStorage.getItem('token');
+    const tickCreateQuestions = async () => {
+      if (!isPlaying()) return;
+  
       const tabId = localStorage.getItem('tabId');
-
-      if (!token || !tabId) return;
-
-      const playbackTime = getCurrentTime ? Math.floor(getCurrentTime()) : 0;
-
-      if (!isPlaying() || playbackTime <= 120) return;
+      if (!tabId || !getCurrentTime) return;
   
-        try {
-          const res = await fetch(`${API_BASE_URL}/questions/create`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token,
-          },
-          body: JSON.stringify({
-            tab_id: tabId,
-            playback_time: playbackTime,
-          }),
-        });
+      const playbackTime = Math.floor(getCurrentTime());
+      if (playbackTime <= 60) return;
+
+      console.log("creating question", playbackTime)
   
-        if (!res.ok) return;
-        const data = await res.json();
-        console.log(data)
-        const totalNew = Object.values(data.questions).reduce((sum, arr) => sum + arr.length, 0);
+      const { totalNew } = await createQuestions(tabId, playbackTime);
+      if (totalNew > 0) {
         setUnattemptedQuestionCount((prev) => prev + totalNew);
-        console.log(unattemptedQuestionCount)
-      } catch (err) {
-        console.error('Failed to fetch questions', err);
       }
     };
-    createQuestions();
-    const interval = setInterval(createQuestions, 30000);
-    return () => clearInterval(interval);   
+  
+    const intervalId = setInterval(tickCreateQuestions, 20000);
+  
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [showIframe]);  
 
-  }, [showIframe]);
+
+  useEffect(() => {
+    console.log("inside create chunk")
+    if (!showIframe || !getCurrentTime) return;
+    
+    const tickCreateChunk = async () => {
+      if (!isPlaying()) return;
+      try {
+        const playbackTime = Math.floor(getCurrentTime());
+        console.log("Creating video chunk for time:", playbackTime);
+        await createVideoChunk(playbackTime);
+      } catch (err) {
+        console.error('createVideoChunk failed:', err);
+      }
+    };
+  
+    // Call immediately
+    tickCreateChunk();
+    
+    // Set up interval
+    const intervalId = setInterval(tickCreateChunk, 20000);
+  
+    return () => clearInterval(intervalId);
+  }, [showIframe, getCurrentTime]); // ✅ Include dependencies  
+
+
+  // Save playback time every 2 seconds
+  useEffect(() => {
+    if (!showIframe || !getCurrentTime || !videoId) return;
+    
+    const savePlaybackTime = () => {
+      try {
+        const currentTime = Math.floor(getCurrentTime());
+        if (currentTime > 0) {
+          localStorage.setItem(`playbackTime_${videoId}`, currentTime.toString());
+        }
+      } catch (error) {
+        console.error('Failed to save playback time:', error);
+      }
+    };
+    
+    const intervalId = setInterval(savePlaybackTime, 2000);
+    
+    return () => clearInterval(intervalId);
+  }, [showIframe, getCurrentTime, videoId]);
+  
 
   return (
     <DesktopOnly>
-    <div className="w-full h-full flex flex-col font-fraunces bg-white">
+    <div className="relative w-full h-screen flex flex-col font-fraunces bg-white overflow-hidden">
       {!showIframe ? (
         <>
           <PlatformNavbar defaultTab="Study Room" />
@@ -147,6 +246,19 @@ export default function StudyRoom() {
           </div>
         </>
       )}
+      {!isLoggedIn && (
+        <div className="absolute inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <LoginCard redirectUri={window.location.href} />
+        </div>
+      )}
+
+       {/* preparing-room loader overlay */}
+       {isLoggedIn && isPreparingRoom && (
+          <div className="absolute inset-0 z-50 bg-black/40 flex flex-col items-center justify-center space-y-4">
+            <Loader2 className="animate-spin h-12 w-12 text-white" />
+            <p className="text-white text-lg">Preparing study room…</p>
+          </div>
+        )}
     </div>
     </DesktopOnly>
   );

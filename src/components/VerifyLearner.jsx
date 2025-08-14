@@ -12,8 +12,26 @@ export default function VerifyLearner() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const token = queryParams.get('token');
+    const queryParams   = new URLSearchParams(location.search);
+    const token         = queryParams.get('token');
+    const redirectParam = queryParams.get('redirect_url');          // may be null
+
+    /** Very small, optional safety-net:  
+     *  – allow any relative path (“/study-room?v=123”)  
+     *  – OR allow absolute URLs whose origin matches current origin  
+     *  Anything else falls back to null → we’ll send them to /platform
+     */
+    const getSafeRedirect = (url) => {
+      if (!url) return null;
+      try {
+        const parsed = new URL(url, window.location.origin); // handles relative & absolute
+        return parsed.origin === window.location.origin ? parsed.pathname + parsed.search + parsed.hash : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const safeRedirect = getSafeRedirect(redirectParam);
 
     const verifyToken = async () => {
       if (!token) {
@@ -21,28 +39,28 @@ export default function VerifyLearner() {
         setTimeout(() => navigate('/login'), 2000);
         return;
       }
-        try {
-          const res = await fetch(`${API_BASE_URL}/magic-link/verify`, {
+      try {
+        const res = await fetch(`${API_BASE_URL}/magic-link/verify`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token }),
-        });      
+        });
+
         const data = await res.json();
         const { token: authToken, user } = data;
-        if (authToken) {
-          localStorage.setItem('token', authToken);
-          localStorage.setItem('user', JSON.stringify(user));
-          navigate('/platform');
-        } else {
-          throw new Error('Invalid response: missing token');
-        }
-        } catch (err) {
-          console.error(err);
-          setError('Verification failed. Redirecting...');
-          setTimeout(() => navigate('/login'), 3000);
-        }
+
+        if (!authToken) throw new Error('Invalid response: missing token');
+
+        localStorage.setItem('token', authToken);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        // use replace so verification page doesn’t stay in history stack
+        navigate(safeRedirect || '/platform', { replace: true });
+      } catch (err) {
+        console.error(err);
+        setError('Verification failed. Redirecting…');
+        setTimeout(() => navigate('/login'), 3000);
+      }
     };
 
     verifyToken();
@@ -51,11 +69,10 @@ export default function VerifyLearner() {
   return (
     <div className="min-h-screen flex flex-col bg-[#F4DEC2] font-fraunces">
       <Navbar showNav={false} showButtons={false} />
-
       <div className="bg-[#fdebd0] flex-grow px-2 pt-12 flex justify-center">
         <div className="bg-white rounded-xl shadow-md px-6 py-4 w-full max-w-md text-center h-[300px] flex flex-col justify-center">
           <h1 className={cfg.authHeading}>
-            {error ? 'Verification Failed' : 'Verifying your identity...'}
+            {error ? 'Verification Failed' : 'Verifying your identity…'}
           </h1>
           <p className={`${cfg.authMuted} mt-3`}>
             {error || 'Please wait a moment.'}

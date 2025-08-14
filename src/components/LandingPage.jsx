@@ -57,7 +57,7 @@ const LandingPage = () => {
         className="bg-[#F4DEC2] shadow-md px-4 sm:px-6 md:px-[100px] pt-20 pb-16"
       >
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug">
-          Make learning from youtube,{' '}
+          Make learning from youtube{' '}
           <br className="hidden sm:block" />
           interactive with ilon AI.
         </h1>
