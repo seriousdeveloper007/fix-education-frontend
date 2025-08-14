@@ -66,53 +66,59 @@ export default function StudyRoomNavbar({
 
 
   return (
-    <header className="sticky top-0 z-50 w-full h-16 px-6 flex items-center justify-between shadow-md bg-white/40 backdrop-blur-lg font-fraunces">
-      {/* LEFT: Back Button */}
-      <div className="flex-1 flex items-center pl-[50px]">
-        <div
-          onClick={handleBack}
-          className="flex items-center space-x-2 cursor-pointer transition-transform duration-150 hover:-translate-x-0.5 select-none"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-700 hover:text-black" />
-          <span className="text-sm text-gray-700 hover:text-black font-medium">Back</span>
+    <header className="sticky top-0 z-50 w-full bg-white/40 backdrop-blur-lg shadow-md font-fraunces">
+      {/* Inner container: widen the middle area and center the whole bar */}
+      <div className="mx-auto max-w-[1100px] h-16 px-2 flex items-center justify-between">
+        {/* LEFT: Back Button */}
+        <div className="flex-1 flex">
+          <div
+            onClick={handleBack}
+            className="flex items-center space-x-2 cursor-pointer transition-transform duration-150 hover:-translate-x-0.5 select-none"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-700 hover:text-black" />
+            <span className="text-sm text-gray-700 hover:text-black font-medium">Back</span>
+          </div>
         </div>
-      </div>
-
-      {/* MID: Tab Navigation */}
-      <div className="flex-1 flex justify-center items-center space-x-8">
-        {tabs.map((tab) => {
-          const isAttemptTab = tab.label === 'Attempt Question';
-          const hasCount = isAttemptTab && unattemptedQuestionCount > 0;
-
-          return (
-            <div
-              key={tab.label}
-              onClick={() => handleTabSelect(tab.label)}
-              className={`flex flex-col items-center group cursor-pointer transition-transform duration-150 hover:-translate-y-0.5 ${
-                isAttemptTab && animateAttemptTab ? 'animate-bounce animate-pulse' : ''
-              }`}
-            >
-              <div className="flex items-center space-x-2">
-                {tab.icon}
-                <span className={selectedTab === tab.label ? cfg.tabActive : cfg.tabInactive}>
-                  {tab.label}
-                  {hasCount && (
-                    <span className="text-red-600 font-semibold ml-1">
-                      ({unattemptedQuestionCount})
-                    </span>
+  
+        {/* MID: Tab Navigation (wider + no-wrap) */}
+        <nav className="flex-1 flex justify-center">
+          <ul className="flex items-center gap-12">
+            {tabs.map((tab) => {
+              const isAttemptTab = tab.label === 'Attempt Question';
+              const hasCount = isAttemptTab && unattemptedQuestionCount > 0;
+              const active = selectedTab === tab.label;
+  
+              return (
+                <li
+                  key={tab.label}
+                  onClick={() => handleTabSelect(tab.label)}
+                  className={`relative group cursor-pointer select-none flex items-center gap-2 py-2 px-1 shrink-0
+                    transition-transform duration-150 hover:-translate-y-0.5
+                    ${isAttemptTab && animateAttemptTab ? 'animate-bounce animate-pulse' : ''}`}
+                >
+                  <span className="shrink-0">{tab.icon}</span>
+  
+                  <span className={`whitespace-nowrap ${active ? cfg.tabActive : cfg.tabInactive}`}>
+                    {tab.label}
+                    {hasCount && (
+                      <span className="text-red-600 font-semibold ml-1">({unattemptedQuestionCount})</span>
+                    )}
+                  </span>
+  
+                  {/* underline for active tab (just under the label+icon) */}
+                  {active && (
+                    <span className="absolute -bottom-1 left-0 right-0 h-[3px] bg-black rounded-full" />
                   )}
-                </span>
-              </div>
-              {selectedTab === tab.label && (
-                <div className="mt-1 w-full h-[3px] bg-black rounded-full transition-all duration-200" />
-              )}
-            </div>
-          );
-        })}
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+  
+        {/* RIGHT: Spacer */}
+        <div className="flex-1 pr-[20px]" />
       </div>
-
-      {/* RIGHT: Spacer */}
-      <div className="flex-1 pr-[50px]" />
     </header>
   );
+  
 }

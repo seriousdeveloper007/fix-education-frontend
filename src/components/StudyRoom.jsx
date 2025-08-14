@@ -59,11 +59,8 @@ export default function StudyRoom() {
   const startTime = savedStartTime > 0 ? savedStartTime : urlStartTime;
   const [unattemptedQuestionCount, setUnattemptedQuestionCount] = useState(0);
   const isLoggedIn = Boolean(localStorage.getItem('token'));
-  const storedTabId = localStorage.getItem('tabId');
   const showIframe = videoId && mode === 'play';
-  const [isPreparingRoom, setIsPreparingRoom] = useState(
-    showIframe && isLoggedIn && !storedTabId
-  );
+  const [isPreparingRoom, setIsPreparingRoom] = useState(showIframe && isLoggedIn);
 
   const handleUpdateTabDetails = useCallback(async (getCurrentTime, getDuration) => {
     if (!getCurrentTime || !getDuration) return;
@@ -96,16 +93,22 @@ export default function StudyRoom() {
 
 
   useEffect(() => {
-    let cancelled = false;
+    if (!showIframe || !isLoggedIn) return;
+
+    localStorage.removeItem('tabId');
+    const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = localStorage.getItem('token');
+    if (!userId || !token) {
+      console.error('Missing user or token');
+      return;
+    }
 
     const attemptCreateTab = async () => {
-      const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
-      const token = localStorage.getItem('token');
-      if (!userId || !token) return console.error('Missing user or token');
-    
       try {
         const { id } = await createTab(userId, videoUrl, token);
         localStorage.setItem('tabId', id);
+        localStorage.removeItem('chatId');
+        analytics.youtubeLearningStarted(videoUrl);
         setIsPreparingRoom(false);
       } catch (err) {
         console.error('createTab failed, retrying in 5s', err);
@@ -113,53 +116,46 @@ export default function StudyRoom() {
       }
     };
 
-    if (isPreparingRoom) {
-      attemptCreateTab();
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isPreparingRoom, isLoggedIn]);
+    attemptCreateTab();
+  }, [showIframe, isLoggedIn, videoUrl]);
 
   useEffect(() => {
-    if (!showIframe) return;
-  
-    // initial load
+    if (!showIframe || isPreparingRoom) return;
+
     (async () => {
       const data = await fetchUnattemptedQuestions();
       setUnattemptedQuestionCount(data.length);
     })();
-  
+
     const tickCreateQuestions = async () => {
       if (!isPlaying()) return;
-  
+
       const tabId = localStorage.getItem('tabId');
       if (!tabId || !getCurrentTime) return;
-  
+
       const playbackTime = Math.floor(getCurrentTime());
       if (playbackTime <= 60) return;
 
       console.log("creating question", playbackTime)
-  
+
       const { totalNew } = await createQuestions(tabId, playbackTime);
       if (totalNew > 0) {
         setUnattemptedQuestionCount((prev) => prev + totalNew);
       }
     };
-  
+
     const intervalId = setInterval(tickCreateQuestions, 20000);
-  
+
     return () => {
       clearInterval(intervalId);
     };
-  }, [showIframe]);  
+  }, [showIframe, isPreparingRoom]);
 
 
   useEffect(() => {
     console.log("inside create chunk")
-    if (!showIframe || !getCurrentTime) return;
-    
+    if (!showIframe || !getCurrentTime || isPreparingRoom) return;
+
     const tickCreateChunk = async () => {
       if (!isPlaying()) return;
       try {
@@ -170,21 +166,21 @@ export default function StudyRoom() {
         console.error('createVideoChunk failed:', err);
       }
     };
-  
+
     // Call immediately
     tickCreateChunk();
-    
+
     // Set up interval
     const intervalId = setInterval(tickCreateChunk, 20000);
-  
+
     return () => clearInterval(intervalId);
-  }, [showIframe, getCurrentTime]); // ✅ Include dependencies  
+  }, [showIframe, getCurrentTime, isPreparingRoom]); // ✅ Include dependencies
 
 
   // Save playback time every 2 seconds
   useEffect(() => {
-    if (!showIframe || !getCurrentTime || !videoId) return;
-    
+    if (!showIframe || !getCurrentTime || !videoId || isPreparingRoom) return;
+
     const savePlaybackTime = () => {
       try {
         const currentTime = Math.floor(getCurrentTime());
@@ -195,11 +191,11 @@ export default function StudyRoom() {
         console.error('Failed to save playback time:', error);
       }
     };
-    
+
     const intervalId = setInterval(savePlaybackTime, 2000);
-    
+
     return () => clearInterval(intervalId);
-  }, [showIframe, getCurrentTime, videoId]);
+  }, [showIframe, getCurrentTime, videoId, isPreparingRoom]);
   
 
   return (

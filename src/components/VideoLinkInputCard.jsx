@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlayCircle, Loader2, Youtube } from 'lucide-react';
 import analytics from '../services/posthogService';
-import { createTab } from '../services/tabService';
 
 
 function isValidYouTubeUrl(url) {
@@ -29,33 +28,16 @@ export default function VideoLinkInputCard({ cfg, initialUrl = '' }) {
     setUrl(initialUrl);
   }, [initialUrl]);
 
-  const handleClick = async () => {
+  const handleClick = () => {
     setError('');
-    setLoading(true);
     const trimmed = url.trim();
     if (!isValidYouTubeUrl(trimmed)) {
       setError('Please enter a valid YouTube URL');
-      setLoading(false);
       return;
     }
-    try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const token = localStorage.getItem('token');
-      if (!user || !token) {
-        setError('User not authenticated');
-        setLoading(false);
-        return;
-      }
-      const tab = await createTab(user.id, trimmed, token);
-      localStorage.setItem('tabId', tab.id);
-      localStorage.removeItem('chatId');
-      analytics.youtubeLearningStarted(trimmed);
-      navigate(`/study-room?video=${encodeURIComponent(trimmed)}&mode=play`);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to initiate learning session. Please try again.');
-      setLoading(false);
-    }
+    setLoading(true);
+    analytics.youtubeLearningStarted(trimmed);
+    navigate(`/study-room?video=${encodeURIComponent(trimmed)}&mode=play`);
   };
 
   return (

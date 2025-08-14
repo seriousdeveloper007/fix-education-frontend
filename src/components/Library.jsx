@@ -93,7 +93,6 @@
 //       const encodedUrl = encodeURIComponent(url.toString());
   
 //       navigate(`/study-room?video=${encodedUrl}&mode=play`);
-//       localStorage.setItem('tabId', tab.id);
 //     } catch (error) {
 //       console.error("Invalid video URL:", tab.captured_from_url, error);
 //     }
@@ -291,8 +290,6 @@ export default function Library() {
       const encodedUrl = encodeURIComponent(url.toString());
   
       navigate(`/study-room?video=${encodedUrl}&mode=play`);
-      localStorage.setItem('tabId', tab.id);
-      localStorage.removeItem('chatId');
     } catch (error) {
       console.error("Invalid video URL:", tab.captured_from_url, error);
     }
