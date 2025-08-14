@@ -223,7 +223,7 @@ export default function NoteView({ tabId }) {
   return (
     <div className="w-full h-full overflow-hidden flex flex-col gap-4 p-4 relative">
       {/* Title input with better styling */}
-      <div className="flex items-center gap-3">
+      {/* <div className="flex items-center gap-3">
         <label className="text-base font-medium text-slate-700 shrink-0">Title</label>
         <input
           type="text"
@@ -233,7 +233,7 @@ export default function NoteView({ tabId }) {
           className="flex-1 rounded-lg border border-slate-300 px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
           placeholder="Enter note title..."
         />
-      </div>
+      </div> */}
 
       {/* Editor fills the rest with proper padding */}
       <div className="flex-1 min-h-0 rounded-lg border border-gray-200 bg-white overflow-hidden">

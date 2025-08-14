@@ -126,7 +126,6 @@ function EditorContent({ initialDocState, tabId, noteId, onChange }) {
             }
             placeholder={
               <div className="text-gray-400 text-base absolute top-4 left-4 pointer-events-none">
-                Start typing...
               </div>
             }
             ErrorBoundary={LexicalErrorBoundary}
