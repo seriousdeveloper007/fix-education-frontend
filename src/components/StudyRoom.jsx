@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
-import { createTab } from '../services/tabService';
+import { useState, useEffect, useCallback } from 'react';
+import { createTab , updateTab} from '../services/tabService';
 import { useYouTubePlayer } from './useYouTubePlayer.js';
 import PlatformNavbar from './PlatformNavbar';
 import StudyRoomNavbar from './StudyRoomNavbar.jsx';
@@ -54,14 +54,44 @@ export default function StudyRoom() {
   const cfg = themeConfig.app;
   const [sidePanelTab, setSidePanelTab] = useState(null);
   const isSidePanelOpen = !!sidePanelTab;
-  const startTime = extractStartTime(videoUrl);
+  const urlStartTime = extractStartTime(videoUrl);
+  const savedStartTime = videoId ? parseInt(localStorage.getItem(`playbackTime_${videoId}`) || '0', 10) : 0;
+  const startTime = savedStartTime > 0 ? savedStartTime : urlStartTime;
   const [unattemptedQuestionCount, setUnattemptedQuestionCount] = useState(0);
-  const { iframeRef, pause, getCurrentTime, isPlaying, getDuration } = useYouTubePlayer(videoId);
   const isLoggedIn = Boolean(localStorage.getItem('token'));
   const storedTabId = localStorage.getItem('tabId');
   const showIframe = videoId && mode === 'play';
   const [isPreparingRoom, setIsPreparingRoom] = useState(
     showIframe && isLoggedIn && !storedTabId
+  );
+
+  const handleUpdateTabDetails = useCallback(async (getCurrentTime, getDuration) => {
+    if (!getCurrentTime || !getDuration) return;
+    
+    console.log("Updating tab details from video state change...");
+    const last_playback_time = Math.floor(getCurrentTime() || 0);
+    const video_length = getDuration() || 0;
+    
+    try {
+      await updateTab(last_playback_time, video_length);
+    } catch (error) {
+      console.error('Failed to update tab details:', error);
+    }
+  }, []);
+
+  // Handle YouTube player state changes (play/pause)
+  const handlePlayerStateChange = useCallback((state) => {
+    console.log('Player state changed to:', state);
+    
+    // Update tab details on play (1) or pause (2) events
+    if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.PAUSED) {
+      handleUpdateTabDetails(getCurrentTime, getDuration);
+    }
+  }, [handleUpdateTabDetails]);
+
+  const { iframeRef, pause, getCurrentTime, isPlaying, getDuration } = useYouTubePlayer(
+    videoId, 
+    handlePlayerStateChange
   );
 
 
@@ -102,7 +132,7 @@ export default function StudyRoom() {
     })();
   
     const tickCreateQuestions = async () => {
-      if (!isPlaying || !isPlaying()) return;
+      if (!isPlaying()) return;
   
       const tabId = localStorage.getItem('tabId');
       if (!tabId || !getCurrentTime) return;
@@ -118,7 +148,7 @@ export default function StudyRoom() {
       }
     };
   
-    const intervalId = setInterval(tickCreateQuestions, 150000);
+    const intervalId = setInterval(tickCreateQuestions, 20000);
   
     return () => {
       clearInterval(intervalId);
@@ -127,9 +157,11 @@ export default function StudyRoom() {
 
 
   useEffect(() => {
+    console.log("inside create chunk")
     if (!showIframe || !getCurrentTime) return;
-  
+    
     const tickCreateChunk = async () => {
+      if (!isPlaying()) return;
       try {
         const playbackTime = Math.floor(getCurrentTime());
         console.log("Creating video chunk for time:", playbackTime);
@@ -143,17 +175,36 @@ export default function StudyRoom() {
     tickCreateChunk();
     
     // Set up interval
-    const intervalId = setInterval(tickCreateChunk, 60000);
+    const intervalId = setInterval(tickCreateChunk, 20000);
   
     return () => clearInterval(intervalId);
   }, [showIframe, getCurrentTime]); // ✅ Include dependencies  
 
-  
+
+  // Save playback time every 2 seconds
+  useEffect(() => {
+    if (!showIframe || !getCurrentTime || !videoId) return;
+    
+    const savePlaybackTime = () => {
+      try {
+        const currentTime = Math.floor(getCurrentTime());
+        if (currentTime > 0) {
+          localStorage.setItem(`playbackTime_${videoId}`, currentTime.toString());
+        }
+      } catch (error) {
+        console.error('Failed to save playback time:', error);
+      }
+    };
+    
+    const intervalId = setInterval(savePlaybackTime, 2000);
+    
+    return () => clearInterval(intervalId);
+  }, [showIframe, getCurrentTime, videoId]);
   
 
   return (
     <DesktopOnly>
-    <div className="relative w-full h-full flex flex-col font-fraunces bg-white">
+    <div className="relative w-full h-screen flex flex-col font-fraunces bg-white overflow-hidden">
       {!showIframe ? (
         <>
           <PlatformNavbar defaultTab="Study Room" />

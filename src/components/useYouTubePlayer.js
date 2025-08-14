@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-export function useYouTubePlayer(videoId) {
+export function useYouTubePlayer(videoId, onStateChange) {
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
   const hasInitializedRef = useRef(false);
@@ -30,7 +30,12 @@ export function useYouTubePlayer(videoId) {
             },
             onStateChange: (event) => {
               console.log('🎮 Player state changed:', event.data);
-            },
+              
+              // Call the callback if provided
+              if (onStateChange) {
+                onStateChange(event.data);
+              }
+            },            
           },
         });
         hasInitializedRef.current = true;
