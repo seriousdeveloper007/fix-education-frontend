@@ -8,11 +8,11 @@ import NoteView from './NoteView';
 export default function SidePanel({ tab, onClose, getCurrentTime, updateQuestionCount }) {
   const cfg = themeConfig.app;
 
-  const renderContent = () => {
-    if (tab === 'Ask Doubt') return <p className={cfg.cardSubheading}>Ask your doubt here</p>;
-    if (tab === 'Attempt Question') return <p className={cfg.cardSubheading}>Here&apos;s a question to try</p>;
-    if (tab === 'Take Notes') return <p className={cfg.cardSubheading}>Take your notes here</p>;
-    return null;
+  const getTitle = () => {
+    if (tab === 'Ask Doubt') return 'Ask your doubt';
+    if (tab === 'Attempt Question') return 'Practice Questions';
+    if (tab === 'Take Notes') return 'Take Notes';
+    return '';
   };
 
   const renderUI = () => {
@@ -26,14 +26,23 @@ export default function SidePanel({ tab, onClose, getCurrentTime, updateQuestion
   };
 
   return (
-    <div className="w-1/3 bg-white shadow rounded-none flex flex-col h-full px-2 py-2">
-      <div className="flex items-center justify-between px-1 py-0.5 border-b">
-        <div className="px-1">{renderContent()}</div>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700 px-1">
+    <div className="w-1/3 bg-white shadow-lg rounded-none flex flex-col h-full">
+      {/* Header with title and close button */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+        <h2 className="text-lg font-semibold text-gray-800">{getTitle()}</h2>
+        <button 
+          onClick={onClose} 
+          className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-200 transition-colors"
+          aria-label="Close panel"
+        >
           <X className="w-5 h-5" />
         </button>
       </div>
-      <div className="flex-1 flex flex-col overflow-hidden">{renderUI()}</div>
+      
+      {/* Content area */}
+      <div className="flex-1 flex flex-col overflow-hidden bg-white">
+        {renderUI()}
+      </div>
     </div>
   );
 }

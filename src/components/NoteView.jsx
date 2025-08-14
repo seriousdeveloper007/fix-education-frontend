@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { debounce } from 'lodash';
 import LexicalEditor from './editor/LexicalEditor';
 import { ensureNote, updateNote, fetchNote } from '../services/noteService';
-import { getStoredNoteId, setStoredNoteId } from '../utils/storage';
+import { getStoredNoteId, setStoredNoteId, removeStoredNoteId } from '../utils/storage';
 
 function StatusChip({ state }) {
   const map = {
@@ -20,13 +20,14 @@ function StatusChip({ state }) {
       : state === 'error'
       ? 'Error while saving'
       : 'Idle';
-  return <span className={`text-xs px-2 py-0.5 rounded border ${map[state]}`}>{label}</span>;
+  return <span className={`text-sm px-3 py-1 rounded-full border ${map[state]}`}>{label}</span>;
 }
 
 export default function NoteView({ tabId }) {
   const [status, setStatus] = useState('idle');
   const [title, setTitle] = useState('Untitled');
   const [initialDocState, setInitialDocState] = useState(null);
+  const [isReady, setIsReady] = useState(false);
 
   const noteIdRef = useRef(getStoredNoteId(tabId));
   const versionRef = useRef(0);
@@ -35,9 +36,36 @@ export default function NoteView({ tabId }) {
   const savingRef = useRef(false);
   const pendingRef = useRef(null);
 
+  // Cleanup function
+  const cleanup = useCallback(() => {
+    if (noteIdRef.current && !title.trim()) {
+      // Remove note ID from storage if note is empty
+      removeStoredNoteId(tabId);
+      console.log('Cleaned up empty note from storage');
+    }
+  }, [tabId, title]);
+
+  // Enhanced error handling
+  const handleError = useCallback((error, context) => {
+    console.error(`Error in ${context}:`, error);
+    setStatus('error');
+    
+    // If note doesn't exist anymore, clean up storage
+    if (error.status === 404) {
+      removeStoredNoteId(tabId);
+      noteIdRef.current = null;
+    }
+  }, [tabId]);
+
   useEffect(() => {
     let active = true;
+    
     async function bootstrap() {
+      if (!tabId) {
+        console.warn('No tabId provided to NoteView');
+        return;
+      }
+
       try {
         setStatus('saving');
 
@@ -46,6 +74,7 @@ export default function NoteView({ tabId }) {
           try {
             const n = await fetchNote(tabId, existingId);
             if (!active) return;
+            
             versionRef.current = n.version ?? 0;
             setTitle(n.title || 'Untitled');
             setInitialDocState(n.document_state || null);
@@ -55,13 +84,16 @@ export default function NoteView({ tabId }) {
               document_state: n.document_state || {},
             };
             setStatus('saved');
+            setIsReady(true);
             setTimeout(() => active && setStatus('idle'), 800);
             return;
           } catch (e) {
             console.warn('Stored note_id invalid, will create a fresh note', e);
+            removeStoredNoteId(tabId); // Clean up invalid note ID
           }
         }
 
+        // Create new note
         const payload = { title: 'Untitled', plain_text: '', html: '', document_state: {} };
         const note = await ensureNote(tabId, payload);
         if (!active) return;
@@ -79,22 +111,24 @@ export default function NoteView({ tabId }) {
         };
 
         setStatus('saved');
+        setIsReady(true);
         setTimeout(() => active && setStatus('idle'), 800);
       } catch (e) {
-        console.error(e);
-        setStatus('error');
+        handleError(e, 'bootstrap');
       }
     }
 
     if (tabId) bootstrap();
+    
     return () => {
       active = false;
+      cleanup();
     };
-  }, [tabId]);
+  }, [tabId, handleError, cleanup]);
 
   const pumpQueue = useMemo(
     () => async () => {
-      if (savingRef.current) return;
+      if (savingRef.current || !noteIdRef.current) return;
       savingRef.current = true;
 
       while (pendingRef.current) {
@@ -110,70 +144,91 @@ export default function NoteView({ tabId }) {
           versionRef.current = res.version ?? versionRef.current + 1;
           setStatus('saved');
         } catch (e) {
-          console.error('save failed', e);
+          console.error('Save failed:', e);
           if (e.status === 409) {
+            // Conflict - refresh and retry
             try {
               const fresh = await fetchNote(tabId, noteIdRef.current);
               versionRef.current = fresh.version ?? versionRef.current;
               if (!pendingRef.current) pendingRef.current = payload;
               continue;
             } catch (e2) {
-              console.error('refresh after 409 failed', e2);
+              handleError(e2, 'refresh after 409');
+              break;
             }
+          } else {
+            handleError(e, 'save');
+            break;
           }
-          setStatus('error');
         }
       }
 
-      if (status === 'saved') setTimeout(() => setStatus('idle'), 800);
+      if (status === 'saved') {
+        setTimeout(() => setStatus('idle'), 800);
+      }
       savingRef.current = false;
     },
-    [status, tabId]
+    [status, tabId, handleError]
   );
 
   const scheduleSave = useMemo(
     () =>
       debounce((payload) => {
+        if (!noteIdRef.current) {
+          console.warn('Cannot save: no note ID available');
+          return;
+        }
         pendingRef.current = payload;
         pumpQueue();
       }, 400),
     [pumpQueue]
   );
 
+  // Clean up debounced function
   useEffect(() => () => scheduleSave.cancel(), [scheduleSave]);
 
-  const handleEditorChange = ({ plain_text, html, document_state }) => {
+  const handleEditorChange = useCallback(({ plain_text, html, document_state }) => {
     lastContentRef.current = { plain_text, html, document_state };
     scheduleSave({ title, plain_text, html, document_state });
-  };
+  }, [title, scheduleSave]);
 
-  const onTitleChange = (e) => {
+  const onTitleChange = useCallback((e) => {
     const t = e.target.value || 'Untitled';
     setTitle(t);
     const { plain_text, html, document_state } = lastContentRef.current;
     scheduleSave({ title: t, plain_text, html, document_state });
-  };
-  const onTitleBlur = () => scheduleSave.flush();
+  }, [scheduleSave]);
+
+  const onTitleBlur = useCallback(() => {
+    scheduleSave.flush();
+  }, [scheduleSave]);
+
+  // Don't render editor until we're ready
+  if (!isReady) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="text-slate-500">Loading note...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full h-full overflow-hidden flex flex-col gap-3 p-2 relative">
-      {/* Fixed title row (no chip here anymore) */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <label className="text-sm text-slate-600 shrink-0">Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={onTitleChange}
-            onBlur={onTitleBlur}
-            className="w-full min-w-0 rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
-            placeholder="Untitled"
-          />
-        </div>
+    <div className="w-full h-full overflow-hidden flex flex-col gap-4 p-4 relative">
+      {/* Title input with better styling */}
+      <div className="flex items-center gap-3">
+        <label className="text-base font-medium text-slate-700 shrink-0">Title</label>
+        <input
+          type="text"
+          value={title}
+          onChange={onTitleChange}
+          onBlur={onTitleBlur}
+          className="flex-1 rounded-lg border border-slate-300 px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+          placeholder="Enter note title..."
+        />
       </div>
 
-      {/* Editor fills the rest; internal area scrolls */}
-      <div className="flex-1 min-h-0">
+      {/* Editor fills the rest with proper padding */}
+      <div className="flex-1 min-h-0 rounded-lg border border-gray-200 bg-white overflow-hidden">
         <LexicalEditor
           initialDocState={initialDocState}
           tabId={tabId}
@@ -183,7 +238,7 @@ export default function NoteView({ tabId }) {
       </div>
 
       {/* Status chip at bottom-right, always visible */}
-      <div className="absolute bottom-2 right-2 pointer-events-none">
+      <div className="absolute bottom-6 right-6">
         <StatusChip state={status} />
       </div>
     </div>

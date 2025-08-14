@@ -1,54 +1,63 @@
-import { useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { COMMAND_PRIORITY_LOW, $insertNodes, PASTE_COMMAND } from 'lexical';
-import { uploadNoteImage } from '../../../services/imageService';
-import { $generateNodesFromDOM } from '@lexical/html';
+import { useEffect } from 'react';
+import { COMMAND_PRIORITY_LOW, PASTE_COMMAND } from 'lexical';
+import { $createImageNode } from './ImageNode';
+import { uploadImage } from '../../../services/imageService';
 
-export default function PasteImagePlugin({ tabId, noteId, onUploaded }) {
+export default function PasteImagePlugin({ tabId, noteId }) {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
     return editor.registerCommand(
       PASTE_COMMAND,
       async (event) => {
-        const clipboard = event.clipboardData;
-        if (!clipboard) return false;
-
-        const items = Array.from(clipboard.items || []);
-        const imageFiles = items
-          .filter((it) => it.kind === 'file')
-          .map((it) => it.getAsFile())
-          .filter((f) => f && f.type?.startsWith('image/'));
-
-        // If no images → let default paste (text/HTML) proceed.
-        if (imageFiles.length === 0) return false;
-
-        // If images present but note doesn't exist yet, don't block text paste.
-        if (!noteId) return false;
+        const files = event.clipboardData?.files;
+        if (!files || files.length === 0) return false;
 
         event.preventDefault();
-        for (const file of imageFiles) {
+        for (const file of files) {
+          if (!file.type.startsWith('image/')) continue;
+
+          // Validate size (10MB)
+          if (file.size > 10 * 1024 * 1024) {
+            alert('Image exceeds 10MB limit');
+            continue;
+          }
+
           try {
-            const { url } = await uploadNoteImage(tabId, noteId, file);
-            onUploaded?.(url);
+            // Upload via FormData
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('alt_text', file.name || 'Pasted image');
+
             editor.update(() => {
-              const parser = new DOMParser();
-              const dom = parser.parseFromString(
-                `<img src="${url}" alt="" style="max-width:100%;height:auto;" />`,
-                'text/html'
-              );
-              const nodes = $generateNodesFromDOM(editor, dom);
-              $insertNodes(nodes);
+              editor.setEditable(false); // Lock during upload
             });
-          } catch (e) {
-            console.error('image upload error', e);
+
+            const response = await uploadImage(tabId, noteId, formData);
+            const { url, id, alt_text } = response;
+
+            editor.update(() => {
+              const node = $createImageNode({
+                src: url, // Signed URL
+                altText: alt_text,
+                imageId: id, // For deletion
+              });
+              editor.getRoot().append(node);
+              editor.setEditable(true);
+            });
+          } catch (error) {
+            editor.update(() => {
+              editor.setEditable(true);
+            });
+            console.error('Image upload failed:', error);
           }
         }
         return true;
       },
       COMMAND_PRIORITY_LOW
     );
-  }, [editor, tabId, noteId, onUploaded]);
+  }, [editor, tabId, noteId]);
 
   return null;
 }
