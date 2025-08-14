@@ -39,3 +39,48 @@ html, body, #root {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;  /* IE and Edge */
 }
+
+/* Add this to your global CSS or import in LexicalEditor.jsx */
+
+.editor-image-container {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  margin: 8px 0;
+  position: relative;
+}
+
+.editor-image-wrapper {
+  text-align: center;
+  margin: 12px 0;
+}
+
+.editor-image-wrapper img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: block;
+  margin: 0 auto;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.editor-image-wrapper img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading animation for upload status chips */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}

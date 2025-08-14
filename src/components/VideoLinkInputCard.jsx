@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlayCircle, Loader2 } from 'lucide-react';
+import { PlayCircle, Loader2, Youtube } from 'lucide-react';
 import analytics from '../services/posthogService';
 import { createTab } from '../services/tabService';
 
@@ -60,9 +60,12 @@ export default function VideoLinkInputCard({ cfg, initialUrl = '' }) {
 
   return (
     <div id="videolink-input-card" className={`w-full max-w-[600px] ${cfg.card} min-h-[250px]`}>
-      <div className={cfg.cardHeadinglarge}>Enter YouTube Video URL</div>
+      <div className={`${cfg.cardHeadinglarge} flex items-center gap-2`}>
+        <Youtube size={48} />
+        Enter YouTube Video URL
+      </div>
       <div className={cfg.cardSubheading}>
-        ilon AI helps you resolve doubts, test your knowledge, and generate structured notes from raw input.
+      ILON AI clears the doubts, tickles your brain with quizzes, and lines up your notes like a pro librarian on caffeine.
       </div>
       <input
         type="text"
@@ -74,7 +77,11 @@ export default function VideoLinkInputCard({ cfg, initialUrl = '' }) {
         }}
         className={cfg.inputfield}
       />
-      <button onClick={handleClick} disabled={!url.trim() || loading} className={cfg.primaryButton}>
+      <button
+        onClick={handleClick}
+        disabled={!url.trim() || loading}
+        className={`${cfg.primaryButton} mx-auto`}
+      >
         {loading ? (
           <div className="flex items-center justify-center gap-2">
             <Loader2 size={20} className="animate-spin" /> Preparing Study Room...

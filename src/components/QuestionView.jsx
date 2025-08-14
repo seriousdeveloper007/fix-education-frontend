@@ -187,15 +187,24 @@ function SubjectiveQuestion({ question, updateQuestionCount, theme }) {
 export default function QuestionView({ updateQuestionCount }) {
   const cfg = themeConfig.app;
   const [questions, setQuestions] = useState([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       const data = await fetchUnattemptedQuestions();
       setQuestions(data);
+      setLoaded(true);
     };
     load();
   }, []);
 
+  if (loaded && questions.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full p-4 text-center text-gray-500">
+        Start in the Study Room—watch the video and take the quiz; your progress and history will appear here.
+      </div>
+    );
+  }
 
   const grouped = {
     mcq: questions.filter((q) => q.type === 'mcq'),
