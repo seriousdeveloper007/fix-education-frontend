@@ -5,7 +5,7 @@ import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
 import PropTypes from 'prop-types';
 
-
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const GOOGLE_ENDPOINT = `${API_BASE_URL}/user/auth/web/google`; // identical to old path
 
 export default function LoginCard({ redirectUri = null }) {
@@ -21,20 +21,19 @@ export default function LoginCard({ redirectUri = null }) {
 
   /* ───────── Google Identity Services ───────── */
   useEffect(() => {
-    /*  ───────── enable when GIS script is on page ─────────
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.initialize({
-        callback: handleCredentialResponse,
-        auto_select: false,
-        cancel_on_tap_outside: false,
-      });
-      window.google.accounts.id.renderButton(
-        document.getElementById('google-signin-button'),
-        { theme: 'outline', size: 'large', width: 280 }
-      );
-      window.google.accounts.id.prompt();
-    }
-    */
+    // if (window.google?.accounts?.id) {
+    //   window.google.accounts.id.initialize({
+    //     client_id: GOOGLE_CLIENT_ID,
+    //     callback: handleCredentialResponse,
+    //     auto_select: false,
+    //     cancel_on_tap_outside: false,
+    //   });
+    //   window.google.accounts.id.renderButton(
+    //     document.getElementById('google-signin-button'),
+    //     { theme: 'outline', size: 'large', width: 280 }
+    //   );
+    //   window.google.accounts.id.prompt();
+    // }
   }, []);
 
   async function handleCredentialResponse({ credential }) {
