@@ -149,7 +149,7 @@ function SubjectiveQuestion({ question, updateQuestionCount, theme }) {
   return (
     <div className="relative mt-4 p-4 pb-8 rounded-lg bg-gray-50 border border-gray-200">
       <div className="flex justify-between items-start mb-1">
-        <MarkdownRenderer text={question_text} className={`${theme.questionText} pr-4`} />
+        <MarkdownRenderer text={question_text} className={`${theme.questionText}`} />
         <div className={`shrink-0 px-2 py-0.5 text-xs rounded ${getDifficultyColor(difficulty_level)}`}>{difficulty_level}</div>
       </div>
       <textarea

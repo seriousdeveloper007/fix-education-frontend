@@ -89,7 +89,7 @@ export default function MarkdownRenderer({ text, className }) {
 
             if (inline) {
               return (
-                <code className="px-1 py-0.5 rounded bg-gray-200 font-mono text-[0.85em]">
+                <code className="py-0.5 rounded bg-gray-200 font-mono text-[0.85em]">
                   {raw}
                 </code>
               );
