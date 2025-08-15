@@ -96,6 +96,11 @@ export default function StudyRoom() {
     if (!showIframe || !isLoggedIn) return;
 
     localStorage.removeItem('tabId');
+    localStorage.removeItem('chatId');
+    Object.keys(localStorage)
+      .filter((key) => key.startsWith('noteId'))
+      .forEach((key) => localStorage.removeItem(key));
+
     const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
     const token = localStorage.getItem('token');
     if (!userId || !token) {
