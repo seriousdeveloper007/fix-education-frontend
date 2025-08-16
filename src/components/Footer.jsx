@@ -14,10 +14,10 @@ const Footer = () => {
           <div className="flex items-center space-x-2">
           <img
               src={icon}
-              alt="ilon ai logo"
+              alt="ILON AI logo"
               className="h-10 w-10"
             />
-            <span className="font-semibold text-base">ilon AI</span>
+            <span className="font-semibold text-base">ILON AI</span>
           </div>
 
           {/* Right: Links (mobile only stacked vertically) */}

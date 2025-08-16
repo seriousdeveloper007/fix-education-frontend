@@ -59,11 +59,11 @@ const LandingPage = () => {
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug">
           Make learning from youtube{' '}
           <br className="hidden sm:block" />
-          interactive with ilon AI.
+          interactive with ILON AI.
         </h1>
 
         <p className="mt-3 text-base sm:text-lg text-slate-700 max-w-2xl">
-          Ask doubts while watching, answer ilon AI questions in every 5–10 mins, and auto-organize your notes.
+          Ask doubts while watching, answer ILON AI questions in every 5–10 mins, and auto-organize your notes.
         </p>
         <CTAButtons />
         <div id="how-to-use" className="mt-10">
@@ -71,7 +71,7 @@ const LandingPage = () => {
             <iframe
               className="absolute top-0 left-0 w-full h-full rounded-xl"
               src="https://www.youtube.com/embed/-P1Y8AGWbD4?si=j5HencGGvVhRp4Lx"
-              title="How to use ilon AI"
+              title="How to use ILON AI"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
@@ -85,7 +85,7 @@ const LandingPage = () => {
         className="px-4 sm:px-6 md:px-[100px] py-16 bg-white"
       >
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-snug text-center mb-12">
-          Why use ilon ai?
+          Why use ILON AI?
         </h2>
         {/* Comparison Images */}
         <div className="mb-8">
@@ -93,7 +93,7 @@ const LandingPage = () => {
           <div className="sm:hidden flex justify-center">
             <img
               src={mobileComparison}
-              alt="YouTube vs ilon AI Comparison"
+              alt="YouTube vs ILON AI Comparison"
               className="rounded-xl w-full max-w-xs"
             />
           </div>
@@ -102,7 +102,7 @@ const LandingPage = () => {
           <div className="hidden sm:flex justify-center px-4 sm:px-6 md:px-[150px]">
             <img
               src={desktopComparison}
-              alt="YouTube vs ilon AI Comparison"
+              alt="YouTube vs ILON AI Comparison"
               className="rounded-xl w-full max-w-full"
             />
           </div>
@@ -156,7 +156,7 @@ const LandingPage = () => {
           Pricing
         </h2>
         <p className="text-center mx-auto text-lg sm:text-xl md:text-2xl text-black">
-          ilon ai is completely free to use — no subscriptions, no hidden fees.
+          ILON AI is completely free to use — no subscriptions, no hidden fees.
         </p>
         <CTAButtons center />
 

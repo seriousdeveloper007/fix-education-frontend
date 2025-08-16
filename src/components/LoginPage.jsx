@@ -29,23 +29,22 @@ export default function GoogleLogin() {
       <Navbar showNav={false} showButtons={false} />
       {fromExtension && (
         <div className="fixed top-20 right-8 z-50 w-80 bg-white rounded-2xl shadow-xl p-6 text-center border border-gray-200">
-          {/* ilon AI logo and title */}
           <div className="flex items-center justify-center mb-4">
             <img src={Logo} alt="ilon AI logo" className="mr-2 w-8 h-8 rounded" />
-            <span className="text-xl font-semibold text-gray-900">ilon AI</span>
+            <span className="text-xl font-semibold text-gray-900">ILON AI</span>
           </div>
 
           {/* Heading */}
-          <h2 className="text-lg font-bold text-gray-800 mb-2">Pin ilon AI to access later</h2>
+          <h2 className="text-lg font-bold text-gray-800 mb-2">Pin ILON AI to access later</h2>
 
           {/* Subtext */}
           <div className="flex justify-center items-center">
             <p className="text-sm text-gray-600 mb-4 text-center flex items-center">
               Click the
               <span className="inline-block mx-1">
-                <img src={ExtensionIcon} alt="ilon AI logo" className="w-8 h-8 rounded" />
+                <img src={ExtensionIcon} alt="ILON AI logo" className="w-8 h-8 rounded" />
               </span>
-              above to pin ilon AI.
+              above to pin ILON AI.
             </p>
           </div>
 

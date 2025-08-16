@@ -121,7 +121,7 @@ export default function LoginCard({ redirectUri = null }) {
     <div className="bg-white rounded-xl shadow-md px-6 py-8 w-full max-w-md text-center">
       <h1 className={cfg.authHeading}>Signup / Login in seconds</h1>
       <p className={`${cfg.authSubheading} mt-2`}>
-        ilon AI helps you learn faster and keeps your brain active while learning.
+        ILON AI helps you learn faster and keeps your brain active while learning.
       </p>
 
       <div className="login-options mt-6 space-y-6 flex flex-col items-center">
