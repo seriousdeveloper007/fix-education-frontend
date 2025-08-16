@@ -22,14 +22,14 @@ const Footer = () => {
 
           {/* Right: Links (mobile only stacked vertically) */}
           <div className="flex flex-col items-end sm:hidden text-right space-y-1">
-            {/* <a
-              href="https://www.google.com"
+            <a
+              href="https://chromewebstore.google.com/detail/ilon-ai/jobhpgjofnmpcbkpnofkdkfmaifmmbgn"
               className="hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
               Chrome Extension
-            </a> */}
+            </a>
             <Link
               to="/privacy-policy"
               className="hover:underline"
@@ -41,14 +41,14 @@ const Footer = () => {
 
         {/* Right: Links for larger screens (inline) */}
         <div className="hidden sm:flex items-center gap-6">
-          {/* <a
-            href="https://www.google.com"
+          <a
+            href="https://chromewebstore.google.com/detail/ilon-ai/jobhpgjofnmpcbkpnofkdkfmaifmmbgn"
             className="hover:underline"
             target="_blank"
             rel="noopener noreferrer"
           >
             Chrome Extension
-          </a> */}
+          </a>
           <Link
             to="/privacy-policy"
             className="hover:underline"

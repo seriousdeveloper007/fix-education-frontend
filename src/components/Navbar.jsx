@@ -4,6 +4,8 @@ import { Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Logo from '../assets/logo-without-bg.png';
+import { CHROME_EXTENSION_LINK } from '../config.js';
+
 
 
 
@@ -79,15 +81,13 @@ const Navbar = ({
             <div className="flex items-center gap-4">
               {childrenButtons ?? (
                 <>
-                  {/* TODO: Re-enable Chrome Extension download button */}
-                  {/*
                   <button
+                    onClick={() => window.open(CHROME_EXTENSION_LINK, '_blank')}
                     className={`hidden md:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-2 font-medium transition`}
                   >
                     <Download size={16} />
                     Chrome Extension
                   </button>
-                  */}
                   <button
                     onClick={() => navigate('/login')}
                     className={`${cfg.primaryBtn} transition font-medium px-3 md:px-5 py-1.5 md:py-2 text-sm md:text-base`}

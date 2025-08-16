@@ -9,6 +9,8 @@ import Navbar from './Navbar';
 import analytics from '../services/posthogService';
 import mobileComparison from '../assets/mobile-youtube-vs-ilon.png';
 import desktopComparison from '../assets/desktop-youtube-vs-ilon.png';
+import { CHROME_EXTENSION_LINK } from '../config.js';
+
 
 
 
@@ -30,14 +32,15 @@ const CTAButtons = ({ center = false, showDownload = true }) => {
         Start learning for Free
       </button>
 
-      {/* {showDownload && (
+      {showDownload && (
         <button
+          onClick={() => window.open(CHROME_EXTENSION_LINK, '_blank')}
           className={`hidden sm:inline-flex items-center gap-2 ${cfg.secondaryBtn} px-5 py-3 sm:py-3.5 font-medium transition`}
         >
           <Download size={16} />
           Chrome Extension
         </button>
-      )} */}
+      )}
     </div>
   );
 };
