@@ -73,7 +73,7 @@ export default function PlatformLanding() {
               width="1000"
               height="500"
               src="https://www.youtube.com/embed/-P1Y8AGWbD4?si=q_SKwkgOZyl4VJPO"
-              title="How to use ilon AI"
+              title="How to use ILON AI"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
