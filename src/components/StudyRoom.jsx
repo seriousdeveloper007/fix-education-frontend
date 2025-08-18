@@ -232,7 +232,6 @@ export default function StudyRoom() {
               title="YouTube video"
               className={`${isSidePanelOpen ? 'w-2/3' : 'w-full'} h-full`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
             />
             {isSidePanelOpen && (
               <SidePanel
