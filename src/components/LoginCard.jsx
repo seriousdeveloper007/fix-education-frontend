@@ -21,19 +21,19 @@ export default function LoginCard({ redirectUri = null }) {
 
   /* ───────── Google Identity Services ───────── */
   useEffect(() => {
-    // if (window.google?.accounts?.id) {
-    //   window.google.accounts.id.initialize({
-    //     client_id: GOOGLE_CLIENT_ID,
-    //     callback: handleCredentialResponse,
-    //     auto_select: false,
-    //     cancel_on_tap_outside: false,
-    //   });
-    //   window.google.accounts.id.renderButton(
-    //     document.getElementById('google-signin-button'),
-    //     { theme: 'outline', size: 'large', width: 280 }
-    //   );
-    //   window.google.accounts.id.prompt();
-    // }
+    if (window.google?.accounts?.id) {
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+        auto_select: false,
+        cancel_on_tap_outside: false,
+      });
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signin-button'),
+        { theme: 'outline', size: 'large', width: 280 }
+      );
+      window.google.accounts.id.prompt();
+    }
   }, []);
 
   async function handleCredentialResponse({ credential }) {
@@ -61,7 +61,8 @@ export default function LoginCard({ redirectUri = null }) {
         }),
       );
       localStorage.setItem('token', appJwt);
-      navigate('/platform');
+      window.location.reload();
+
     } catch (err) {
       setError(err.message);
       localStorage.removeItem('user');
