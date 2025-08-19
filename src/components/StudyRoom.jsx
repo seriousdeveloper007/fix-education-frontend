@@ -62,6 +62,12 @@ export default function StudyRoom() {
   const showIframe = videoId && mode === 'play';
   const [isPreparingRoom, setIsPreparingRoom] = useState(showIframe && isLoggedIn);
 
+  useEffect(() => {
+    if (showIframe) {
+      setSidePanelTab('Ask Doubt');
+    }
+  }, [showIframe]);
+
   const handleUpdateTabDetails = useCallback(async (getCurrentTime, getDuration) => {
     if (!getCurrentTime || !getDuration) return;
     
@@ -236,7 +242,10 @@ export default function StudyRoom() {
             {isSidePanelOpen && (
               <SidePanel
                 tab={sidePanelTab}
-                onClose={() => setSidePanelTab(null)}
+                onClose={() => {
+                  analytics.sideNavbarClosed(sidePanelTab);
+                  setSidePanelTab(null);
+                }}
                 getCurrentTime={getCurrentTime}
                 updateQuestionCount={(delta) => {
                   setUnattemptedQuestionCount((prev) => Math.max(0, prev + delta));
