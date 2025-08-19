@@ -120,11 +120,7 @@ export default function LoginCard({ redirectUri = null }) {
   /* ───────── UI (unchanged design) ───────── */
   return (
     <div className="bg-white rounded-xl shadow-md px-6 py-8 w-full max-w-md text-center">
-      <h1 className={cfg.authHeading}>Signup / Login in seconds</h1>
-      <p className={`${cfg.authSubheading} mt-2`}>
-        ilon AI helps you learn faster and keeps your brain active while learning.
-      </p>
-
+      <h1 className={cfg.authHeading}>Use ILON AI for 15 mins — you’ll realize YouTube is shit 💩</h1>
       <div className="login-options mt-6 space-y-6 flex flex-col items-center">
         {/* Google button (renders when GIS initialised) */}
         <div id="google-signin-button" />

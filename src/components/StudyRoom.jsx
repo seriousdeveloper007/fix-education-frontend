@@ -121,6 +121,13 @@ export default function StudyRoom() {
         localStorage.removeItem('chatId');
         analytics.youtubeLearningStarted(videoUrl);
         setIsPreparingRoom(false);
+        setTimeout(async () => {
+            try {
+              await createVideoChunk(Math.floor(startTime || 0));
+             } catch (e) {
+            console.error('Initial createVideoChunk (bg) failed:', e);
+          }
+          }, 0);
       } catch (err) {
         console.error('createTab failed, retrying in 5s', err);
         setTimeout(attemptCreateTab, 5000);
