@@ -20,6 +20,7 @@ const analytics = {
   loginEmailSubmitted: (email) => capture('login_email_submitted', { email }),
   navbarOptionClicked: (option) => capture('navbar_option_clicked', { option }),
   sideNavbarOpened: (tab) => capture('side_navbar_opened', { tab }),
+  sideNavbarClosed: (tab) => capture('side_navbar_closed', { tab }),
   doubtAsked: () => capture('doubt_asked'),
   questionAttempted: (questionId) => capture('question_attempted', { question_id: questionId }),
   libraryPageLoaded: () => capture('library_page_loaded'),
