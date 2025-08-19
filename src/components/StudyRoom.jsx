@@ -62,6 +62,12 @@ export default function StudyRoom() {
   const showIframe = videoId && mode === 'play';
   const [isPreparingRoom, setIsPreparingRoom] = useState(showIframe && isLoggedIn);
 
+  useEffect(() => {
+    if (showIframe) {
+      setSidePanelTab('Ask Doubt');
+    }
+  }, [showIframe]);
+
   const handleUpdateTabDetails = useCallback(async (getCurrentTime, getDuration) => {
     if (!getCurrentTime || !getDuration) return;
     
@@ -115,6 +121,13 @@ export default function StudyRoom() {
         localStorage.removeItem('chatId');
         analytics.youtubeLearningStarted(videoUrl);
         setIsPreparingRoom(false);
+        setTimeout(async () => {
+            try {
+              await createVideoChunk(Math.floor(startTime || 0));
+             } catch (e) {
+            console.error('Initial createVideoChunk (bg) failed:', e);
+          }
+          }, 0);
       } catch (err) {
         console.error('createTab failed, retrying in 5s', err);
         setTimeout(attemptCreateTab, 5000);
@@ -236,7 +249,10 @@ export default function StudyRoom() {
             {isSidePanelOpen && (
               <SidePanel
                 tab={sidePanelTab}
-                onClose={() => setSidePanelTab(null)}
+                onClose={() => {
+                  analytics.sideNavbarClosed(sidePanelTab);
+                  setSidePanelTab(null);
+                }}
                 getCurrentTime={getCurrentTime}
                 updateQuestionCount={(delta) => {
                   setUnattemptedQuestionCount((prev) => Math.max(0, prev + delta));
