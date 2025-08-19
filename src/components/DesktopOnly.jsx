@@ -20,7 +20,7 @@ export default function DesktopOnly({ children }) {
   if (isMobile) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center font-fraunces gap-4">
-        <div>ilon AI is currently available on laptop/desktop.</div>
+        <div>ILON AI is currently available on laptop/desktop.</div>
         <button className={cfg.primaryButton}>Request Mobile Access</button>
       </div>
     );

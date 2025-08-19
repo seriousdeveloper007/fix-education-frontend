@@ -6,7 +6,7 @@ const TermsOfService = () => (
     <p>Last updated: July 29, 2025</p>
 
     <h2>1. Acceptance</h2>
-    <p>By installing or using the Ilon X Extension, you agree to these Terms of Service.</p>
+    <p>By installing or using the ILON AI Extension, you agree to these Terms of Service.</p>
 
     <h2>2. License</h2>
     <p>We grant you a non-exclusive, non-transferable license to use the Extension in accordance with these terms.</p>
@@ -30,7 +30,7 @@ const TermsOfService = () => (
     <p>These terms are governed by the laws of [Your Jurisdiction].</p>
 
     <h2>8. Contact</h2>
-    <p>Questions? Email us at <a href="mailto:tos@ilonx.com">tos@ilonx.com</a>.</p>
+    <p>Questions? Email us at <a href="mailto:support@ilonai.in">support@ilonai.in</a>.</p>
   </div>
 );
 

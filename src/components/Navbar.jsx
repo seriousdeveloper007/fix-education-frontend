@@ -51,11 +51,11 @@ const Navbar = ({
           <Link to="/" className="flex items-center gap-3">
           <img
               src={Logo}
-              alt="ilon ai logo"
+              alt="ILON AI logo"
               className="w-10 h-10 object-contain select-none"
               draggable="false"
             />
-            <span className="text-lg font-semibold text-gray-800">ilon AI</span>
+            <span className="text-lg font-semibold text-gray-800">ILON AI</span>
           </Link>
 
           {/* Center: Nav Links (hide on mobile) */}

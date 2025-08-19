@@ -21,7 +21,7 @@ const CookiePolicy = () => (
     <p>You can control cookies via your browser settings. Disabling essential cookies may limit functionality.</p>
 
     <h2>5. Contact</h2>
-    <p>Questions: <a href="mailto:privacy@ilonx.com">privacy@ilonx.com</a>.</p>
+    <p>Questions: <a href="mailto:tech@ilonai.in">privacy@ilonai.in</a>.</p>
   </div>
 );
 
