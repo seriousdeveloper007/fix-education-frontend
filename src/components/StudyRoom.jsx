@@ -116,6 +116,7 @@ export default function StudyRoom() {
 
     const attemptCreateTab = async () => {
       try {
+        setIsPreparingRoom(true);
         const { id } = await createTab(userId, videoUrl, token);
         localStorage.setItem('tabId', id);
         localStorage.removeItem('chatId');
