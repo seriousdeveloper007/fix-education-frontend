@@ -33,10 +33,10 @@ export default function StudyRoomNavbar({
       label: 'Attempt Question',
       icon: <PencilLine className="w-7 h-5 text-cyan-600 group-hover:text-cyan-800" />,
     },
-    {
-      label: 'Take Notes',
-      icon: <Notebook className="w-7 h-5 text-cyan-600 group-hover:text-cyan-800" />,
-    },
+    // {
+    //   label: 'Take Notes',
+    //   icon: <Notebook className="w-7 h-5 text-cyan-600 group-hover:text-cyan-800" />,
+    // },
     // Future tab (example): { label: 'Take Notes', icon: <StickyNote /> }
   ];
   // General function to update tab details - called by all clickable elements
