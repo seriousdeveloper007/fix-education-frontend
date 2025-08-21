@@ -169,7 +169,7 @@ export default function Library() {
                           <div className="text-[10px] text-gray-400 mt-1 text-center">View</div>
                         </div>
 
-                        <div
+                        {/* <div
                           className="flex flex-col items-center justify-center text-sm text-gray-700 cursor-pointer"
                           onClick={() => {
                             navigate(`/library/${tab.id}?view=notes`, {
@@ -180,7 +180,7 @@ export default function Library() {
                           <Notebook className="w-14 h-14 text-gray-500" strokeWidth={1} />
                           <div className="text-xs text-center mt-1">Saved <br/> Notes</div>
                           <div className="text-[10px] text-gray-400 mt-1 text-center">View</div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>

@@ -11,17 +11,17 @@ export default function SidePanel({ tab, onClose, getCurrentTime, updateQuestion
   const getTitle = () => {
     if (tab === 'Ask Doubt') return 'Ask your doubt';
     if (tab === 'Attempt Question') return 'Practice Questions';
-    if (tab === 'Take Notes') return 'Take Notes';
+    // if (tab === 'Take Notes') return 'Take Notes';
     return '';
   };
 
   const renderUI = () => {
     if (tab === 'Ask Doubt') return <ChatView getCurrentTime={getCurrentTime} />;
     if (tab === 'Attempt Question') return <QuestionView updateQuestionCount={updateQuestionCount} />;
-    if (tab === 'Take Notes') {
-      const tabId = localStorage.getItem('tabId');
-      return <NoteView tabId={tabId} />;
-    }
+    // if (tab === 'Take Notes') {
+    //   const tabId = localStorage.getItem('tabId');
+    //   return <NoteView tabId={tabId} />;
+    // }
     return null;
   };
 
