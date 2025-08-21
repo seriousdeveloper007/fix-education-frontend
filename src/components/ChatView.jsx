@@ -202,7 +202,7 @@ export default function ChatView({ getCurrentTime }) {
   };
 
   return (
-    <div className="flex flex-col h-full relative">
+    <div className="flex flex-col h-full relative px-2">
       {error && (
         <div className="absolute left-0 right-0 top-0 z-20 px-4">
           <div className="mt-2 rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700 shadow-sm">
@@ -288,6 +288,7 @@ export default function ChatView({ getCurrentTime }) {
             onClick={() => {
               setMessages([]);
               localStorage.removeItem('chatId');
+              setIsLoading(false);
               hasConnectedRef.current = false;
               close();
               attachedImages.forEach((img) => img?.url && URL.revokeObjectURL(img.url));
