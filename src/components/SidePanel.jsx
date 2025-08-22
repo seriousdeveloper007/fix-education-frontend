@@ -4,6 +4,7 @@ import ChatView from './ChatView';
 import PropTypes from 'prop-types';
 import QuestionView from './QuestionView';
 import NoteView from './NoteView';
+import TasksView from './TasksView';
 
 export default function SidePanel({ tab, onClose, getCurrentTime, updateQuestionCount }) {
   const cfg = themeConfig.app;
@@ -20,11 +21,7 @@ export default function SidePanel({ tab, onClose, getCurrentTime, updateQuestion
     if (tab === 'Ask Doubt') return <ChatView getCurrentTime={getCurrentTime} />;
     if (tab === 'Attempt Question') return <QuestionView updateQuestionCount={updateQuestionCount} />;
     if (tab === 'Code from Video') {
-      return (
-        <div className="p-4 text-sm text-gray-700 overflow-auto">
-          Extracted code will appear here.
-        </div>
-      );
+      return <TasksView />;
     }
     // if (tab === 'Take Notes') {
     //   const tabId = localStorage.getItem('tabId');
