@@ -54,6 +54,31 @@ export default function TasksView() {
 
   return (
     <div className="p-4 text-sm text-gray-700 overflow-auto space-y-4">
+      {!tasks.length ? (
+        <div>There is no extracted code from the video</div>
+      ) : (
+        // In TasksView component, update the tasks mapping section:
+          tasks.map((task, idx) => (
+            <div key={idx} className="border-l-2 border-gray-200 pl-4 relative">
+              {/* Add serial number */}
+              <span className="absolute -left-3 bg-white px-1 text-sm font-semibold text-gray-600">
+                {idx + 1}.
+              </span>
+              
+              {/* Add mb-1 to description for minimal gap */}
+              {task.description && (
+                <p className="text-gray-800 mb-1">{task.description}</p>
+              )}
+              
+              {task.code_snippet && (
+                <MarkdownRenderer 
+                  text={`\`\`\`${task.coding_language || ''}\n${task.code_snippet}\n\`\`\``}
+                  className="mt-0" // Pass className to control spacing
+                />
+              )}
+            </div>
+          ))
+      )}
       <button
         onClick={handleExtract}
         disabled={extracting}
@@ -67,19 +92,6 @@ export default function TasksView() {
           'Extract Code'
         )}
       </button>
-
-      {!tasks.length ? (
-        <div>There is no extracted code from the video</div>
-      ) : (
-        tasks.map((task, idx) => (
-          <div key={idx} className="space-y-2">
-            {task.description && <p className="text-gray-800">{task.description}</p>}
-            {task.code && (
-              <MarkdownRenderer text={`\n\u0060\u0060\u0060${task.language ? task.language : ''}\n${task.code}\n\u0060\u0060\u0060\n`} />
-            )}
-          </div>
-        ))
-      )}
     </div>
   );
 }
