@@ -1,7 +1,7 @@
 import themeConfig from './themeConfig';
 import { useEffect, useRef, useState } from 'react';
 import { updateTab } from '../services/tabService';
-import { ArrowLeft, MessageSquare, Notebook, PencilLine } from 'lucide-react';
+import { ArrowLeft, MessageSquare, PencilLine, Code } from 'lucide-react';
 
 export default function StudyRoomNavbar({
   videoUrl,
@@ -32,6 +32,10 @@ export default function StudyRoomNavbar({
     {
       label: 'Attempt Question',
       icon: <PencilLine className="w-7 h-5 text-cyan-600 group-hover:text-cyan-800" />,
+    },
+    {
+      label: 'Code from Video',
+      icon: <Code className="w-7 h-5 text-emerald-600 group-hover:text-emerald-800" />,
     },
     // {
     //   label: 'Take Notes',

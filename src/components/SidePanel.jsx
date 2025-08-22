@@ -11,6 +11,7 @@ export default function SidePanel({ tab, onClose, getCurrentTime, updateQuestion
   const getTitle = () => {
     if (tab === 'Ask Doubt') return 'Ask your doubt';
     if (tab === 'Attempt Question') return 'Practice Questions';
+    if (tab === 'Code from Video') return 'Extracted Code from Video';
     // if (tab === 'Take Notes') return 'Take Notes';
     return '';
   };
@@ -18,6 +19,13 @@ export default function SidePanel({ tab, onClose, getCurrentTime, updateQuestion
   const renderUI = () => {
     if (tab === 'Ask Doubt') return <ChatView getCurrentTime={getCurrentTime} />;
     if (tab === 'Attempt Question') return <QuestionView updateQuestionCount={updateQuestionCount} />;
+    if (tab === 'Code from Video') {
+      return (
+        <div className="p-4 text-sm text-gray-700 overflow-auto">
+          Extracted code will appear here.
+        </div>
+      );
+    }
     // if (tab === 'Take Notes') {
     //   const tabId = localStorage.getItem('tabId');
     //   return <NoteView tabId={tabId} />;
