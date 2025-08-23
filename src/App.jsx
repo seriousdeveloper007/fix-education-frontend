@@ -14,6 +14,8 @@ import VerifyLearner from './components/VerifyLearner';
 import Library from './components/Library';
 import StudyRoom from './components/StudyRoom'; // ✅ correct
 import LibraryDetail from './components/LibraryDetail'; // new file
+import ChatRoadmap from './components/ChatRoadmap';
+import RoadMapUI from './components/RoadMapUI';
 
 
 
@@ -98,6 +100,15 @@ function AppRoutes() {
       <Route path="/verify-learner" element={<VerifyLearner />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/error" element={<ErrorPage />} />
+      <Route
+        path="/roadmap"
+        element={(
+          <>
+            <ChatRoadmap />
+            <RoadMapUI />
+          </>
+        )}
+      />
 
       {/* Fallback */}
       <Route
