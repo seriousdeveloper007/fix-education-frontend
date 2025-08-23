@@ -20,6 +20,7 @@ import {
 } from "react-icons/si";
 import MarkdownRenderer from "./MarkdownRenderer";
 import { useRoadmapWebSocket } from "../services/RoadmapWebSocket";
+import { fetchRoadmapMessages } from "../services/roadmapMessageService";
 
 /* =========================
    Config / Constants
@@ -321,6 +322,16 @@ export default function ChatRoadmap() {
   // typewriter (pauses while typing/focused)
   const typed = useTypewriter(ROTATING_PROMPTS, isFocused || input.length > 0);
 
+  useEffect(() => {
+    const roadmapId = localStorage.getItem('roadmapId');
+    if (!roadmapId) return;
+    fetchRoadmapMessages(roadmapId)
+      .then((loaded) => setMessages(loaded))
+      .catch((err) => {
+        console.error('Failed to load messages', err);
+      });
+  }, []);
+
   const hasMessages = messages.length > 0;
 
   // handlers
@@ -351,7 +362,7 @@ export default function ChatRoadmap() {
     setInput('');
     setIsLoading(false);
     hasConnectedRef.current = false;
-    localStorage.removeItem("oadmapId");
+    localStorage.removeItem("roadmapId");
     close();
   }, [close]);
 
