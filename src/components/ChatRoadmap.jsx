@@ -19,7 +19,7 @@ import {
   SiGithub,
 } from "react-icons/si";
 import MarkdownRenderer from "./MarkdownRenderer";
-import { API_BASE_URL } from "../config";
+import { useRoadmapWebSocket } from "./RoadmapWebSocket";
 
 /* =========================
    Config / Constants
@@ -53,25 +53,6 @@ const BG_ICONS = [
   { C: SiGit, color: "#F05032", size: 40, top: "86%", left: "38%" },
   { C: SiGithub, color: "#24292E", size: 40, top: "88%", left: "64%" },
 ];
-
-/* =========================
-   In-file utilities
-========================= */
-
-async function sendToRoadmapAPI(payload) {
-  try {
-    const res = await fetch(`${API_BASE_URL}/roadmap/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    return { text: data?.text ?? "Thanks! Generating your roadmap..." };
-  } catch (e) {
-    console.error("Roadmap API error:", e);
-    return { text: "We're processing your message…" };
-  }
-}
 
 /* =========================
    In-file hooks
@@ -313,6 +294,24 @@ export default function ChatRoadmap() {
   const [isFocused, setIsFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const hasConnectedRef = useRef(false);
+
+  const { sendMessage, connect, close } = useRoadmapWebSocket({
+    onMessage: (msg) => {
+      setIsLoading(false);
+
+      let text = msg;
+      try {
+        const parsed = typeof msg === 'string' ? JSON.parse(msg) : msg;
+        text = parsed.text ?? parsed;
+      } catch {
+        text = typeof msg === 'string' ? msg : '';
+      }
+
+      setMessages((prev) => [...prev, { role: 'agent', text }]);
+    },
+  });
+
   // refs + effects
   const messageContainerRef = useRef(null);
   useAutoScroll(messageContainerRef, [messages, isLoading]);
@@ -323,28 +322,35 @@ export default function ChatRoadmap() {
   const hasMessages = messages.length > 0;
 
   // handlers
-  const handleSend = useCallback(async () => {
+  const handleSend = useCallback(() => {
     const trimmed = input.trim();
     if (!trimmed) return;
 
-    setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
-    setInput("");
+    setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
+    setInput('');
     setIsLoading(true);
 
-    const res = await sendToRoadmapAPI({
-      text: trimmed,
-      message_type: "text",
-    });
+    const payload = { text: trimmed, message_type: 'text' };
 
-    setIsLoading(false);
-    setMessages((prev) => [...prev, { role: "agent", text: res.text ?? "" }]);
-  }, [input]);
+    if (!hasConnectedRef.current) {
+      connect();
+      hasConnectedRef.current = true;
+
+      setTimeout(() => {
+        sendMessage(payload);
+      }, 3000);
+    } else {
+      sendMessage(payload);
+    }
+  }, [input, connect, sendMessage]);
 
   const resetChat = useCallback(() => {
     setMessages([]);
-    setInput("");
+    setInput('');
     setIsLoading(false);
-  }, []);
+    hasConnectedRef.current = false;
+    close();
+  }, [close]);
 
   const icons = useMemo(() => BG_ICONS, []);
 
