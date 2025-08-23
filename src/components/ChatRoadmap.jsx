@@ -19,7 +19,7 @@ import {
   SiGithub,
 } from "react-icons/si";
 import MarkdownRenderer from "./MarkdownRenderer";
-import { useRoadmapWebSocket } from "../services/roadmapWebSocket.js";
+import { useRoadmapWebSocket } from "../services/RoadmapWebSocket";
 
 /* =========================
    Config / Constants
@@ -273,7 +273,9 @@ const Composer = React.memo(function Composer({
           <ArrowRight size={20} />
         </button>
         <span
-          onClick={onReset}
+          onClick={() => {
+            onReset?.(); // then trigger your reset logic
+          }}
           className="text-xs font-medium bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] bg-clip-text text-transparent hover:underline cursor-pointer"
         >
           + New
@@ -349,6 +351,7 @@ export default function ChatRoadmap() {
     setInput('');
     setIsLoading(false);
     hasConnectedRef.current = false;
+    localStorage.removeItem("oadmapId");
     close();
   }, [close]);
 
