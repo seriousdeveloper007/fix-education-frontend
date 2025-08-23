@@ -19,7 +19,7 @@ import {
   SiGithub,
 } from "react-icons/si";
 import MarkdownRenderer from "./MarkdownRenderer";
-import { useRoadmapWebSocket } from "./RoadmapWebSocket";
+import { useRoadmapWebSocket } from "../services/roadmapWebSocket.js";
 
 /* =========================
    Config / Constants
