@@ -14,18 +14,19 @@ export function useRoadmapWebSocket({ onMessage } = {}) {
       try {
         const data = JSON.parse(event.data);
 
-        // Save chat_id as roadmapId if sent from backend
+        // Save chat_id as chatRoadmapId if sent from backend
         if (data?.chat_id) {
           try {
-            localStorage.setItem('roadmapId', data.chat_id);
+            localStorage.setItem('chatRoadmapId', data.chat_id);
           } catch (e) {
-            console.warn('Failed to save roadmapId to localStorage:', e);
+            console.warn('Failed to save chatRoadmapId to localStorage:', e);
           }
+          return;
         }
 
         // Handle message content - backend sends { "message": "text content" }
-        if (data.message !== undefined) {
-          onMessage?.(data.message);
+        if (data.token !== undefined) {
+          onMessage?.(data.token);
         } else {
           onMessage?.(data);
         }
@@ -60,9 +61,9 @@ export function useRoadmapWebSocket({ onMessage } = {}) {
   const sendMessage = (data) => {
     try {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
-        const roadmapId = localStorage.getItem('roadmapId');
-        const payload = roadmapId
-          ? { ...data, chat_id: roadmapId }
+        const chatRoadmapId = localStorage.getItem('chatRoadmapId');
+        const payload = chatRoadmapId
+          ? { ...data, chat_id: parseInt(chatRoadmapId, 10) }
           : data;
 
         wsRef.current.send(JSON.stringify(payload));

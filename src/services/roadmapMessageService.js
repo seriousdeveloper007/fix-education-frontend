@@ -1,13 +1,13 @@
 import { API_BASE_URL } from '../config.js';
 
-export async function fetchRoadmapMessages(roadmapId) {
+export async function fetchRoadmapMessages(chatRoadmapId) {
   const token = localStorage.getItem('token');
-  if (!roadmapId) return [];
+  if (!chatRoadmapId) return [];
 
   const headers = token ? { Authorization: token } : {};
 
   try {
-    const res = await fetch(`${API_BASE_URL}/messages/${roadmapId}`, { headers });
+    const res = await fetch(`${API_BASE_URL}/messages/${chatRoadmapId}`, { headers });
     if (!res.ok) throw new Error('Failed to fetch messages');
     const data = await res.json();
     return (data.messages || []).map((m) => ({

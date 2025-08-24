@@ -21,6 +21,8 @@ import {
 import MarkdownRenderer from "./MarkdownRenderer";
 import { useRoadmapWebSocket } from "../services/RoadmapWebSocket";
 import { fetchRoadmapMessages } from "../services/roadmapMessageService";
+import RoadMapUI from '../components/RoadMapUI';
+
 
 /* =========================
    Config / Constants
@@ -143,22 +145,35 @@ const BackgroundIconCloud = React.memo(function BackgroundIconCloud({ icons }) {
 const MessageList = React.memo(function MessageList({ messages, isLoading, containerRef }) {
   return (
     <div ref={containerRef} className="flex-1 overflow-y-auto space-y-3 mt-2 scrollbar-hide pb-4">
-      {messages.map((msg, idx) => (
-        <div
-          key={idx}
-          className={`${
-            msg.role === "user"
-              ? "ml-auto w-fit max-w-[75%] bg-blue-100"
-              : "mr-auto w-fit max-w-full bg-gray-100"
-          } px-3 py-2 rounded-xl text-sm break-words`}
-        >
-          <MarkdownRenderer text={msg.text} />
-        </div>
-      ))}
+      {messages.map((msg, idx) => {
+        // NEW: if this is a roadmap message, render the RoadMapUI component
+        if (msg.type === "roadmap") {
+          return (
+            <div key={idx} className="mr-auto w-full">
+              <RoadMapUI roadmapData={msg.roadmap} />
+            </div>
+          );
+        }
+
+        // otherwise render as a normal bubble
+        return (
+          <div
+            key={idx}
+            className={`${
+              msg.role === "user"
+                ? "ml-auto w-fit max-w-[75%] bg-blue-100"
+                : "mr-auto w-fit max-w-full bg-gray-100"
+            } px-3 py-2 rounded-xl text-sm break-words`}
+          >
+            <MarkdownRenderer text={msg.text} />
+          </div>
+        );
+      })}
       {isLoading && <LoadingDots />}
     </div>
   );
 });
+
 
 const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset, onFocus, onBlur }) {
   // Add keydown handler for Hero component
@@ -175,9 +190,9 @@ const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset,
   return (
     <div className="relative z-10 min-h-screen w-full flex flex-col items-center justify-start pt-16">
       <div className="max-w-4xl px-1 text-center">
-        <h1 className="text-center text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-relaxed">
+        <h1 className="text-center text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mx-2">
           Achieve your goal by building your{" "}
-          <span className="relative inline-block px-1 py-2">
+          <span className="relative inline-block px-1 py-1 sm:py-2">
             <span className="absolute inset-x-0 bottom-0 h-3 bg-emerald-200/60 rounded-lg -z-10" />
             <span className="bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-500 bg-clip-text text-transparent">
               Personalized Roadmap
@@ -302,17 +317,43 @@ export default function ChatRoadmap() {
   const { sendMessage, connect, close } = useRoadmapWebSocket({
     onMessage: (msg) => {
       setIsLoading(false);
-
-      let text = msg;
-      try {
-        const parsed = typeof msg === 'string' ? JSON.parse(msg) : msg;
-        text = parsed.text ?? parsed;
-      } catch {
-        text = typeof msg === 'string' ? msg : '';
+    
+      // Case 1: If msg is an object (JSON), treat it as a new message
+      if (typeof msg === "object" && msg && msg.roadmap) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "agent", type: "roadmap", roadmap: msg.roadmap }
+        ]);
+        return; // don't fall through
       }
-
-      setMessages((prev) => [...prev, { role: 'agent', text }]);
-    },
+  
+      if (typeof msg === "object" && msg !== null) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "agent", text: msg.message ?? JSON.stringify(msg) }
+        ]);
+        return;
+      }
+    
+      // Case 2: msg is a token string → append to last agent message
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+    
+        if (!last || last.role === "user") {
+          // Start new agent message with this token
+          return [...prev, { role: "agent", text: msg }];
+        } else {
+          // Append token to existing agent message
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            ...last,
+            text: (last.text || "") + msg,
+          };
+          return updated;
+        }
+      });
+    }
+    
   });
 
   // refs + effects
@@ -323,9 +364,9 @@ export default function ChatRoadmap() {
   const typed = useTypewriter(ROTATING_PROMPTS, isFocused || input.length > 0);
 
   useEffect(() => {
-    const roadmapId = localStorage.getItem('roadmapId');
-    if (!roadmapId) return;
-    fetchRoadmapMessages(roadmapId)
+    const chatRoadmapId = localStorage.getItem('chatRoadmapId');
+    if (!chatRoadmapId) return;
+    fetchRoadmapMessages(chatRoadmapId)
       .then((loaded) => setMessages(loaded))
       .catch((err) => {
         console.error('Failed to load messages', err);
@@ -362,7 +403,7 @@ export default function ChatRoadmap() {
     setInput('');
     setIsLoading(false);
     hasConnectedRef.current = false;
-    localStorage.removeItem("roadmapId");
+    localStorage.removeItem("chatRoadmapId");
     close();
   }, [close]);
 
