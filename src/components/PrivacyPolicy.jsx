@@ -45,7 +45,7 @@ const PrivacyPolicy = ({ theme = 'website' }) => {
           </p>
           <p>
             Reading this privacy notice will help you understand your privacy rights and choices. If you do not agree
-            with our policies and practices, please do not use our Services. Contact us at <a className="underline text-orange-700" href="mailto:support@ilon.ai.digital">support@ilon.ai.digital</a> with any questions.
+            with our policies and practices, please do not use our Services. Contact us at <a className="underline text-orange-700" href="mailto:support@ilonai.in">support@ilonai.in</a> with any questions.
           </p>
         </Section>
 
