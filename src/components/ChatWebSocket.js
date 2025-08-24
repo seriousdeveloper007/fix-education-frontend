@@ -20,7 +20,7 @@ export function useChatWebSocket({ onMessage, onToken, getPlaybackTime } = {}) {
       params.append('chatId', storedChatId);
     }
 
-      const ws = new WebSocket(`${WS_BASE_URL}/ws/chat?${params.toString()}`);
+    const ws = new WebSocket(`${WS_BASE_URL}/ws/chat?${params.toString()}`);
     wsRef.current = ws;
 
     ws.onmessage = (event) => {
@@ -52,7 +52,7 @@ export function useChatWebSocket({ onMessage, onToken, getPlaybackTime } = {}) {
     try {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         const playbackTime = getPlaybackTime ? Math.floor(getPlaybackTime()) : 0;
-        
+
         // Merge playback time with the data object and send
         wsRef.current.send(JSON.stringify({
           ...data,
