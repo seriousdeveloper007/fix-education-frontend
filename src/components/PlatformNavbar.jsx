@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronDown, LogOut } from 'lucide-react';
 import analytics from '../services/posthogService';
 import Logo from '../assets/logo-without-bg.png';
-import { FolderKanban, BookOpenCheck, LibraryBig } from 'lucide-react';
+import { FolderKanban, BookOpenCheck, LibraryBig, Route } from 'lucide-react';
 
 
 function UserAvatar({ profilePicture, emailPrefix }) {
@@ -29,7 +29,7 @@ function UserAvatar({ profilePicture, emailPrefix }) {
   );
 }
 
-export default function PlatformNavbar({ defaultTab = 'My Space' }) {
+export default function PlatformNavbar({ defaultTab = 'Roadmap' }) {
   const [selected, setSelected] = useState(defaultTab);
   const [userInfo, setUserInfo] = useState({ emailPrefix: '', profilePicture: '' });
   const navigate = useNavigate();
@@ -56,20 +56,23 @@ export default function PlatformNavbar({ defaultTab = 'My Space' }) {
     localStorage.clear();
     window.location.reload();
   };
-  
+
 
   const handleTabClick = (tab) => {
     setSelected(tab);
     analytics.navbarOptionClicked(tab);
     switch (tab) {
-      case 'My Space':
-        navigate('/platform');
-        break;
+      // case 'My Space':
+      //   navigate('/platform');
+      //   break;
       case 'Study Room':
         navigate('/study-room');
         break;
       case 'Library':
         navigate('/library');
+        break;
+      case 'Roadmap':
+        navigate('/roadmap');
         break;
       default:
         break;
@@ -83,11 +86,12 @@ export default function PlatformNavbar({ defaultTab = 'My Space' }) {
   };
 
   const icons = {
-    'My Space': <FolderKanban className="w-5 h-5 text-indigo-600 group-hover:text-indigo-800" />,
+   // 'My Space': <FolderKanban className="w-5 h-5 text-indigo-600 group-hover:text-indigo-800" />,
     'Study Room': <BookOpenCheck className="w-5 h-5 text-cyan-600 group-hover:text-cyan-800" />,
     'Library': <LibraryBig className="w-5 h-5 text-emerald-600 group-hover:text-emerald-800" />,
+    'Roadmap': <Route className="w-5 h-5 text-purple-600 group-hover:text-purple-800" />
   };
-  
+
 
   return (
     <header className={`sticky top-0 z-50 w-full h-16 px-6 flex items-center justify-between shadow-md bg-white/40 backdrop-blur-lg font-fraunces`}>
@@ -99,21 +103,21 @@ export default function PlatformNavbar({ defaultTab = 'My Space' }) {
 
       {/* MID: navigation */}
       <div className="flex-1 flex justify-center items-center space-x-8">
-      {['My Space', 'Study Room', 'Library'].map((tab) => (
-        <div
-          key={tab}
-          onClick={() => handleTabClick(tab)}
-          className="flex flex-col items-center group cursor-pointer transition-transform duration-150 hover:-translate-y-0.5"
-        >
-          <div className="flex items-center space-x-2">
-            {icons[tab]}
-            <span className={selected === tab ? cfg.tabActive : cfg.tabInactive}>{tab}</span>
+        {['Roadmap' , 'Study Room', 'Library' ].map((tab) => (
+          <div
+            key={tab}
+            onClick={() => handleTabClick(tab)}
+            className="flex flex-col items-center group cursor-pointer transition-transform duration-150 hover:-translate-y-0.5"
+          >
+            <div className="flex items-center space-x-2">
+              {icons[tab]}
+              <span className={selected === tab ? cfg.tabActive : cfg.tabInactive}>{tab}</span>
+            </div>
+            {selected === tab && (
+              <div className="mt-1 w-full h-[3px] bg-black rounded-full transition-all duration-200" />
+            )}
           </div>
-          {selected === tab && (
-            <div className="mt-1 w-full h-[3px] bg-black rounded-full transition-all duration-200" />
-          )}
-        </div>
-      ))}
+        ))}
 
       </div>
 
