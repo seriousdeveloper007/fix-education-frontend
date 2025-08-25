@@ -6,16 +6,16 @@ import { API_BASE_URL } from '../config.js';
 import PropTypes from 'prop-types';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const GOOGLE_ENDPOINT = `${API_BASE_URL}/user/auth/web/google`; // identical to old path
+const GOOGLE_ENDPOINT = `${API_BASE_URL}/user/auth/web/google`;
 
-export default function LoginCard({ redirectUri = null }) {
+export default function LoginCard({ redirectUri = null, heading }) {
   const cfg = themeConfig.website;
   const navigate = useNavigate();
 
   /* ───────── local state ───────── */
-  const [email, setEmail]   = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState('');
+  const [error, setError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -58,11 +58,10 @@ export default function LoginCard({ redirectUri = null }) {
           profile_picture: backendUser.profile_picture,
           name: backendUser.name,
           id: backendUser.id,
-        }),
+        })
       );
       localStorage.setItem('token', appJwt);
       window.location.reload();
-
     } catch (err) {
       setError(err.message);
       localStorage.removeItem('user');
@@ -88,13 +87,11 @@ export default function LoginCard({ redirectUri = null }) {
       setLoading(true);
       analytics.loginEmailSubmitted(email);
 
-      // Build request payload
       const payload = {
         email,
         login_via: 'website',
       };
 
-      // Only add redirect when prop is provided
       if (redirectUri) {
         payload.redirect_url = redirectUri;
       }
@@ -117,12 +114,16 @@ export default function LoginCard({ redirectUri = null }) {
       setLoading(false);
     }
   }
-  /* ───────── UI (unchanged design) ───────── */
+
+  /* ───────── UI ───────── */
   return (
     <div className="bg-white rounded-xl shadow-md px-6 py-8 w-full max-w-md text-center">
-      <h1 className={cfg.authHeading}>Use ILON AI for 15 mins — you’ll realize YouTube is shit 💩</h1>
+      <h1 className={cfg.authHeading}>
+        {heading || "Use ILON AI for 15 mins — you’ll realize YouTube is shit 💩"}
+      </h1>
+
       <div className="login-options mt-6 space-y-6 flex flex-col items-center">
-        {/* Google button (renders when GIS initialised) */}
+        {/* Google button */}
         <div id="google-signin-button" />
 
         <input
@@ -165,5 +166,6 @@ export default function LoginCard({ redirectUri = null }) {
 }
 
 LoginCard.propTypes = {
-    redirectUri: PropTypes.string,
-  };
+  redirectUri: PropTypes.string,
+  heading: PropTypes.string,
+};

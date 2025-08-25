@@ -175,7 +175,7 @@ const MessageList = React.memo(function MessageList({ messages, isLoading, conta
 });
 
 
-const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset, onFocus, onBlur }) {
+const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset, onFocus, onBlur, isLoading}) {
   // Add keydown handler for Hero component
   const handleKeyDown = useCallback(
     (e) => {
@@ -216,6 +216,7 @@ const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset,
             <textarea
               rows={4}
               value={input}
+              disabled={isLoading}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
@@ -254,6 +255,7 @@ const Composer = React.memo(function Composer({
   onReset,
   onFocus,
   onBlur,
+  isLoading,
   placeholder = "Type your goal or current skills…",
   rows = 4,
 }) {
@@ -272,6 +274,7 @@ const Composer = React.memo(function Composer({
       <textarea
         rows={rows}
         value={value}
+        disabled={isLoading}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         onFocus={onFocus}
@@ -317,14 +320,20 @@ export default function ChatRoadmap() {
   const { sendMessage, connect, close } = useRoadmapWebSocket({
     onMessage: (msg) => {
       setIsLoading(false);
-    
-      // Case 1: If msg is an object (JSON), treat it as a new message
-      if (typeof msg === "object" && msg && msg.roadmap) {
+      if (typeof msg === "object" && msg && msg.roadmap_id && msg.roadmap) {
+        // Save roadmap_id to localStorage
+        localStorage.setItem('roadmapId', msg.roadmap_id);
+        
+        // Add roadmap message to chat
         setMessages((prev) => [
           ...prev,
-          { role: "agent", type: "roadmap", roadmap: msg.roadmap }
+          { 
+            role: "agent", 
+            type: "roadmap", 
+            roadmap: msg.roadmap,
+          }
         ]);
-        return; // don't fall through
+        return;
       }
   
       if (typeof msg === "object" && msg !== null) {
@@ -332,6 +341,12 @@ export default function ChatRoadmap() {
           ...prev,
           { role: "agent", text: msg.message ?? JSON.stringify(msg) }
         ]);
+        
+        // Set loading back to true after 1 second
+        setTimeout(() => {
+          setIsLoading(true);
+        }, 1000);
+        
         return;
       }
     
@@ -404,6 +419,7 @@ export default function ChatRoadmap() {
     setIsLoading(false);
     hasConnectedRef.current = false;
     localStorage.removeItem("chatRoadmapId");
+    localStorage.removeItem("roadmapId");
     close();
   }, [close]);
 
@@ -421,6 +437,7 @@ export default function ChatRoadmap() {
           typed={typed}
           onSend={handleSend}
           onReset={resetChat}
+          isLoading={isLoading}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
@@ -435,6 +452,7 @@ export default function ChatRoadmap() {
               onReset={resetChat}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
+              isLoading={isLoading}
               placeholder="Type your goal or current skills…"
               rows={4}
             />
