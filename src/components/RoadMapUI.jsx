@@ -152,8 +152,7 @@ const RoadMapUI = ({ roadmapData }) => {
   const data = roadmapData || sampleData;
 
   // Make sure we operate on `data.roadmap` (per schema)
-  const topics = Array.isArray(data.roadmap) ? data.roadmap : [];
-
+  const topics = Array.isArray(data.topics) ? data.topics : [];
   // Group topics by week
   const topicsByWeek = topics.reduce((acc, topic) => {
     const week = topic.week_number;
