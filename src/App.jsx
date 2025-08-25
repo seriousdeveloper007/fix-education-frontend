@@ -7,17 +7,37 @@ import {
 
 import LandingPage from './components/LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
-import PlatformLanding from './components/PlatformLanding';
 import GoogleLogin from './components/LoginPage';
 import ErrorPage from './components/ErrorPage';
 import VerifyLearner from './components/VerifyLearner';
 import Library from './components/Library';
-import StudyRoom from './components/StudyRoom'; // ✅ correct
-import LibraryDetail from './components/LibraryDetail'; // new file
+import StudyRoom from './components/StudyRoom'; 
+import LibraryDetail from './components/LibraryDetail'; 
 import ChatRoadmap from './components/ChatRoadmap';
 import RoadMapUI from './components/RoadMapUI';
 
+import BasicNavbar from './components/BasicNavbar';
+import PlatformNavbar from './components/PlatformNavbar';
 
+function ConditionalRoadmapPage() {
+  if (isLoggedIn()) {
+    // Logged-in user: Platform navbar + RoadMapUI body
+    return (
+      <>
+        <PlatformNavbar defaultTab="Roadmap" />
+        <ChatRoadmap />
+      </>
+    );
+  } else {
+    // Non-logged user: Basic navbar + ChatRoadmap body
+    return (
+      <>
+        <BasicNavbar />
+        <ChatRoadmap />
+      </>
+    );
+  }
+}
 
 export default function App() {
   return (
@@ -44,7 +64,7 @@ function AppRoutes() {
         path="/"
         element={
           isLoggedIn() ? (
-            <Navigate to="/platform" replace />
+            <Navigate to="/roadmap" replace />
           ) : (
             <LandingPage />
           )
@@ -56,7 +76,7 @@ function AppRoutes() {
         path="/login"
         element={
           isLoggedIn() ? (
-            <Navigate to="/platform" replace />
+            <Navigate to="/roadmap" replace />
           ) : (
             <GoogleLogin />
           )
@@ -64,14 +84,14 @@ function AppRoutes() {
       />
 
       {/* Single Protected PlatformLanding Route */}
-      <Route
+      {/* <Route
         path="/platform"
         element={
           <PrivateRoute>
             <PlatformLanding />
           </PrivateRoute>
         }
-      />
+      /> */}
 
       <Route
         path="/study-room"
@@ -100,14 +120,10 @@ function AppRoutes() {
       <Route path="/verify-learner" element={<VerifyLearner />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/error" element={<ErrorPage />} />
+
       <Route
         path="/roadmap"
-        element={(
-          <>
-            <ChatRoadmap />
-            {/* <RoadMapUI /> */}
-          </>
-        )}
+        element={<ConditionalRoadmapPage />}
       />
 
       {/* Fallback */}
@@ -115,7 +131,7 @@ function AppRoutes() {
         path="*"
         element={
           isLoggedIn() ? (
-            <Navigate to="/platform" replace />
+            <Navigate to="/roadmap" replace />
           ) : (
             <Navigate to="/" replace />
           )

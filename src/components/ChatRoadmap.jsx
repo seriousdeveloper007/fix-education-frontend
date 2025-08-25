@@ -22,6 +22,11 @@ import MarkdownRenderer from "./MarkdownRenderer";
 import { useRoadmapWebSocket } from "../services/RoadmapWebSocket";
 import { fetchRoadmapMessages } from "../services/roadmapMessageService";
 import RoadMapUI from '../components/RoadMapUI';
+import { deleteRoadmap } from '../services/roadmapService';
+
+
+
+
 
 
 /* =========================
@@ -200,7 +205,7 @@ const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset,
           </span>
         </h1>
         <p className="mt-3 text-base sm:text-lg text-slate-700 max-w-4xl mx-auto">
-          Ilon AI curates the best free resources from YouTube, GitHub, LeetCode, HackerRank, and more — matched to your skill level.
+          ILON AI curates the best free resources from YouTube, GitHub, LeetCode, HackerRank, and more — matched to your skill level.
         </p>
       </div>
 
@@ -239,7 +244,7 @@ const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset,
               onClick={onReset}
               className="text-xs font-medium bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] bg-clip-text text-transparent hover:underline cursor-pointer"
             >
-              + New
+              + Start Again
             </span>
           </div>
         </div>
@@ -297,7 +302,7 @@ const Composer = React.memo(function Composer({
           }}
           className="text-xs font-medium bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] bg-clip-text text-transparent hover:underline cursor-pointer"
         >
-          + New
+          + Start Again
         </span>
       </div>
     </div>
@@ -316,6 +321,23 @@ export default function ChatRoadmap() {
   const [isLoading, setIsLoading] = useState(false);
 
   const hasConnectedRef = useRef(false);
+
+  const getAuthData = useCallback(() => {
+    try {
+      const token = localStorage.getItem('token'); 
+      const userStr = localStorage.getItem('user'); 
+      if (token && userStr) {
+        const user = JSON.parse(userStr);
+        if (user && user.id) {
+          return { token, user };
+        }
+      }
+    } catch (error) {
+      console.error('Error getting auth data:', error);
+    }
+    return null;
+  }, []);
+  
 
   const { sendMessage, connect, close } = useRoadmapWebSocket({
     onMessage: (msg) => {
@@ -399,7 +421,9 @@ export default function ChatRoadmap() {
     setInput('');
     setIsLoading(true);
 
-    const payload = { text: trimmed, message_type: 'text' };
+    const authData = getAuthData();
+
+    const payload = { text: trimmed, message_type: 'text' , ...(authData && {user_id: authData.user.id,auth_token: authData.token}) };
 
     if (!hasConnectedRef.current) {
       connect();
@@ -411,9 +435,22 @@ export default function ChatRoadmap() {
     } else {
       sendMessage(payload);
     }
-  }, [input, connect, sendMessage]);
+  }, [input, connect, sendMessage , getAuthData]);
 
-  const resetChat = useCallback(() => {
+  const resetChat = useCallback(async () => {
+
+    const authData = getAuthData();
+    const roadmapId = localStorage.getItem('roadmapId');
+    
+    if (authData && roadmapId) {
+      try {
+        await deleteRoadmap(roadmapId, authData.token);
+        console.log('Roadmap deleted successfully');
+      } catch (error) {
+        console.error('Failed to delete roadmap:', error);
+      }
+    }
+
     setMessages([]);
     setInput('');
     setIsLoading(false);
@@ -421,7 +458,7 @@ export default function ChatRoadmap() {
     localStorage.removeItem("chatRoadmapId");
     localStorage.removeItem("roadmapId");
     close();
-  }, [close]);
+  }, [close , getAuthData]);
 
   const icons = useMemo(() => BG_ICONS, []);
 
