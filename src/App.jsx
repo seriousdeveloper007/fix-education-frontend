@@ -14,30 +14,7 @@ import Library from './components/Library';
 import StudyRoom from './components/StudyRoom'; 
 import LibraryDetail from './components/LibraryDetail'; 
 import ChatRoadmap from './components/ChatRoadmap';
-import RoadMapUI from './components/RoadMapUI';
 
-import BasicNavbar from './components/BasicNavbar';
-import PlatformNavbar from './components/PlatformNavbar';
-
-function ConditionalRoadmapPage() {
-  if (isLoggedIn()) {
-    // Logged-in user: Platform navbar + RoadMapUI body
-    return (
-      <>
-        <PlatformNavbar defaultTab="Roadmap" />
-        <ChatRoadmap />
-      </>
-    );
-  } else {
-    // Non-logged user: Basic navbar + ChatRoadmap body
-    return (
-      <>
-        <BasicNavbar />
-        <ChatRoadmap />
-      </>
-    );
-  }
-}
 
 export default function App() {
   return (
@@ -123,7 +100,7 @@ function AppRoutes() {
 
       <Route
         path="/roadmap"
-        element={<ConditionalRoadmapPage />}
+        element={<ChatRoadmap />}
       />
 
       {/* Fallback */}
