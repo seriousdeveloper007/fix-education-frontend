@@ -10,18 +10,30 @@ import LoginCard from './LoginCard';  // contains ALL login logic
 
 export default function GoogleLogin() {
   const [fromExtension, setFromExtension] = useState(false);
+  const [fromRoadmap, setFromRoadmap] = useState(false); 
 
-  /* detect ?from-extension=true */
-  useEffect(() => {
+   /* detect URL parameters */
+   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    
+    // Existing extension detection
     if (params.get('from-extension') === 'true') {
       setFromExtension(true);
+    }
+    
+    // NEW: Detect roadmap parameter
+    if (params.get('from') === 'roadmap') {
+      setFromRoadmap(true);
+    }
+    
+    // Clean URL
+    if (params.has('from-extension') || params.has('from')) {
       const url = new URL(window.location);
       url.searchParams.delete('from-extension');
+      url.searchParams.delete('from');
       window.history.replaceState({}, '', url);
     }
   }, []);
-
   useEffect(() => analytics.loginPageLoaded(), []);
 
   return (
@@ -69,7 +81,9 @@ export default function GoogleLogin() {
       )}
 
       <div className="flex-grow flex items-start justify-center px-4 pt-16">
-        <LoginCard />
+      <LoginCard 
+          heading={fromRoadmap ? "Sign In to Secure Your Roadmap" : undefined}
+        />
       </div>
     </div>
   );

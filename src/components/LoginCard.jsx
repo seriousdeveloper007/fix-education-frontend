@@ -4,6 +4,7 @@ import themeConfig from './themeConfig';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
 import PropTypes from 'prop-types';
+import { handlePostLoginRoadmapCheck } from '../services/roadmapService.js';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const GOOGLE_ENDPOINT = `${API_BASE_URL}/user/auth/web/google`;
@@ -46,12 +47,21 @@ export default function LoginCard({ redirectUri = null, heading }) {
       });
 
       if (!res.ok) {
-        const { detail } = await res.json();
+
+        const responseText = await res.text();
+
+        let detail;
+        try {
+          const jsonResponse = JSON.parse(responseText);
+          detail = jsonResponse.detail;
+        } catch {
+          detail = responseText;
+        }
         throw new Error(detail || 'Login failed');
       }
 
       const { user: backendUser, token: appJwt } = await res.json();
-      localStorage.setItem(
+localStorage.setItem(
         'user',
         JSON.stringify({
           email: backendUser.email,
@@ -61,108 +71,118 @@ export default function LoginCard({ redirectUri = null, heading }) {
         })
       );
       localStorage.setItem('token', appJwt);
+
+      await handlePostLoginRoadmapCheck(backendUser, appJwt);
+
+      window.dispatchEvent(new CustomEvent('userLoggedIn', { 
+        detail: { user: backendUser, token: appJwt } 
+      }));
+
+
+
       window.location.reload();
-    } catch (err) {
-      setError(err.message);
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      navigate('/error');
-    } finally {
-      setLoading(false);
-    }
+  } catch (err) {
+
+    setError(err.message);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+/* ───────── magic-link email flow ───────── */
+async function handleVerifyEmail() {
+  setError('');
+  setEmailError('');
+  setSuccess('');
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setEmailError('Please enter a valid email address');
+    return;
   }
 
-  /* ───────── magic-link email flow ───────── */
-  async function handleVerifyEmail() {
-    setError('');
-    setEmailError('');
-    setSuccess('');
+  try {
+    setLoading(true);
+    analytics.loginEmailSubmitted(email);
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError('Please enter a valid email address');
-      return;
+    const payload = {
+      email,
+      login_via: 'website',
+    };
+
+    if (redirectUri) {
+      payload.redirect_url = redirectUri;
     }
 
-    try {
-      setLoading(true);
-      analytics.loginEmailSubmitted(email);
+    const res = await fetch(`${API_BASE_URL}/magic-link/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
 
-      const payload = {
-        email,
-        login_via: 'website',
-      };
-
-      if (redirectUri) {
-        payload.redirect_url = redirectUri;
-      }
-
-      const res = await fetch(`${API_BASE_URL}/magic-link/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const { detail } = await res.json();
-        throw new Error(detail || 'Request failed');
-      }
-
-      setSuccess('A verification link has been sent to your email.');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      const { detail } = await res.json();
+      throw new Error(detail || 'Request failed');
     }
+
+    setSuccess('A verification link has been sent to your email.');
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
   }
+}
 
-  /* ───────── UI ───────── */
-  return (
-    <div className="bg-white rounded-xl shadow-md px-6 py-8 w-full max-w-md text-center">
-      <h1 className={cfg.authHeading}>
-        {heading || "Use ILON AI for 15 mins — you’ll realize YouTube is shit 💩"}
-      </h1>
+/* ───────── UI ───────── */
+return (
+  <div className="bg-white rounded-xl shadow-md px-6 py-8 w-full max-w-md text-center">
+    <h1 className={cfg.authHeading}>
+      {heading || "Use ILON AI for 15 mins — you’ll realize YouTube is shit 💩"}
+    </h1>
 
-      <div className="login-options mt-6 space-y-6 flex flex-col items-center">
-        {/* Google button */}
-        <div id="google-signin-button" />
+    <div className="login-options mt-6 space-y-6 flex flex-col items-center">
+      {/* Google button */}
+      <div id="google-signin-button" />
 
-        <input
-          type="email"
-          placeholder="Enter your email"
-          className="w-[280px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <input
+        type="email"
+        placeholder="Enter your email"
+        className="w-[280px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-        <button
-          onClick={handleVerifyEmail}
-          disabled={loading}
-          className={`${cfg.primaryBtn} w-[280px] h-11`}
+      <button
+        onClick={handleVerifyEmail}
+        disabled={loading}
+        className={`${cfg.primaryBtn} w-[280px] h-11`}
+      >
+        {loading ? 'Processing…' : 'Verify Email'}
+      </button>
+
+      {(emailError || error) && (
+        <p className="text-sm text-red-600 mt-2">{emailError || error}</p>
+      )}
+      {success && (
+        <p className="text-sm text-emerald-600 mt-2 text-center">{success}</p>
+      )}
+
+      <p className={`${cfg.authMuted} text-xs mt-1`}>
+        By continuing, you agree to our{' '}
+        <a
+          href="/privacy-policy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-gray-700"
         >
-          {loading ? 'Processing…' : 'Verify Email'}
-        </button>
-
-        {(emailError || error) && (
-          <p className="text-sm text-red-600 mt-2">{emailError || error}</p>
-        )}
-        {success && (
-          <p className="text-sm text-emerald-600 mt-2 text-center">{success}</p>
-        )}
-
-        <p className={`${cfg.authMuted} text-xs mt-1`}>
-          By continuing, you agree to our{' '}
-          <a
-            href="/privacy-policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-gray-700"
-          >
-            T&C and Privacy Policy
-          </a>
-        </p>
-      </div>
+          T&C and Privacy Policy
+        </a>
+      </p>
     </div>
-  );
+  </div>
+);
 }
 
 LoginCard.propTypes = {
