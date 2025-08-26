@@ -73,6 +73,13 @@ localStorage.setItem(
       localStorage.setItem('token', appJwt);
 
       await handlePostLoginRoadmapCheck(backendUser, appJwt);
+
+      window.dispatchEvent(new CustomEvent('userLoggedIn', { 
+        detail: { user: backendUser, token: appJwt } 
+      }));
+
+
+
       window.location.reload();
   } catch (err) {
 

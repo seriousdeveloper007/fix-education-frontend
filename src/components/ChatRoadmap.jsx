@@ -22,7 +22,7 @@ import MarkdownRenderer from "./MarkdownRenderer";
 import { useRoadmapWebSocket } from "../services/RoadmapWebSocket";
 import { fetchRoadmapMessages } from "../services/roadmapMessageService";
 import RoadMapUI from '../components/RoadMapUI';
-import { deleteRoadmap } from '../services/roadmapService';
+import { deleteRoadmap, fetchRoadmapById, assignRoadmapToUser , fetchUserRoadmaps } from '../services/roadmapService';
 
 
 
@@ -181,7 +181,6 @@ const MessageList = React.memo(function MessageList({ messages, isLoading, conta
 
 
 const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset, onFocus, onBlur, isLoading}) {
-  // Add keydown handler for Hero component
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -319,6 +318,9 @@ export default function ChatRoadmap() {
   const [input, setInput] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+const [existingRoadmap, setExistingRoadmap] = useState(null);
+const [roadmapLoading, setRoadmapLoading] = useState(false);
+const [chatDisabled, setChatDisabled] = useState(false);
 
   const hasConnectedRef = useRef(false);
 
@@ -337,14 +339,45 @@ export default function ChatRoadmap() {
     }
     return null;
   }, []);
+  const assignRoadmapToCurrentUser = useCallback(async (roadmapId) => {
+    const authData = getAuthData();
+    if (!authData || !roadmapId) return false;
   
+    try {
+      await assignRoadmapToUser(roadmapId, authData.user.id, authData.token);
+      console.log('Roadmap assigned to user successfully');
+      return true;
+    } catch (error) {
+      console.error('Failed to assign roadmap to user:', error);
+      return false;
+    }
+  }, [getAuthData]);
 
   const { sendMessage, connect, close } = useRoadmapWebSocket({
-    onMessage: (msg) => {
+    onMessage: async (msg) => {
       setIsLoading(false);
       if (typeof msg === "object" && msg && msg.roadmap_id && msg.roadmap) {
         // Save roadmap_id to localStorage
         localStorage.setItem('roadmapId', msg.roadmap_id);
+
+        const authData = getAuthData();
+        if (authData) {
+          console.log('User is logged in, assigning roadmap...');
+          // Add a small delay to ensure roadmap is fully saved
+          setTimeout(async () => {
+            try {
+              await assignRoadmapToCurrentUser(msg.roadmap_id);
+            } catch (error) {
+              console.error('Failed to assign roadmap immediately after creation:', error);
+              // Optionally retry once more
+              setTimeout(() => {
+                assignRoadmapToCurrentUser(msg.roadmap_id);
+              }, 2000);
+            }
+          }, 500);
+        }
+  
+        setChatDisabled(true);
         
         // Add roadmap message to chat
         setMessages((prev) => [
@@ -410,6 +443,99 @@ export default function ChatRoadmap() {
       });
   }, []);
 
+
+  // Check for existing roadmap on component mount
+useEffect(() => {
+  const checkForExistingRoadmap = async () => {
+    const roadmapId = localStorage.getItem('roadmapId');
+    const authData = getAuthData();
+    
+    if (roadmapId) {
+      setRoadmapLoading(true);
+      try {
+        const roadmapData = await fetchRoadmapById(roadmapId, authData?.token);
+        
+        if (roadmapData) {
+          setExistingRoadmap(roadmapData);
+          setChatDisabled(true);
+          setMessages([]);
+        } else {
+          // Roadmap not found, clear localStorage
+          localStorage.removeItem('roadmapId');
+        }
+      } catch (error) {
+        console.error('Error checking for existing roadmap:', error);
+      } finally {
+        setRoadmapLoading(false);
+      }
+    }
+ 
+
+  else if ( authData && authData.user?.id) {
+    setRoadmapLoading(true);
+    try {
+      const existingRoadmap = await fetchUserRoadmaps(authData.user.id, authData.token);
+      if (existingRoadmap) {
+        console.log('Found existing roadmap for logged in user');
+        localStorage.setItem('roadmapId', existingRoadmap.id.toString());
+        setExistingRoadmap(existingRoadmap);
+        setChatDisabled(true);
+        setMessages([]);
+      }
+    } catch (error) {
+      console.error('Error fetching user roadmaps:', error);
+    } finally {
+      setRoadmapLoading(false);
+    }
+  }
+
+  }
+  checkForExistingRoadmap();
+}, [getAuthData]);
+
+
+// Listen for login events during roadmap preparation
+useEffect(() => {
+  const handleUserLogin = async (event) => {
+    const { user, token } = event.detail;
+    const roadmapId = localStorage.getItem('roadmapId');
+    
+    if (roadmapId) {
+      console.log('User logged in with existing roadmap, assigning...');
+      try {
+        await assignRoadmapToUser(roadmapId, user.id, token);
+        console.log('Roadmap assigned after login');
+      } catch (error) {
+        console.error('Failed to assign roadmap after login:', error);
+      }
+    }
+
+    else {
+      // Check if user has existing roadmaps in backend
+      console.log('Checking for user existing roadmaps after login...');
+      try {
+        const existingRoadmap = await fetchUserRoadmaps(user.id, token);
+        if (existingRoadmap) {
+          console.log('Found existing roadmap after login:', existingRoadmap.id);
+          localStorage.setItem('roadmapId', existingRoadmap.id.toString());
+          setExistingRoadmap(existingRoadmap);
+          setChatDisabled(true);
+          setMessages([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user roadmaps after login:', error);
+      }
+    }
+  };
+ 
+
+  window.addEventListener('userLoggedIn', handleUserLogin);
+  
+  return () => {
+    window.removeEventListener('userLoggedIn', handleUserLogin);
+  };
+}, []);
+
   const hasMessages = messages.length > 0;
 
   // handlers
@@ -454,6 +580,8 @@ export default function ChatRoadmap() {
     setMessages([]);
     setInput('');
     setIsLoading(false);
+    setExistingRoadmap(null);
+  setChatDisabled(false);
     hasConnectedRef.current = false;
     localStorage.removeItem("chatRoadmapId");
     localStorage.removeItem("roadmapId");
@@ -466,36 +594,124 @@ export default function ChatRoadmap() {
     <div className="relative w-full overflow-hidden min-h-screen text-slate-900 selection:bg-emerald-300/30 font-fraunces bg-white">
       {/* Background tech icons */}
       <BackgroundIconCloud icons={icons} />
-
-      {!hasMessages ? (
-        <Hero
-          input={input}
-          setInput={setInput}
-          typed={typed}
-          onSend={handleSend}
-          onReset={resetChat}
-          isLoading={isLoading}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-        />
-      ) : (
+  
+      {/* Show loading state when checking for existing roadmap */}
+      {roadmapLoading && (
+        <div className="relative z-10 h-screen w-full flex items-center justify-center">
+          <LoadingDots />
+        </div>
+      )}
+  
+      {/* Show existing roadmap if it exists */}
+      {!roadmapLoading && existingRoadmap && (
         <div className="relative z-10 h-screen w-full flex flex-col pt-4">
           <div className="w-full max-w-4xl mx-auto px-1 flex flex-col h-full">
-            <MessageList messages={messages} isLoading={isLoading} containerRef={messageContainerRef} />
-            <Composer
-              value={input}
-              onChange={setInput}
-              onSend={handleSend}
-              onReset={resetChat}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              isLoading={isLoading}
-              placeholder="Type your goal or current skills…"
-              rows={4}
-            />
+            <div className="flex-1 overflow-y-auto space-y-3 mt-2 scrollbar-hide pb-4">
+              <div className="mr-auto w-full">
+                <RoadMapUI roadmapData={existingRoadmap} />
+              </div>
+            </div>
+            
+            {/* Show reset button for existing roadmap */}
+            <div className="flex-shrink-0 pt-2 pr-2 mb-4 flex justify-center">
+              <button
+                onClick={resetChat}
+                className="px-4 py-2 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white rounded-lg transition-all text-sm"
+              >
+                Create New Roadmap
+              </button>
+            </div>
           </div>
         </div>
+      )}
+  
+      {/* Show hero or chat interface only if no existing roadmap */}
+      {!roadmapLoading && !existingRoadmap && (
+        <>
+          {!hasMessages ? (
+            <Hero
+              input={input}
+              setInput={setInput}
+              typed={typed}
+              onSend={handleSend}
+              onReset={resetChat}
+              isLoading={isLoading}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+            />
+          ) : (
+            <div className="relative z-10 h-screen w-full flex flex-col pt-4">
+              <div className="w-full max-w-4xl mx-auto px-1 flex flex-col h-full">
+                <MessageList messages={messages} isLoading={isLoading} containerRef={messageContainerRef} />
+                
+                {/* Only show composer if chat is not disabled */}
+                {!chatDisabled && (
+                  <Composer
+                    value={input}
+                    onChange={setInput}
+                    onSend={handleSend}
+                    onReset={resetChat}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    isLoading={isLoading}
+                    placeholder="Type your goal or current skills…"
+                    rows={4}
+                  />
+                )}
+                
+                {/* Show reset button when chat is disabled but no existing roadmap loaded */}
+                {chatDisabled && !existingRoadmap && (
+                  <div className="flex-shrink-0 pt-2 pr-2 mb-4 flex justify-center">
+                    <button
+                      onClick={resetChat}
+                      className="px-4 py-2 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white rounded-lg transition-all text-sm"
+                    >
+                      Create New Roadmap
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
 }
+//   return (
+//     <div className="relative w-full overflow-hidden min-h-screen text-slate-900 selection:bg-emerald-300/30 font-fraunces bg-white">
+//       {/* Background tech icons */}
+//       <BackgroundIconCloud icons={icons} />
+
+//       {!hasMessages ? (
+//         <Hero
+//           input={input}
+//           setInput={setInput}
+//           typed={typed}
+//           onSend={handleSend}
+//           onReset={resetChat}
+//           isLoading={isLoading}
+//           onFocus={() => setIsFocused(true)}
+//           onBlur={() => setIsFocused(false)}
+//         />
+//       ) : (
+//         <div className="relative z-10 h-screen w-full flex flex-col pt-4">
+//           <div className="w-full max-w-4xl mx-auto px-1 flex flex-col h-full">
+//             <MessageList messages={messages} isLoading={isLoading} containerRef={messageContainerRef} />
+//             <Composer
+//               value={input}
+//               onChange={setInput}
+//               onSend={handleSend}
+//               onReset={resetChat}
+//               onFocus={() => setIsFocused(true)}
+//               onBlur={() => setIsFocused(false)}
+//               isLoading={isLoading}
+//               placeholder="Type your goal or current skills…"
+//               rows={4}
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
