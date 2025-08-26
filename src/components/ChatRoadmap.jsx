@@ -172,7 +172,7 @@ const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset,
   );
 
   return (
-    <div className="relative z-10 min-h-screen w-full flex flex-col items-center justify-start pt-16">
+    <div className="relative z-10 min-h-screen w-full flex flex-col items-center justify-start">
         <div className="w-full">
         {isLoggedIn() ? (
           <PlatformNavbar defaultTab="Roadmap" />
@@ -181,7 +181,7 @@ const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset,
         )}
       </div>
       
-      <div className="max-w-4xl px-1 text-center">
+      <div className="max-w-4xl px-1 text-center pt-12">
         <h1 className="text-center text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mx-2">
           Achieve your goal by building your{" "}
           <span className="relative inline-block px-1 py-1 sm:py-2">
@@ -238,7 +238,8 @@ const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset,
       </div>
     </div>
   );
-});
+ });
+
 
 const Composer = React.memo(function Composer({
   value,
@@ -250,6 +251,8 @@ const Composer = React.memo(function Composer({
   isLoading,
   placeholder = "Type your goal or current skills…",
   rows = 4,
+  messages = [],
+  containerRef,
 }) {
   const handleKeyDown = useCallback(
     (e) => {
@@ -262,46 +265,68 @@ const Composer = React.memo(function Composer({
   );
 
   return (
-<>
-    <div className="w-full">
-      {isLoggedIn() ? (
-        <PlatformNavbar defaultTab="Roadmap" />
-      ) : (
-        <BasicNavbar />
-      )}
-    </div>
-    <div className="flex-shrink-0 pt-2 pr-2 border rounded-xl flex items-start bg-white/80 backdrop-blur-md mb-4">
-      <textarea
-        rows={rows}
-        value={value}
-        disabled={isLoading}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        placeholder={placeholder}
-        className="flex-1 resize-none px-3 py-1 text-sm focus:outline-none focus:ring-0 border-none scrollbar-hide bg-transparent"
-        style={{ maxHeight: "120px", minHeight: "40px", overflowY: "auto" }}
-      />
-      <div className="ml-2 flex flex-col items-center space-y-2">
-        <button
-          onClick={onSend}
-          className="p-2 rounded-full bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white h-[40px] w-[40px] flex items-center justify-center transition-all"
-          title="Send"
-        >
-          <ArrowRight size={20} />
-        </button>
-        <span
-          onClick={() => {
-            onReset?.();
-          }}
-          className="text-xs font-medium bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] bg-clip-text text-transparent hover:underline cursor-pointer"
-        >
-          + Start Again
-        </span>
+    <div className="h-screen flex flex-col">
+      {/* Navbar */}
+      <div className="w-full flex-shrink-0">
+        {isLoggedIn() ? (
+          <PlatformNavbar defaultTab="Roadmap" />
+        ) : (
+          <BasicNavbar />
+        )}
+      </div>
+
+      {/* Message List Container - FIXED */}
+      <div className="flex-1 overflow-hidden flex justify-center">
+        <div className="w-full max-w-4xl px-1 py-2 flex flex-col h-full">  {/* Added flex flex-col h-full */}
+          <MessageList 
+            messages={messages} 
+            isLoading={isLoading} 
+            containerRef={containerRef} 
+          />
+        </div>
+      </div>
+
+      {/* Input Area */}
+      <div className="flex-shrink-0 flex justify-center mb-4">
+        <div className="w-full max-w-4xl px-1">
+          <div className="pt-2 pr-2 border rounded-xl flex items-start bg-white/80 backdrop-blur-md">
+            <textarea
+              rows={rows}
+              value={value}
+              disabled={isLoading}
+              onChange={(e) => onChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              placeholder={placeholder}
+              className="flex-1 resize-none px-3 py-1 text-sm focus:outline-none focus:ring-0 border-none scrollbar-hide bg-transparent"
+              style={{
+                maxHeight: "120px",
+                minHeight: "40px",
+                overflowY: "auto"
+              }}
+            />
+            <div className="ml-2 flex flex-col items-center space-y-2">
+              <button
+                onClick={onSend}
+                className="p-2 rounded-full bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white h-[40px] w-[40px] flex items-center justify-center transition-all"
+                title="Send"
+              >
+                <ArrowRight size={20} />
+              </button>
+              <span
+                onClick={() => {
+                  onReset?.();
+                }}
+                className="text-xs font-medium bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] bg-clip-text text-transparent hover:underline cursor-pointer"
+              >
+                + Start Again
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    </>
   );
 });
 
@@ -350,15 +375,68 @@ export default function ChatRoadmap() {
     }
   }, [getAuthData]);
 
+  const updateTopicInRoadmap = useCallback((topicId, updates) => {
+    setExistingRoadmap(prevRoadmap => {
+      if (!prevRoadmap || !prevRoadmap.topics) return prevRoadmap;
+      
+      const updatedTopics = prevRoadmap.topics.map(topic => {
+        if (topic.id === topicId) {
+          return { ...topic, ...updates };
+        }
+        return topic;
+      });
+      
+      return {
+        ...prevRoadmap,
+        topics: updatedTopics
+      };
+    });
+    
+    // Also update any roadmaps in messages
+    setMessages(prevMessages => {
+      return prevMessages.map(msg => {
+        if (msg.type === 'roadmap' && msg.roadmap) {
+          const updatedTopics = msg.roadmap.topics.map(topic => {
+            if (topic.id === topicId) {
+              return { ...topic, ...updates };
+            }
+            return topic;
+          });
+          
+          return {
+            ...msg,
+            roadmap: {
+              ...msg.roadmap,
+              topics: updatedTopics
+            }
+          };
+        }
+        return msg;
+      });
+    });
+  }, []);
+
   const { sendMessage, connect, close } = useRoadmapWebSocket({
     onMessage: async (msg) => {
       setIsLoading(false);
+
+      if (typeof msg === "object" && msg && msg.topic_id && (msg.video_link || msg.assignment_links)) {
+        // Update the specific topic
+        const updates = {};
+        if (msg.video_link) updates.video_link = msg.video_link;
+        if (msg.video_title) updates.video_title = msg.video_title;
+        if (msg.assignment_links) updates.assignment_links = msg.assignment_links;
+        
+        updateTopicInRoadmap(msg.topic_id, updates);
+        return;
+      }
+
       if (typeof msg === "object" && msg && msg.roadmap_id && msg.roadmap) {
         localStorage.setItem('roadmapId', msg.roadmap_id);
+        setExistingRoadmap(msg.roadmap);
 
         const authData = getAuthData();
         if (authData) {
-          console.log('User is logged in, assigning roadmap...');
           setTimeout(async () => {
             try {
               await assignRoadmapToCurrentUser(msg.roadmap_id);
@@ -412,7 +490,6 @@ export default function ChatRoadmap() {
         }
       });
     }
-
   });
 
   const messageContainerRef = useRef(null);
@@ -483,10 +560,8 @@ export default function ChatRoadmap() {
       const roadmapId = localStorage.getItem('roadmapId');
 
       if (roadmapId) {
-        console.log('User logged in with existing roadmap, assigning...');
         try {
           await assignRoadmapToUser(roadmapId, user.id, token);
-          console.log('Roadmap assigned after login');
         } catch (error) {
           console.error('Failed to assign roadmap after login:', error);
         }
@@ -578,33 +653,40 @@ export default function ChatRoadmap() {
     
       <BackgroundIconCloud icons={icons} />
 
-      {roadmapLoading && (
-        <div className="relative z-10 h-screen w-full flex items-center justify-center">
-          <LoadingDots />
-        </div>
-      )}
-
       {!roadmapLoading && existingRoadmap && (
-        <div className="relative z-10 h-screen w-full flex flex-col pt-4">
-          <div className="w-full max-w-4xl mx-auto px-1 flex flex-col h-full">
-            <div className="flex-1 overflow-y-auto space-y-3 mt-2 scrollbar-hide pb-4">
-              <div className="mr-auto w-full">
+        <div className="relative z-10 h-screen w-full flex flex-col">
+          {/* Navbar */}
+          <div className="w-full flex-shrink-0">
+            {isLoggedIn() ? (
+              <PlatformNavbar defaultTab="Roadmap" />
+            ) : (
+              <BasicNavbar />
+            )}
+          </div>
+          
+          {/* Main content container - needs overflow-hidden */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Scrollable content area */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="w-full max-w-4xl mx-auto px-1 py-4">
                 <RoadMapUI roadmapData={existingRoadmap} />
               </div>
             </div>
-
-            <div className="flex-shrink-0 pt-2 pr-2 mb-4 flex justify-center">
-              <button
-                onClick={resetChat}
-                className="px-4 py-2 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white rounded-lg transition-all text-sm"
-              >
-                Create New Roadmap
-              </button>
+            
+            {/* Button - outside scrollable area */}
+            <div className="flex-shrink-0 w-full max-w-4xl mx-auto px-1 py-4">
+              <div className="flex justify-center">
+                <button
+                  onClick={resetChat}
+                  className="px-4 py-2 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white rounded-lg transition-all text-sm"
+                >
+                  Create New Roadmap
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
-
       {!roadmapLoading && !existingRoadmap && (
         <>
           {!hasMessages ? (
@@ -619,26 +701,32 @@ export default function ChatRoadmap() {
               onBlur={() => setIsFocused(false)}
             />
           ) : (
-            <div className="relative z-10 h-screen w-full flex flex-col pt-4">
-              <div className="w-full max-w-4xl mx-auto px-1 flex flex-col h-full">
-                <MessageList messages={messages} isLoading={isLoading} containerRef={messageContainerRef} />
-
-               
-                {!chatDisabled && (
-                  <Composer
-                    value={input}
-                    onChange={setInput}
-                    onSend={handleSend}
-                    onReset={resetChat}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    isLoading={isLoading}
-                    placeholder="Type your goal or current skills…"
-                    rows={4}
-                  />
-                )}
-                {chatDisabled && !existingRoadmap && (
-                  <div className="flex-shrink-0 pt-2 pr-2 mb-4 flex justify-center">
+            <>
+              {!chatDisabled && (
+                <Composer
+                  value={input}
+                  onChange={setInput}
+                  onSend={handleSend}
+                  onReset={resetChat}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  isLoading={isLoading}
+                  messages={messages}
+                  containerRef={messageContainerRef}
+                  placeholder="Type your goal or current skills…"
+                  rows={4}
+                />
+              )}
+              {chatDisabled && !existingRoadmap && (
+                <div className="relative z-10 h-screen w-full flex flex-col">
+                  <div className="w-full">
+                    {isLoggedIn() ? (
+                      <PlatformNavbar defaultTab="Roadmap" />
+                    ) : (
+                      <BasicNavbar />
+                    )}
+                  </div>
+                  <div className="flex-1 flex items-center justify-center">
                     <button
                       onClick={resetChat}
                       className="px-4 py-2 bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] hover:from-[#0369a1] hover:to-[#06b6d4] text-white rounded-lg transition-all text-sm"
@@ -646,9 +734,9 @@ export default function ChatRoadmap() {
                       Create New Roadmap
                     </button>
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
+              )}
+            </>
           )}
         </>
       )}
