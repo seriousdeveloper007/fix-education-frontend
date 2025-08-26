@@ -96,19 +96,9 @@ const ResourceItem = ({ url, onClick }) => {
   );
 };
 
-// YouTube video component
 const YouTubeVideoCard = ({ url, title, onClick }) => {
-  const [videoTitle, setVideoTitle] = useState(title || 'YouTube Video');
+  const [videoTitle, setVideoTitle] = useState(title);
   const thumbnailUrl = getYouTubeThumbnail(url);
-
-  useEffect(() => {
-    if (!title) {
-      const videoId = getYouTubeVideoId(url);
-      if (videoId) {
-        setVideoTitle(`Video: ${videoId}`);
-      }
-    }
-  }, [url, title]);
 
   return (
     <div
@@ -171,6 +161,13 @@ const RoadMapUI = ({ roadmapData }) => {
     window.open(videoLink, '_blank');
   };
 
+  const topicTypeLabel = (type) => {
+    if (type === 'learning_video') return 'Video lecture';
+    if (type === 'question') return 'Assignment';
+    if (type === 'assignment') return 'Assignment'; // optional: handle assignment
+    return null;
+  };
+
   const handleResourceClick = (resourceLink) => {
     window.open(resourceLink, '_blank');
   };
@@ -210,7 +207,7 @@ const RoadMapUI = ({ roadmapData }) => {
               <div className={themeConfig.roadmap.topicContainer}>
                 {topicsByWeek[week].map((topic, idx) => (
                   <div key={`${week}-${topic.topic_order}-${idx}`} className={themeConfig.roadmap.topicCard}>
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <h3 className={themeConfig.roadmap.topicTitle}>
                           Topic {topic.topic_order}: {topic.topic_name}
@@ -228,8 +225,16 @@ const RoadMapUI = ({ roadmapData }) => {
                       )}
                     </div>
 
+                    {topicTypeLabel(topic.topic_type) && (
+                      <div>
+                        <span className={`${themeConfig.roadmap.typeBadge} inline-flex w-fit`}>
+                          {topicTypeLabel(topic.topic_type)}
+                        </span>
+                      </div>
+                    )}
+
                     {/* Why Learn This Topic */}
-                    <div className="mb-6">
+                    <div className="mb-6 mt-5">
                       <h4 className={themeConfig.roadmap.sectionTitle}>
                         <BookOpen className="w-4 h-4" />
                         Why learn this topic:

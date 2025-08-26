@@ -22,11 +22,9 @@ import MarkdownRenderer from "./MarkdownRenderer";
 import { useRoadmapWebSocket } from "../services/RoadmapWebSocket";
 import { fetchRoadmapMessages } from "../services/roadmapMessageService";
 import RoadMapUI from '../components/RoadMapUI';
+import { getRoadmap } from "../services/roadmapService"; // ADD THIS LINE
 
 
-/* =========================
-   Config / Constants
-========================= */
 
 // Rotating prompts (typewriter copy)
 const ROTATING_PROMPTS = [
@@ -142,20 +140,21 @@ const BackgroundIconCloud = React.memo(function BackgroundIconCloud({ icons }) {
   );
 });
 
-const MessageList = React.memo(function MessageList({ messages, isLoading, containerRef }) {
+// Change the function signature to accept currentRoadmap
+const MessageList = React.memo(function MessageList({ messages, currentRoadmap, isLoading, containerRef }) {
   return (
     <div ref={containerRef} className="flex-1 overflow-y-auto space-y-3 mt-2 scrollbar-hide pb-4">
       {messages.map((msg, idx) => {
-        // NEW: if this is a roadmap message, render the RoadMapUI component
+        // MODIFIED: Use currentRoadmap instead of msg.roadmap
         if (msg.type === "roadmap") {
           return (
             <div key={idx} className="mr-auto w-full">
-              <RoadMapUI roadmapData={msg.roadmap} />
+              <RoadMapUI roadmapData={currentRoadmap} />
             </div>
           );
         }
 
-        // otherwise render as a normal bubble
+        // Rest remains the same...
         return (
           <div
             key={idx}
@@ -173,7 +172,6 @@ const MessageList = React.memo(function MessageList({ messages, isLoading, conta
     </div>
   );
 });
-
 
 const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset, onFocus, onBlur, isLoading}) {
   // Add keydown handler for Hero component
@@ -256,6 +254,7 @@ const Composer = React.memo(function Composer({
   onFocus,
   onBlur,
   isLoading,
+  disabled = false,
   placeholder = "Type your goal or current skills…",
   rows = 4,
 }) {
@@ -274,7 +273,7 @@ const Composer = React.memo(function Composer({
       <textarea
         rows={rows}
         value={value}
-        disabled={isLoading}
+        disabled={isLoading || disabled}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         onFocus={onFocus}
@@ -304,9 +303,7 @@ const Composer = React.memo(function Composer({
   );
 });
 
-/* =========================
-   Main component
-========================= */
+
 
 export default function ChatRoadmap() {
   // chat state
@@ -314,27 +311,65 @@ export default function ChatRoadmap() {
   const [input, setInput] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentRoadmap, setCurrentRoadmap] = useState(null);
+
+  // Add this function before your WebSocket setup
+  const updateTopicInRoadmap = useCallback((topicId, updates) => {
+    setCurrentRoadmap(prevRoadmap => {
+      if (!prevRoadmap || !prevRoadmap.topics) return prevRoadmap;
+      
+      const updatedTopics = prevRoadmap.topics.map(topic => {
+        if (topic.id === topicId) {
+          return { ...topic, ...updates };
+        }
+        return topic;
+      });
+      
+      return {
+        ...prevRoadmap,
+        topics: updatedTopics
+      };
+    });
+  }, []);
+
 
   const hasConnectedRef = useRef(false);
 
   const { sendMessage, connect, close } = useRoadmapWebSocket({
     onMessage: (msg) => {
       setIsLoading(false);
+
+      if (typeof msg === "object" && msg && msg.topic_id && (msg.video_link || msg.assignment_links)) {
+        
+          // Update the specific topic
+          const updates = {};
+          if (msg.video_link) updates.video_link = msg.video_link;
+          if (msg.video_title) updates.video_title = msg.video_title;
+          if (msg.assignment_links) updates.assignment_links = msg.assignment_links;
+          
+          updateTopicInRoadmap(msg.topic_id, updates);
+          return;
+      }
+
       if (typeof msg === "object" && msg && msg.roadmap_id && msg.roadmap) {
         // Save roadmap_id to localStorage
         localStorage.setItem('roadmapId', msg.roadmap_id);
         
-        // Add roadmap message to chat
+        // NEW: Store the roadmap data in state
+        setCurrentRoadmap(msg.roadmap);
+        
+        // Add roadmap message to chat (MODIFIED - removed roadmap data)
         setMessages((prev) => [
           ...prev,
           { 
             role: "agent", 
-            type: "roadmap", 
-            roadmap: msg.roadmap,
+            type: "roadmap",
+            roadmap_id: msg.roadmap_id  // Just store ID, not full data
           }
         ]);
         return;
       }
+  
   
       if (typeof msg === "object" && msg !== null) {
         setMessages((prev) => [
@@ -373,19 +408,35 @@ export default function ChatRoadmap() {
 
   // refs + effects
   const messageContainerRef = useRef(null);
-  useAutoScroll(messageContainerRef, [messages, isLoading]);
+  useAutoScroll(messageContainerRef, [messages, isLoading, currentRoadmap]);
 
   // typewriter (pauses while typing/focused)
   const typed = useTypewriter(ROTATING_PROMPTS, isFocused || input.length > 0);
 
+  
   useEffect(() => {
-    const chatRoadmapId = localStorage.getItem('chatRoadmapId');
-    if (!chatRoadmapId) return;
-    fetchRoadmapMessages(chatRoadmapId)
-      .then((loaded) => setMessages(loaded))
-      .catch((err) => {
+    async function loadExistingRoadmap() {
+      // First, try to fetch roadmap from API
+      const roadmap = await getRoadmap();
+      if (roadmap) {
+        setCurrentRoadmap(roadmap);
+        // Don't load messages if roadmap exists
+        return;
+      }
+      
+      // Only load messages if no roadmap exists
+      const chatRoadmapId = localStorage.getItem('chatRoadmapId');
+      if (!chatRoadmapId) return;
+      
+      try {
+        const loaded = await fetchRoadmapMessages(chatRoadmapId);
+        setMessages(loaded);
+      } catch (err) {
         console.error('Failed to load messages', err);
-      });
+      }
+    }
+    
+    loadExistingRoadmap();
   }, []);
 
   const hasMessages = messages.length > 0;
@@ -417,6 +468,7 @@ export default function ChatRoadmap() {
     setMessages([]);
     setInput('');
     setIsLoading(false);
+    setCurrentRoadmap(null); 
     hasConnectedRef.current = false;
     localStorage.removeItem("chatRoadmapId");
     localStorage.removeItem("roadmapId");
@@ -424,13 +476,34 @@ export default function ChatRoadmap() {
   }, [close]);
 
   const icons = useMemo(() => BG_ICONS, []);
-
   return (
     <div className="relative w-full overflow-hidden min-h-screen text-slate-900 selection:bg-emerald-300/30 font-fraunces bg-white">
       {/* Background tech icons */}
       <BackgroundIconCloud icons={icons} />
-
-      {!hasMessages ? (
+  
+      {currentRoadmap ? (
+        // Show roadmap when available (from API on refresh)
+        <div className="relative z-10 h-screen w-full flex flex-col pt-4">
+          <div className="w-full max-w-4xl mx-auto px-1 flex flex-col h-full">
+            <div className="flex-1 overflow-y-auto mt-2 scrollbar-hide pb-4">
+              <RoadMapUI roadmapData={currentRoadmap} />
+            </div>
+            <Composer
+              value={input}
+              onChange={setInput}
+              onSend={handleSend}
+              onReset={resetChat}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              disabled={true}
+              isLoading={isLoading}
+              placeholder="Ask questions about your roadmap or request changes…"
+              rows={4}
+            />
+          </div>
+        </div>
+      ) : !hasMessages ? (
+        // Show hero when no messages and no roadmap
         <Hero
           input={input}
           setInput={setInput}
@@ -442,9 +515,15 @@ export default function ChatRoadmap() {
           onBlur={() => setIsFocused(false)}
         />
       ) : (
+        // Show message list when messages exist but no roadmap
         <div className="relative z-10 h-screen w-full flex flex-col pt-4">
           <div className="w-full max-w-4xl mx-auto px-1 flex flex-col h-full">
-            <MessageList messages={messages} isLoading={isLoading} containerRef={messageContainerRef} />
+            <MessageList 
+              messages={messages} 
+              isLoading={isLoading} 
+              containerRef={messageContainerRef} 
+              currentRoadmap={currentRoadmap} 
+            />
             <Composer
               value={input}
               onChange={setInput}
