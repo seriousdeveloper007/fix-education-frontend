@@ -12,8 +12,6 @@ export default function ChatRoadmap() {
     setInput,
     handleSend,
     isLoading,
-    hasStarted,
-    messageContainerRef,
   } = useChatRoadMap();
 
   return (
@@ -21,12 +19,11 @@ export default function ChatRoadmap() {
       <Navbar />
       <BackgroundIconCloud />
       <div className="flex-col font-fraunces px-[30px] lg:px-[250px]">
-        {!hasStarted && <RoadmapHeading />}
-        {hasStarted && (
+        {messages.length === 0 && <RoadmapHeading />}
+        {messages.length > 0 && (
           <MessageList
             messages={messages}
             isLoading={isLoading}
-            containerRef={messageContainerRef}
           />
         )}
         <TextAreaInput

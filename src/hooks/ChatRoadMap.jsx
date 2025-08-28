@@ -1,12 +1,10 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useRoadmapWebSocket } from '../services/roadmapService.js';
 
 export function useChatRoadMap() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
-  const messageContainerRef = useRef(null);
 
   const handleWebSocketMessage = useCallback((msg) => {
     setIsLoading(false);
@@ -25,17 +23,21 @@ export function useChatRoadMap() {
     const text = input.trim();
     if (!text) return;
 
-    setMessages(prev => [...prev, { role: 'user', text }]);
-    setInput('');
     setIsLoading(true);
 
-    if (!hasStarted) {
+    if (messages.length === 0) {
+      // first message → wait 3s
       connect();
-      setHasStarted(true);
+      setTimeout(() => {
+        sendMessage({ text, message_type: 'text' });
+      }, 3000);
+    } else {
+      // subsequent messages → send immediately
+      sendMessage({ text, message_type: 'text' });
     }
-
-    sendMessage({ text, message_type: 'text' });
-  }, [input, connect, sendMessage, hasStarted]);
+    setMessages(prev => [...prev, { role: 'user', text }]);
+    setInput('');
+  }, [input, messages, connect, sendMessage]);
 
   return {
     messages,
@@ -43,7 +45,5 @@ export function useChatRoadMap() {
     setInput,
     handleSend,
     isLoading,
-    hasStarted,
-    messageContainerRef,
   };
 }
