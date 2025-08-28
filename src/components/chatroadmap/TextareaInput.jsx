@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { useTypewriter } from '../../hooks/useTypewriter';
 
-export default function TextAreaInput({ prompts = [], value = '', onChange, onSend, onReset }) {
+export default function TextAreaInput({ prompts = [], value = '', onChange, onSend, onReset, isDisable, floating = false }) {
   const hint = useTypewriter({ prompts });
 
   const handleKeyDown = (e) => {
@@ -14,7 +14,10 @@ export default function TextAreaInput({ prompts = [], value = '', onChange, onSe
   };
 
   return (
-    <div className="border rounded-xl flex items-start px-2 py-1 shadow-sm bg-white/70 backdrop-blur-md">
+    <div className={`
+        border rounded-xl flex items-start px-2 py-1 shadow-sm bg-white/70 backdrop-blur-md
+        ${floating ? "fixed bottom-6 left-[30px] right-[30px] lg:left-[250px] lg:right-[250px]" : ""}
+    `}>
       <div className="relative flex-1">
         {/* Typewriter hint only when textarea is empty */}
         {value.length === 0 && (
@@ -29,6 +32,7 @@ export default function TextAreaInput({ prompts = [], value = '', onChange, onSe
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           onKeyDown={handleKeyDown}
+          disabled={isDisable}
           className="w-full resize-none px-3 py-2 text-sm focus:outline-none focus:ring-0 border-none scrollbar-hide bg-transparent"
           style={{ maxHeight: '120px', minHeight: '40px', overflowY: 'auto' }}
         />
@@ -47,15 +51,14 @@ export default function TextAreaInput({ prompts = [], value = '', onChange, onSe
         </div>
 
         {/* Restart button */}
-        {onReset && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="text-xs font-medium bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] bg-clip-text text-transparent hover:underline cursor-pointer"
-          >
-            + Start Again
-          </button>
-        )}
+        
+        <button
+        type="button"
+        onClick={onReset}
+        className="text-xs font-medium bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] bg-clip-text text-transparent hover:underline cursor-pointer"
+        >
+        + Start Again
+        </button>
       </div>
     </div>
   );

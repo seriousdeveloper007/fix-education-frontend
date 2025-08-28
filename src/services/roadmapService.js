@@ -138,19 +138,10 @@ export function useRoadmapWebSocket({ onMessage } = {}) {
     wsRef.current = ws;
 
     ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-
-        if (data.token !== undefined) {
-          onMessage?.(data.token);
-        } else {
-          onMessage?.(data);
-        }
-      } catch (error) {
-        console.warn('Failed to parse WebSocket message:', error);
-        onMessage?.(event.data);
-      }
+      // Send the raw event.data directly to the hook
+      onMessage?.(event.data);
     };
+    
 
     ws.onopen = () => {
       console.log('[Roadmap WebSocket Connected]');
@@ -193,14 +184,14 @@ export function useRoadmapWebSocket({ onMessage } = {}) {
   return { connect, sendMessage, close };
 }
 
-export async function fetchRoadmapMessages(chatRoadmapId) {
-  const token = localStorage.getItem('token');
-  if (!chatRoadmapId) return [];
 
-  const headers = token ? { Authorization: token } : {};
+export async function fetchRoadmapMessages() {
+  const chat_id = localStorage.getItem('chatRoadmapId'); // fetch from localStorage
+
+  if (!chat_id) return [];
 
   try {
-    const res = await fetch(`${API_BASE_URL}/messages/${chatRoadmapId}`, { headers });
+    const res = await fetch(`${API_BASE_URL}/messages/${chat_id}`);
     if (!res.ok) throw new Error('Failed to fetch messages');
     const data = await res.json();
     return (data.messages || []).map((m) => ({

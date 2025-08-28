@@ -6,7 +6,7 @@ import { LoadingDots } from "./LoadingDots";
 
 export const MessageList = React.memo(function MessageList({ messages, isLoading, containerRef }) {
     return (
-      <div ref={containerRef} className="flex-1 overflow-y-auto space-y-3 mt-2 scrollbar-hide pb-4">
+      <div ref={containerRef} className="flex-1 overflow-y-auto space-y-3 mt-2 scrollbar-hide pb-4 pt-2">
         {messages.map((msg, idx) => {
           return (
             <div

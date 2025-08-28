@@ -2,8 +2,9 @@ import { BackgroundIconCloud } from "../components/BackgroundIconCloud";
 import Navbar from "../components/Navbar";
 import RoadmapHeading from "../components/chatroadmap/RoadmapHeading";
 import TextAreaInput from "../components/chatroadmap/TextareaInput";
-import { MessageList, ROTATING_PROMPTS } from "../components/chatroadmap";
+import { MessageList } from "../components/chatroadmap/MessageList";
 import { useChatRoadMap } from "../hooks/ChatRoadMap";
+import { ROTATING_PROMPTS } from "../components/chatroadmap/constants";
 
 export default function ChatRoadmap() {
   const {
@@ -13,6 +14,7 @@ export default function ChatRoadmap() {
     handleSend,
     isLoading,
     resetChat,
+    isLoadingHistory
   } = useChatRoadMap();
 
   return (
@@ -32,7 +34,9 @@ export default function ChatRoadmap() {
           value={input}
           onChange={setInput}
           onSend={handleSend}
-          onReset={messages.length > 0 ? resetChat : undefined}
+          onReset= {resetChat}
+          isDisable={isLoadingHistory}
+          floating={messages.length > 0}
         />
       </div>
     </>
