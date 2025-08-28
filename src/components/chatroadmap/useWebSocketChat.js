@@ -1,10 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRoadmapWebSocket } from "../../services/RoadmapWebSocket";
 import { fetchRoadmapMessages } from "../../services/roadmapMessageService.js";
-import { useAuth } from './useAuth.js';
+import { getAuthInfo } from '../../utils/authUtils.js';
 
 export function useWebSocketChat({ onTopicUpdate, onRoadmapCreate }) {
-  const { getAuthInfo } = useAuth();
+  const { getAuthInfo } = getAuthInfo();
 
   // Chat state
   const [messages, setMessages] = useState([]);

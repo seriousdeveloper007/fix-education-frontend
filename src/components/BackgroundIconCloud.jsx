@@ -1,5 +1,5 @@
 import React from "react";
-import { BG_ICONS } from "./constants";
+import { BG_ICONS } from "./chatroadmap/constants";
 
 export const BackgroundIconCloud = React.memo(function BackgroundIconCloud() {
   const icons = BG_ICONS ?? [];

@@ -1,6 +1,5 @@
 import React from 'react';
 import RoadMapUI from '../RoadMapUI';
-import RoadmapNavbar from './RoadmapNavbar';
 import CreateNewButton from './CreateNewButton';
 
 export default function RoadmapDisplayView({ existingRoadmap, onReset }) {
@@ -8,7 +7,6 @@ export default function RoadmapDisplayView({ existingRoadmap, onReset }) {
     <div className="relative z-10 h-screen w-full flex flex-col">
       {/* Navbar */}
       <div className="w-full flex-shrink-0">
-        <RoadmapNavbar />
       </div>
 
       {/* Main content container - needs overflow-hidden */}

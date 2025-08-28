@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import { deleteRoadmap, fetchRoadmapById, assignRoadmapToUser, fetchUserRoadmaps } from '../../services/roadmapService.js';
-import { useAuth } from './useAuth.js';
+import { getAuthInfo } from '../../utils/authUtils.js';
 
 export function useRoadmapManager() {
-  const { getAuthInfo } = useAuth();
+  const { getAuthInfo } = getAuthInfo();
 
   // Roadmap state
   const [existingRoadmap, setExistingRoadmap] = useState(null);

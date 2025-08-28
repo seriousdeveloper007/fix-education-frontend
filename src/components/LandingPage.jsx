@@ -5,7 +5,7 @@ import themeConfig from './themeConfig';
 import { landingContent  } from './landingContent';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
-import Navbar from './Navbar';
+import Navbar from './OldNavbar';
 import analytics from '../services/posthogService';
 import mobileComparison from '../assets/mobile-youtube-vs-ilon.png';
 import desktopComparison from '../assets/desktop-youtube-vs-ilon.png';

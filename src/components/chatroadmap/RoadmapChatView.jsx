@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { ArrowRight } from 'lucide-react';
 import CreateNewButton from './CreateNewButton';
-import RoadmapNavbar from './RoadmapNavbar';
 import { useAutoScroll } from './hooks';
 
 const TextAreaInput = ({
@@ -78,7 +77,7 @@ const Hero = React.memo(function Hero({ input, setInput, typed, onSend, onReset,
   return (
     <div className="relative z-10 min-h-screen w-full flex flex-col items-center justify-start">
       <div className="w-full">
-        <RoadmapNavbar />
+        {/* <RoadmapNavbar /> */}
       </div>
 
       <div className="max-w-4xl px-1 text-center pt-12">
@@ -135,7 +134,7 @@ const Composer = React.memo(function Composer({
     <div className="h-screen flex flex-col">
       {/* Navbar */}
       <div className="w-full flex-shrink-0">
-        <RoadmapNavbar />
+        {/* <RoadmapNavbar /> */}
       </div>
 
       {/* Message List Container */}

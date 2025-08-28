@@ -1,7 +1,7 @@
 
 import Logo from '../assets/logo-without-bg.png';
 import { useNavigate } from 'react-router-dom';
-export default function BasicNavbar() {
+export default function LoggedOutNavbar() {
 
     const navigate = useNavigate(); // Add this line
   

@@ -83,13 +83,22 @@
 // }
 
 
-import { BackgroundIconCloud } from "../components/chatroadmapcomponents";
+import { BackgroundIconCloud } from "../components/BackgroundIconCloud";
+import Navbar from "../components/Navbar";
+import RoadmapHeading from "../components/chatroadmap/RoadMapHeading";
+import TextAreaInput from "../components/chatroadmap/TextareaInput";
+import { ROTATING_PROMPTS } from "../components/chatroadmap";
 
 export default function ChatRoadmap() {
 
   return (
-    <div>
-      <BackgroundIconCloud />
+    <>
+    <Navbar/>
+    <BackgroundIconCloud />
+    <div className="flex-col font-fraunces px-[30px] lg:px-[250px]">
+      <RoadmapHeading />
+      <TextAreaInput prompts={ROTATING_PROMPTS}/> 
     </div>
+    </>
   );
 }
