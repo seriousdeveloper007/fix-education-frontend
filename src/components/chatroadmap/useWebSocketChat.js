@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useRoadmapWebSocket } from "../../services/RoadmapWebSocket";
-import { fetchRoadmapMessages } from "../../services/roadmapMessageService.js";
+import { useRoadmapWebSocket, fetchRoadmapMessages } from "../../services/roadmapService.js";
 import { getAuthInfo } from '../../utils/authUtils.js';
 
 export function useWebSocketChat({ onTopicUpdate, onRoadmapCreate }) {
