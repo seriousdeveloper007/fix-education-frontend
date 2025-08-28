@@ -83,8 +83,7 @@
 // }
 
 
-import React from "react";
-import { BackgroundIconCloud } from "./chatroadmapcomponents";
+import { BackgroundIconCloud } from "../components/chatroadmapcomponents";
 
 export default function ChatRoadmap() {
 
