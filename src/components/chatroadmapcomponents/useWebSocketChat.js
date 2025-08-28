@@ -20,7 +20,6 @@ export function useWebSocketChat({ onTopicUpdate, onRoadmapCreate }) {
   const handleWebSocketMessage = useCallback(async (msg) => {
     setIsLoading(false);
 
-    // Handle topic updates (video links, assignments, etc.)
     if (typeof msg === "object" && msg && msg.topic_id && (msg.video_link || msg.assignment_links)) {
       const updates = {};
       if (msg.video_link) updates.video_link = msg.video_link;
