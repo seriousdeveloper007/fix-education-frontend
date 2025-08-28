@@ -13,7 +13,7 @@ import VerifyLearner from './components/VerifyLearner';
 import Library from './components/Library';
 import StudyRoom from './components/StudyRoom'; 
 import LibraryDetail from './components/LibraryDetail'; 
-import ChatRoadmap from './components/ChatRoadmap';
+import ChatRoadmap from './pages/ChatRoadmap';
 
 
 export default function App() {
