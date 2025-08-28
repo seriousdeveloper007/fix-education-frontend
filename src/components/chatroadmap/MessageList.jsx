@@ -1,5 +1,4 @@
 import React from "react";
-import RoadMapUI from "../RoadMapUI";
 import MarkdownRenderer from "../MarkdownRenderer";
 import { LoadingDots } from "./LoadingDots";
 
@@ -9,14 +8,6 @@ export const MessageList = React.memo(function MessageList({ messages, isLoading
     return (
       <div ref={containerRef} className="flex-1 overflow-y-auto space-y-3 mt-2 scrollbar-hide pb-4">
         {messages.map((msg, idx) => {
-          if (msg.type === "roadmap") {
-            return (
-              <div key={idx} className="mr-auto w-full">
-                <RoadMapUI roadmapData={msg.roadmap} />
-              </div>
-            );
-          }
-  
           return (
             <div
               key={idx}
