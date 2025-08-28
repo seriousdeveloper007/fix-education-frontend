@@ -141,15 +141,6 @@ export function useRoadmapWebSocket({ onMessage } = {}) {
       try {
         const data = JSON.parse(event.data);
 
-        if (data?.chat_id) {
-          try {
-            localStorage.setItem('chatRoadmapId', data.chat_id);
-          } catch (e) {
-            console.warn('Failed to save chatRoadmapId to localStorage:', e);
-          }
-          return;
-        }
-
         if (data.token !== undefined) {
           onMessage?.(data.token);
         } else {

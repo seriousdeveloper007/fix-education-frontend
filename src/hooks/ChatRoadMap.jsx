@@ -8,10 +8,21 @@ export function useChatRoadMap() {
 
   const handleWebSocketMessage = useCallback((msg) => {
     setIsLoading(false);
+
+    // Persist chat id for subsequent messages
+    if (typeof msg === 'object' && msg?.chat_id) {
+      try {
+        localStorage.setItem('chatRoadmapId', msg.chat_id);
+      } catch (e) {
+        console.warn('Failed to save chatRoadmapId to localStorage:', e);
+      }
+      return;
+    }
+
     if (typeof msg === 'object') {
-      setMessages(prev => [...prev, { role: 'agent', text: JSON.stringify(msg) }]);
+      setMessages((prev) => [...prev, { role: 'agent', text: JSON.stringify(msg) }]);
     } else {
-      setMessages(prev => [...prev, { role: 'agent', text: msg }]);
+      setMessages((prev) => [...prev, { role: 'agent', text: msg }]);
     }
   }, []);
 
@@ -39,11 +50,23 @@ export function useChatRoadMap() {
     setInput('');
   }, [input, messages, connect, sendMessage]);
 
+  const resetChat = useCallback(() => {
+    setMessages([]);
+    setInput('');
+    setIsLoading(false);
+    try {
+      localStorage.removeItem('chatRoadmapId');
+    } catch (e) {
+      console.warn('Failed to clear chatRoadmapId from localStorage:', e);
+    }
+  }, []);
+
   return {
     messages,
     input,
     setInput,
     handleSend,
     isLoading,
+    resetChat,
   };
 }

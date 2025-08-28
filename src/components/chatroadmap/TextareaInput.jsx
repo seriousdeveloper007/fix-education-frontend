@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { useTypewriter } from '../../hooks/useTypewriter';
 
-export default function TextAreaInput({ prompts = [], value = '', onChange, onSend }) {
+export default function TextAreaInput({ prompts = [], value = '', onChange, onSend, onReset }) {
   const hint = useTypewriter({ prompts });
 
   const handleKeyDown = (e) => {
@@ -47,12 +47,15 @@ export default function TextAreaInput({ prompts = [], value = '', onChange, onSe
         </div>
 
         {/* Restart button */}
-        <button
-          type="button"
-          className="text-xs font-medium bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] bg-clip-text text-transparent hover:underline cursor-pointer"
-        >
-          + Start Again
-        </button>
+        {onReset && (
+          <button
+            type="button"
+            onClick={onReset}
+            className="text-xs font-medium bg-gradient-to-r from-[#0284c7] via-[#0ea5e9] to-[#22d3ee] bg-clip-text text-transparent hover:underline cursor-pointer"
+          >
+            + Start Again
+          </button>
+        )}
       </div>
     </div>
   );
@@ -63,4 +66,5 @@ TextAreaInput.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onSend: PropTypes.func.isRequired,
+  onReset: PropTypes.func,
 };
