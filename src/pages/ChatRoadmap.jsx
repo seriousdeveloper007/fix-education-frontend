@@ -12,6 +12,7 @@ export default function ChatRoadmap() {
     setInput,
     handleSend,
     isLoading,
+    resetChat,
   } = useChatRoadMap();
 
   return (
@@ -31,6 +32,7 @@ export default function ChatRoadmap() {
           value={input}
           onChange={setInput}
           onSend={handleSend}
+          onReset={messages.length > 0 ? resetChat : undefined}
         />
       </div>
     </>

@@ -19,6 +19,16 @@ export function useWebSocketChat({ onTopicUpdate, onRoadmapCreate }) {
   const handleWebSocketMessage = useCallback(async (msg) => {
     setIsLoading(false);
 
+    // Store chat id in localStorage for future messages
+    if (typeof msg === "object" && msg?.chat_id) {
+      try {
+        localStorage.setItem('chatRoadmapId', msg.chat_id);
+      } catch (e) {
+        console.warn('Failed to save chatRoadmapId to localStorage:', e);
+      }
+      return;
+    }
+
     if (typeof msg === "object" && msg && msg.topic_id && (msg.video_link || msg.assignment_links)) {
       const updates = {};
       if (msg.video_link) updates.video_link = msg.video_link;
@@ -145,7 +155,7 @@ export function useWebSocketChat({ onTopicUpdate, onRoadmapCreate }) {
 
   // Reset all chat state and close connections
   
-  const resetChatState = useCallback(() => {
+  const resetChat = useCallback(() => {
     setMessages([]);
     setInput('');
     setIsLoading(false);
@@ -186,7 +196,7 @@ export function useWebSocketChat({ onTopicUpdate, onRoadmapCreate }) {
     
     // Operations
     handleSend,
-    resetChatState,
+    resetChat,
     
     // Computed
     hasMessages: messages.length > 0,
