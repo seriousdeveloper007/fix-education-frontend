@@ -1,5 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useRoadmapWebSocket, fetchRoadmapMessages } from '../services/roadmapService.js';
+import {
+  useRoadmapWebSocket,
+  fetchRoadmapMessages,
+  fetchRoadmapAnalysis,
+} from '../services/roadmapService.js';
 
 export function useChatRoadMap() {
   const [messages, setMessages] = useState([]);
@@ -10,24 +14,33 @@ export function useChatRoadMap() {
   useEffect(() => {
     const loadExistingMessages = async () => {
       const chatId = localStorage.getItem('chatRoadmapId');
-      
-      if (chatId) {
-        setIsLoadingHistory(true);
-        try {
-          const existingMessages = await fetchRoadmapMessages();
-          if (existingMessages.length > 0) {
-            setMessages(existingMessages);
-          }
-        } catch (error) {
-          console.error('Failed to load existing messages:', error);
-        } finally {
-          setIsLoadingHistory(false);
+
+      setIsLoadingHistory(true);
+      try {
+        const [existingMessages, analysis] = await Promise.all([
+          chatId ? fetchRoadmapMessages() : Promise.resolve([]),
+          fetchRoadmapAnalysis(),
+        ]);
+
+        const merged = [];
+        if (analysis) {
+          merged.push({ role: 'agent', kind: 'roadmap', payload: analysis });
         }
+        if (existingMessages.length > 0) {
+          merged.push(...existingMessages);
+        }
+        if (merged.length > 0) {
+          setMessages(merged);
+        }
+      } catch (error) {
+        console.error('Failed to load existing messages:', error);
+      } finally {
+        setIsLoadingHistory(false);
       }
     };
 
     loadExistingMessages();
-  }, []); 
+  }, []);
 
 
   const handleWebSocketMessage = useCallback((msg) => {
