@@ -3,6 +3,7 @@ import {
   useRoadmapWebSocket,
   fetchRoadmapMessages,
   fetchRoadmapAnalysis,
+  updateRoadmap
 } from '../services/roadmapService.js';
 
 export function useChatRoadMap() {
@@ -22,15 +23,17 @@ export function useChatRoadMap() {
           fetchRoadmapAnalysis(),
         ]);
 
-        const merged = [];
-        if (existingMessages.length > 0) {
-          merged.push(...existingMessages);
-        }
-        if (analysis) {
-          merged.push({ role: 'agent', kind: 'roadmap', payload: analysis });
-        }
+        const merged = [...existingMessages];
         if (merged.length > 0) {
           setMessages(merged);
+        }
+        if (analysis) {
+          localStorage.setItem('roadmapId', analysis.id)
+          const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
+          if ((analysis.user_id === null || analysis.user_id === undefined) && userId) {
+            await updateRoadmap({ user_id: userId });
+          }
+          merged.push({ role: 'agent', kind: 'roadmap', payload: analysis});
         }
       } catch (error) {
         console.error('Failed to load existing messages:', error);
@@ -61,6 +64,10 @@ export function useChatRoadMap() {
     if(typeof data === "object" && data?.roadmap_id){
       try { 
         localStorage.setItem("roadmapId", data.roadmap_id); 
+        const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
+          if ((analysis.user_id === null || analysis.user_id === undefined) && userId) {
+            updateRoadmap({ user_id: userId });
+          }
         setMessages(prev => [
           ...prev,
           {

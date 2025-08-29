@@ -114,6 +114,7 @@ export async function fetchRoadmapMessages() {
   }
 }
 
+
 export async function fetchRoadmapAnalysis() {
   const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
   const chatId = localStorage.getItem('chatRoadmapId');
@@ -128,16 +129,14 @@ export async function fetchRoadmapAnalysis() {
     return data.roadmap;
   };
 
-  if (userId) {
-    const roadmap = await fetchAnalysis(`user_id=${userId}`);
-    if (roadmap) return roadmap;
-  }
-
   if (chatId) {
     const roadmap = await fetchAnalysis(`chat_id=${chatId}`);
     if (roadmap) return roadmap;
   }
-
+  if (userId) {
+    const roadmap = await fetchAnalysis(`user_id=${userId}`);
+    if (roadmap) return roadmap;
+  }
   return null;
 }
 
