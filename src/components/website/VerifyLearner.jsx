@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Navbar from './Navbar';
+import Navbar from '../Navbar.jsx';
 import themeConfig from './themeConfig';
 import { API_BASE_URL } from '../config.js';
 

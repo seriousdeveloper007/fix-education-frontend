@@ -2,9 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight, X } from 'lucide-react';
 import { useChatWebSocket } from './ChatWebSocket';
-import analytics from '../services/posthogService';
+import analytics from '../../services/posthogService.js';
 import { API_BASE_URL } from '../config.js';
-import MarkdownRenderer from './MarkdownRenderer';
+import MarkdownRenderer from '../MarkdownRenderer.jsx';
 
 
 const LoadingDots = () => (

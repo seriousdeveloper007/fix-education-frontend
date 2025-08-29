@@ -1,16 +1,16 @@
 import { useSearchParams } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
-import { createTab , updateTab} from '../services/tabService';
+import { createTab , updateTab} from '../services/tabService.js';
 import { useYouTubePlayer } from './useYouTubePlayer.js';
-import PlatformNavbar from './PlatformNavbar';
+import PlatformNavbar from '../components/PlatformNavbar.jsx';
 import StudyRoomNavbar from './StudyRoomNavbar.jsx';
 import VideoLinkInputCard from './VideoLinkInputCard.jsx';
 import themeConfig from './themeConfig';
 import SidePanel from './SidePanel.jsx';
-import { fetchUnattemptedQuestions, createQuestions } from '../services/questionService';
-import DesktopOnly from './DesktopOnly';
-import analytics from '../services/posthogService';
-import LoginCard from './LoginCard';
+import { fetchUnattemptedQuestions, createQuestions } from '../services/questionService.js';
+import DesktopOnly from '../components/DesktopOnly.jsx';
+import analytics from '../services/posthogService.js';
+import LoginCard from '../components/LoginCard.jsx';
 import { Loader2 } from 'lucide-react';
 import { createVideoChunk } from '../services/videoChunkService';
 

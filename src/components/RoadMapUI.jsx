@@ -8,7 +8,7 @@ import {
   Target,
   Play
 } from 'lucide-react';
-import themeConfig from '../components/themeConfig';
+import themeConfig from '../config/themeConfig';
 
 
 // Utility functions

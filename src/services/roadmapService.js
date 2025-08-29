@@ -1,5 +1,5 @@
 // services/roadmapService.js
-import { API_BASE_URL } from '../config.js';
+import { API_BASE_URL } from '../config/config.js';
 
 export const assignRoadmapToUser = async (roadmapId, userId, authToken) => {
   try {

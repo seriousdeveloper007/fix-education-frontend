@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import themeConfig from './themeConfig';
-import { fetchUnattemptedQuestions, submitQuestionAnswer } from '../services/questionService';
-import MarkdownRenderer from './MarkdownRenderer';
+import { fetchUnattemptedQuestions, submitQuestionAnswer } from '../../services/questionService';
+import MarkdownRenderer from '../MarkdownRenderer';
 
 
 

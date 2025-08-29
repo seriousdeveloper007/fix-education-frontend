@@ -2,9 +2,9 @@ import Logo from '../assets/logo-without-bg.png';
 import ExtensionIcon from '../assets/extension_icon.png';
 import ExtensionPin from '../assets/extension-pin.png';
 import { useEffect, useState } from 'react';
-import Navbar from './Navbar';
-import analytics from '../services/posthogService';
-import LoginCard from './LoginCard';  // contains ALL login logic
+import Navbar from '../Navbar';
+import analytics from '../../services/posthogService';
+import LoginCard from '../LoginCard';  // contains ALL login logic
 
 
 

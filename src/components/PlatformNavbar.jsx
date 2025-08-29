@@ -1,4 +1,4 @@
-import themeConfig from './themeConfig';
+import themeConfig from '../config/themeConfig';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, LogOut } from 'lucide-react';

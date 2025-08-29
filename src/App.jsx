@@ -5,11 +5,11 @@ import {
   Navigate,
 } from 'react-router-dom';
 
-import LandingPage from './components/LandingPage';
-import PrivacyPolicy from './components/PrivacyPolicy';
-import GoogleLogin from './components/LoginPage';
-import ErrorPage from './components/ErrorPage';
-import VerifyLearner from './components/VerifyLearner';
+import LandingPage from './components/website/LandingPage';
+import PrivacyPolicy from './components/website/PrivacyPolicy';
+import GoogleLogin from './components/website/GoogleLogin';
+import ErrorPage from './components/website/ErrorPage';
+import VerifyLearner from './components/website/VerifyLearner';
 import Library from './components/Library';
 import StudyRoom from './components/StudyRoom'; 
 import LibraryDetail from './components/LibraryDetail'; 

@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '../config.js';
+import { API_BASE_URL } from '../config/config.js';
 
 export async function fetchRoadmapMessages(chatRoadmapId) {
   const token = localStorage.getItem('token');
