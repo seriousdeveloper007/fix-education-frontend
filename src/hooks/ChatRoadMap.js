@@ -23,11 +23,11 @@ export function useChatRoadMap() {
         ]);
 
         const merged = [];
-        if (analysis) {
-          merged.push({ role: 'agent', kind: 'roadmap', payload: analysis });
-        }
         if (existingMessages.length > 0) {
           merged.push(...existingMessages);
+        }
+        if (analysis) {
+          merged.push({ role: 'agent', kind: 'roadmap', payload: analysis });
         }
         if (merged.length > 0) {
           setMessages(merged);

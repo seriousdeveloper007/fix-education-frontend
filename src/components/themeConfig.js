@@ -76,5 +76,9 @@ export default {
     resourceLink: 'text-cyan-600 group-hover:text-cyan-700 transition-colors duration-150',
     footer: 'mt-8 text-center text-slate-600 text-sm bg-white/30 backdrop-blur-sm rounded-xl p-4 border border-white/30',
     footerText: 'flex items-center justify-center gap-2'
+  },
+  buttons:{
+    secondary: "px-4 py-2 bg-white border-2 border-gray-300 hover:border-[#0ea5e9] text-gray-700 hover:text-[#0284c7] rounded-lg font-medium transition-all duration-200 hover:shadow-md hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50"
   }
+
 };

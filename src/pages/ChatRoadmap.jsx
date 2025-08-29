@@ -17,6 +17,7 @@ export default function ChatRoadmap() {
     isLoadingHistory
   } = useChatRoadMap();
 
+
   return (
     <>
       <Navbar />
@@ -32,7 +33,7 @@ export default function ChatRoadmap() {
           onChange={setInput}
           onSend={handleSend}
           onReset={resetChat}
-          isDisable={isLoadingHistory}
+          isDisable={isLoadingHistory || isLoading}
           floating={messages.length > 0}
         />
       </div>

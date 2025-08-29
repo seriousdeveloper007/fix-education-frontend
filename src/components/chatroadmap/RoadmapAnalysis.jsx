@@ -1,58 +1,106 @@
 import React from "react";
+import themeConfig from "../themeConfig";
 
 export default function RoadmapAnalysis({ roadmap }) {
-  const skills = Array.isArray(roadmap?.skills_already_have) ? roadmap.skills_already_have : [];
+  const btn = themeConfig.buttons
+  const skills = Array.isArray(roadmap?.skills_already_have)
+    ? roadmap.skills_already_have
+    : [];
+
+  const getLevelColor = (level) => {
+    const levelStr = String(level).toLowerCase();
+    if (levelStr.includes('expert') || levelStr.includes('advanced')) {
+      return 'text-green-600';
+    }
+    if (levelStr.includes('intermediate') || levelStr.includes('medium')) {
+      return 'text-blue-600';
+    }
+    if (levelStr.includes('beginner') || levelStr.includes('basic') || levelStr.includes('novice')) {
+      return 'text-amber-600';
+    }
+    return 'text-gray-600';
+  };
 
   return (
     <div className="w-full">
-      <div className="rounded-xl border border-cyan-200 bg-cyan-50/60 p-4 shadow-sm">
-        <div className="mb-2">
-          <div className="text-xs uppercase tracking-wide text-cyan-700/80">Goal and skill Analysis</div>
-          <h3 className="text-base font-semibold text-cyan-900">{roadmap?.title || "Untitled Roadmap"}</h3>
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6 lg:p-8">
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 mb-8">
+          <div className="md:col-span-5">
+            <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+              Target
+            </p>
+            <p className="text-base text-gray-900">
+              {roadmap?.target_skill_or_role || "—"}
+            </p>
+          </div>
+
+          <div className="md:col-span-3">
+            <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+              Duration
+            </p>
+            <p className="text-base text-gray-900">
+              {Number(roadmap?.time_duration) || "—"} weeks
+            </p>
+          </div>
+
+          <div className="md:col-span-4">
+            <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+              Current Profession
+            </p>
+            <p className="text-base text-gray-900">
+              {roadmap?.current_profession || "—"}
+            </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-          <div className="rounded-lg bg-white/70 p-3">
-            <div className="text-[11px] uppercase text-slate-500">Target</div>
-            <div className="font-medium">{roadmap?.target_skill_or_role || "—"}</div>
+        {/* Skills Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-900">
+              Current Skills
+            </h3>
+            <span className="text-xs text-gray-500">
+              {skills.length}
+            </span>
           </div>
 
-          <div className="rounded-lg bg-white/70 p-3">
-            <div className="text-[11px] uppercase text-slate-500">Duration</div>
-            <div className="font-medium">{Number(roadmap?.time_duration) || "—"} weeks</div>
-          </div>
-
-          <div className="rounded-lg bg-white/70 p-3 sm:col-span-2">
-            <div className="text-[11px] uppercase text-slate-500">Current Profession</div>
-            <div className="font-medium">{roadmap?.current_profession || "Not specified"}</div>
-          </div>
-        </div>
-
-        <div className="mt-3">
-          <div className="text-[11px] uppercase text-slate-500 mb-1">Skills Already Have</div>
           {skills.length === 0 ? (
-            <div className="text-sm text-slate-600">No skills provided.</div>
+            <div className="py-8 text-center">
+              <p className="text-sm text-gray-500">No skills listed</p>
+            </div>
           ) : (
-            <div className="flex flex-wrap gap-2">
+            <div className="space-y-2">
               {skills.map((s, i) => {
                 const name = s?.name || s?.topic || "Skill";
                 const level = s?.level ?? "";
+                const levelColor = getLevelColor(level);
+                
                 return (
-                  <span
+                  <div
                     key={i}
-                    className="inline-flex items-center gap-1 rounded-full border border-cyan-200 bg-white/80 px-2 py-1 text-xs"
+                    className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0"
                   >
-                    <span className="font-medium">{name}</span>
+                    <span className="text-sm text-gray-900">
+                      {name}
+                    </span>
                     {String(level).length > 0 && (
-                      <span className="rounded-full bg-cyan-100 px-1.5 py-0.5 text-[10px] text-cyan-800">
+                      <span className={`text-xs ${levelColor}`}>
                         {level}
                       </span>
                     )}
-                  </span>
+                  </div>
                 );
               })}
             </div>
           )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-4 pt-6">
+          <button className={`px-4 py-2 text-sm ${btn.secondary}`}>
+            Create roadmap
+          </button>
         </div>
       </div>
     </div>
