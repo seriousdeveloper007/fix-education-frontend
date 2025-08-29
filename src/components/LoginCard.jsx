@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import themeConfig from './themeConfig';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
+import { updateChat } from '../services/chatService.js';
 import PropTypes from 'prop-types';
-import { handlePostLoginRoadmapCheck } from '../services/roadmapService.js';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const GOOGLE_ENDPOINT = `${API_BASE_URL}/user/auth/web/google`;
@@ -72,13 +72,20 @@ localStorage.setItem(
       );
       localStorage.setItem('token', appJwt);
 
-      await handlePostLoginRoadmapCheck(backendUser, appJwt);
+      // If an anonymous chat exists, attach it to the logged-in user
+      const chatRoadmapId = localStorage.getItem('chatRoadmapId');
+      const chatId = localStorage.getItem('chatId');
+      if (chatRoadmapId || chatId) {
+        try {
+          await updateChat({ user_id: backendUser.id });
+        } catch (err) {
+          console.error('Failed to update chat with user', err);
+        }
+      }
 
-      window.dispatchEvent(new CustomEvent('userLoggedIn', { 
-        detail: { user: backendUser, token: appJwt } 
+      window.dispatchEvent(new CustomEvent('userLoggedIn', {
+        detail: { user: backendUser, token: appJwt }
       }));
-
-
 
       window.location.reload();
   } catch (err) {
