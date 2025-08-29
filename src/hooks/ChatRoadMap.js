@@ -3,7 +3,8 @@ import {
   useRoadmapWebSocket,
   fetchRoadmapMessages,
   fetchRoadmapAnalysis,
-  updateRoadmap
+  updateRoadmap,
+  deleteRoadmap
 } from '../services/roadmapService.js';
 
 export function useChatRoadMap() {
@@ -57,17 +58,17 @@ export function useChatRoadMap() {
   
     // 1) ChatID → save & stop
     if (typeof data === "object" && data?.chat_id) {
-      try { localStorage.setItem("chatRoadmapId", data.chat_id); } catch {}
+      try { localStorage.setItem("chatRoadmapId", data.chat_id); } catch { /* ignore */ }
       return;
     }
 
     if(typeof data === "object" && data?.roadmap_id){
-      try { 
-        localStorage.setItem("roadmapId", data.roadmap_id); 
+      try {
+        localStorage.setItem("roadmapId", data.roadmap_id);
         const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
-          if ((analysis.user_id === null || analysis.user_id === undefined) && userId) {
-            updateRoadmap({ user_id: userId });
-          }
+        if ((data.roadmap?.user_id === null || data.roadmap?.user_id === undefined) && userId) {
+          updateRoadmap({ user_id: userId });
+        }
         setMessages(prev => [
           ...prev,
           {
@@ -75,8 +76,8 @@ export function useChatRoadMap() {
             kind: "roadmap",
             payload: data.roadmap,
           }
-        ]);    
-      } catch {}
+        ]);
+      } catch { /* ignore */ }
     }
   
     // 2) Full message → add as agent
@@ -130,10 +131,23 @@ export function useChatRoadMap() {
     setInput('');
   }, [input, messages, connect, sendMessage]);
 
-  const resetChat = useCallback(() => {
+  const resetChat = useCallback(async () => {
     setMessages([]);
     setInput('');
     setIsLoading(false);
+    const roadmapId = localStorage.getItem('roadmapId');
+    if (roadmapId) {
+      try {
+        await deleteRoadmap(roadmapId);
+      } catch (e) {
+        console.error('Failed to delete roadmap:', e);
+      }
+      try {
+        localStorage.removeItem('roadmapId');
+      } catch (e) {
+        console.warn('Failed to clear roadmapId from localStorage:', e);
+      }
+    }
     try {
       localStorage.removeItem('chatRoadmapId');
     } catch (e) {

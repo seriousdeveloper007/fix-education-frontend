@@ -5,8 +5,9 @@ import { API_BASE_URL, WS_BASE_URL } from '../config.js';
 
 export const deleteRoadmap = async (roadmapId) => {
   try {
-    const roadmapId = localStorage.getItem('roadmapId');
-    const response = await fetch(`${API_BASE_URL}/roadmaps/${roadmapId}`, {
+    const id = roadmapId ?? localStorage.getItem('roadmapId');
+    if (!id) return;
+    const response = await fetch(`${API_BASE_URL}/roadmaps/${id}`, {
       method: 'DELETE',
     });
 
@@ -140,7 +141,7 @@ export async function fetchRoadmapAnalysis() {
   return null;
 }
 
-export const updateRoadmap = async (updates = {}) => {
+export const updateRoadmap = async (updates = {}, roadmapId) => {
   try {
     const id =
       roadmapId ??
