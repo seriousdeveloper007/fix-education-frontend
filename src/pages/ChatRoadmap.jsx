@@ -21,20 +21,17 @@ export default function ChatRoadmap() {
     <>
       <Navbar />
       <BackgroundIconCloud />
-      <div className="flex-col font-fraunces px-[30px] lg:px-[250px]">
+      <div className="relative z-10 flex-col font-fraunces px-[30px] lg:px-[250px]">
         {messages.length === 0 && <RoadmapHeading />}
         {messages.length > 0 && (
-          <MessageList
-            messages={messages}
-            isLoading={isLoading}
-          />
+          <MessageList messages={messages} isLoading={isLoading} />
         )}
         <TextAreaInput
           prompts={ROTATING_PROMPTS}
           value={input}
           onChange={setInput}
           onSend={handleSend}
-          onReset= {resetChat}
+          onReset={resetChat}
           isDisable={isLoadingHistory}
           floating={messages.length > 0}
         />

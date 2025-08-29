@@ -16,7 +16,7 @@ export default function TextAreaInput({ prompts = [], value = '', onChange, onSe
   return (
     <div className={`
         border rounded-xl flex items-start px-2 py-1 shadow-sm bg-white/70 backdrop-blur-md
-        ${floating ? "fixed bottom-6 left-[30px] right-[30px] lg:left-[250px] lg:right-[250px]" : ""}
+        ${floating ? "fixed inset-x-0 bottom-6 mx-[30px] lg:mx-[250px]" : ""}
     `}>
       <div className="relative flex-1">
         {/* Typewriter hint only when textarea is empty */}

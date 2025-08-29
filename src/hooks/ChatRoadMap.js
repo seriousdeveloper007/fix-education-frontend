@@ -46,12 +46,22 @@ export function useChatRoadMap() {
     }
 
     if(typeof data === "object" && data?.roadmap_id){
-      try { localStorage.setItem("roadmapId", data.roadmap_id); } catch {}
+      try { 
+        localStorage.setItem("roadmapId", data.roadmap_id); 
+        setMessages(prev => [
+          ...prev,
+          {
+            role: "agent",
+            kind: "roadmap",
+            payload: data.roadmap,
+          }
+        ]);    
+      } catch {}
     }
   
     // 2) Full message → add as agent
     if (typeof data === "object" && data?.message !== undefined) {
-      setMessages(prev => [...prev, { role: "agent", text: String(data.message) }]);
+      setMessages(prev => [...prev, { role: "agent", kind: "text", text: String(data.message) }]);
       return;
     }
   
@@ -65,7 +75,7 @@ export function useChatRoadMap() {
         const next = [...prev];
         const last = next[next.length - 1];
         if (!last || last.role === "user") {
-          next.push({ role: "agent", text: String(token) });
+          next.push({ role: "agent", kind: "text", text: String(token) });
         } else {
           next[next.length - 1] = { ...last, text: String(last.text || "") + String(token) };
         }

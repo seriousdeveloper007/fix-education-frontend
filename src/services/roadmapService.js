@@ -1,5 +1,5 @@
 // services/roadmapService.js
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { API_BASE_URL, WS_BASE_URL } from '../config.js';
 
 export const assignRoadmapToUser = async (roadmapId, userId, authToken) => {
@@ -130,6 +130,7 @@ export const fetchUserRoadmaps = async (userId, authToken) => {
 
 export function useRoadmapWebSocket({ onMessage } = {}) {
   const wsRef = useRef(null);
+  const reconnectTimerRef = useRef(null);
 
   const connect = () => {
     if (wsRef.current) return; // avoid reconnecting if already connected
@@ -137,28 +138,37 @@ export function useRoadmapWebSocket({ onMessage } = {}) {
     const ws = new WebSocket(`${WS_BASE_URL}/ws/roadmap`);
     wsRef.current = ws;
 
-    ws.onmessage = (event) => {
-      // Send the raw event.data directly to the hook
-      onMessage?.(event.data);
-    };
-    
-
     ws.onopen = () => {
       console.log('[Roadmap WebSocket Connected]');
+    };
+
+    ws.onmessage = (event) => {
+      onMessage?.(event.data);
     };
 
     ws.onclose = () => {
       console.log('[Roadmap WebSocket Closed]');
       wsRef.current = null;
+
+      // try reconnect after small delay
+      reconnectTimerRef.current = setTimeout(() => {
+        console.log('[Roadmap WebSocket Reconnecting...]');
+        connect();
+      }, 1000);
     };
 
     ws.onerror = (error) => {
       console.error('[Roadmap WebSocket Error]:', error);
+      // close triggers onclose → reconnect
+      ws.close();
     };
   };
 
   const close = () => {
     if (wsRef.current) {
+      // prevent auto-reconnect when user explicitly closes
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
       wsRef.current.close();
       wsRef.current = null;
     }
@@ -180,6 +190,12 @@ export function useRoadmapWebSocket({ onMessage } = {}) {
       console.error('Error sending WebSocket message:', error);
     }
   };
+
+  // auto-connect once when hook is used
+  useEffect(() => {
+    connect();
+    return () => close(); // cleanup on unmount
+  }, []);
 
   return { connect, sendMessage, close };
 }
