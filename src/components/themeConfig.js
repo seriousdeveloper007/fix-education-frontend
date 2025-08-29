@@ -78,7 +78,7 @@ export default {
     footerText: 'flex items-center justify-center gap-2'
   },
   buttons:{
-    secondary: "px-4 py-2 bg-white border-2 border-gray-300 hover:border-[#0ea5e9] text-gray-700 hover:text-[#0284c7] rounded-lg font-medium transition-all duration-200 hover:shadow-md hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50"
+    secondary: "px-4 py-2 bg-gradient-to-r from-gray-50 to-blue-50 border-2 border-[#0ea5e9] text-[#0284c7] rounded-lg font-medium transition-all duration-200 shadow-md hover:brightness-105 hover:scale-[1.02] hover:shadow-lg"
   }
 
 };

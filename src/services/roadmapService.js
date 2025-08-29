@@ -3,13 +3,11 @@ import { useRef, useEffect } from 'react';
 import { API_BASE_URL, WS_BASE_URL } from '../config.js';
 
 
-export const deleteRoadmap = async (roadmapId, authToken) => {
+export const deleteRoadmap = async (roadmapId) => {
   try {
+    const roadmapId = localStorage.getItem('roadmapId');
     const response = await fetch(`${API_BASE_URL}/roadmaps/${roadmapId}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `${authToken}`,
-      },
     });
 
     if (!response.ok) {
@@ -142,3 +140,34 @@ export async function fetchRoadmapAnalysis() {
 
   return null;
 }
+
+export const updateRoadmap = async (updates = {}) => {
+  try {
+    const id =
+      roadmapId ??
+      parseInt(localStorage.getItem('roadmapId') || '', 10);
+
+    if (!id || Number.isNaN(id)) {
+      throw new Error('Missing or invalid roadmapId');
+    }
+
+    const res = await fetch(
+      `${API_BASE_URL}/roadmaps/update?roadmap_id=${encodeURIComponent(id)}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error(`Failed to update roadmap: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data.roadmap ?? data;
+  } catch (error) {
+    console.error('Error updating roadmap:', error);
+    throw error;
+  }
+};
