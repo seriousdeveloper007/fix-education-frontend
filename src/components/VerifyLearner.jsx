@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import themeConfig from './themeConfig';
 import { API_BASE_URL } from '../config.js';
+import { updateChat } from '../services/chatService.js';
 
 export default function VerifyLearner() {
   const navigate = useNavigate();
@@ -53,6 +54,17 @@ export default function VerifyLearner() {
 
         localStorage.setItem('token', authToken);
         localStorage.setItem('user', JSON.stringify(user));
+
+        // If an anonymous chat exists, attach it to the logged-in user
+        const chatRoadmapId = localStorage.getItem('chatRoadmapId');
+        const chatId = localStorage.getItem('chatId');
+        if (chatRoadmapId || chatId) {
+          try {
+            await updateChat({ user_id: user.id });
+          } catch (err) {
+            console.error('Failed to update chat with user', err);
+          }
+        }
 
         // use replace so verification page doesn’t stay in history stack
         navigate(safeRedirect || '/platform', { replace: true });

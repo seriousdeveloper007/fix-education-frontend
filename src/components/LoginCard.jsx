@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import themeConfig from './themeConfig';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
+import { updateChat } from '../services/chatService.js';
 import PropTypes from 'prop-types';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -71,11 +72,20 @@ localStorage.setItem(
       );
       localStorage.setItem('token', appJwt);
 
-      window.dispatchEvent(new CustomEvent('userLoggedIn', { 
-        detail: { user: backendUser, token: appJwt } 
+      // If an anonymous chat exists, attach it to the logged-in user
+      const chatRoadmapId = localStorage.getItem('chatRoadmapId');
+      const chatId = localStorage.getItem('chatId');
+      if (chatRoadmapId || chatId) {
+        try {
+          await updateChat({ user_id: backendUser.id });
+        } catch (err) {
+          console.error('Failed to update chat with user', err);
+        }
+      }
+
+      window.dispatchEvent(new CustomEvent('userLoggedIn', {
+        detail: { user: backendUser, token: appJwt }
       }));
-
-
 
       window.location.reload();
   } catch (err) {
