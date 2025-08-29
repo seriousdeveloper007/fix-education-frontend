@@ -5,7 +5,7 @@ import {
   Navigate,
 } from 'react-router-dom';
 
-import LandingPage from './components/LandingPage';
+// import LandingPage from './components/LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import GoogleLogin from './components/LoginPage';
 import ErrorPage from './components/ErrorPage';
@@ -29,6 +29,7 @@ function isLoggedIn() {
 }
 
 // A wrapper for private routes
+// eslint-disable-next-line react/prop-types
 function PrivateRoute({ children }) {
   return isLoggedIn() ? children : <Navigate to="/login" replace />;
 }
@@ -43,7 +44,8 @@ function AppRoutes() {
           isLoggedIn() ? (
             <Navigate to="/roadmap" replace />
           ) : (
-            <LandingPage />
+            // <LandingPage />
+            <ChatRoadmap />
           )
         }
       />
