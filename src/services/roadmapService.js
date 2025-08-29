@@ -219,3 +219,30 @@ export async function fetchRoadmapMessages() {
     return [];
   }
 }
+
+export async function fetchRoadmapAnalysis() {
+  const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
+  const chatId = localStorage.getItem('chatRoadmapId');
+
+  const fetchAnalysis = async (query) => {
+    const res = await fetch(`${API_BASE_URL}/roadmap_analysis?${query}`);
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      throw new Error('Failed to fetch roadmap analysis');
+    }
+    const data = await res.json();
+    return data.roadmap;
+  };
+
+  if (userId) {
+    const roadmap = await fetchAnalysis(`user_id=${userId}`);
+    if (roadmap) return roadmap;
+  }
+
+  if (chatId) {
+    const roadmap = await fetchAnalysis(`chat_id=${chatId}`);
+    if (roadmap) return roadmap;
+  }
+
+  return null;
+}
