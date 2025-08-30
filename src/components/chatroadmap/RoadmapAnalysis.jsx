@@ -40,7 +40,7 @@ export default function RoadmapAnalysis({ roadmap }) {
               Duration
             </p>
             <p className="text-base text-gray-900">
-              {Number(roadmap?.time_duration) || "—"} weeks
+              {Number(roadmap?.total_weeksuration) || "—"} weeks
             </p>
           </div>
 

@@ -15,26 +15,42 @@ export function useChatRoadMap() {
 
   useEffect(() => {
     const loadExistingMessages = async () => {
-      const chatId = localStorage.getItem('chatRoadmapId');
-
       setIsLoadingHistory(true);
       try {
-        const [existingMessages, analysis] = await Promise.all([
-          chatId ? fetchRoadmapMessages() : Promise.resolve([]),
-          fetchRoadmapAnalysis(),
-        ]);
-
-        const merged = [...existingMessages];
-        if (merged.length > 0) {
-          setMessages(merged);
-        }
+        // First, get the roadmap analysis
+        const analysis = await fetchRoadmapAnalysis();
+        
+        let existingMessages = [];
+        
         if (analysis) {
-          localStorage.setItem('roadmapId', analysis.id)
+          // If analysis exists, use its chat_id to fetch messages
+          localStorage.setItem('roadmapId', analysis.id);
+          localStorage.setItem('chatRoadmapId', analysis.chat_id);
+          
           const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
           if ((analysis.user_id === null || analysis.user_id === undefined) && userId) {
             await updateRoadmap({ user_id: userId });
           }
-          merged.push({ role: 'agent', kind: 'roadmap', payload: analysis});
+          
+          // Fetch messages using the chat_id from analysis
+          existingMessages = await fetchRoadmapMessages();
+        } else {
+          // If no analysis, check if we have an existing chatId in localStorage
+          const chatId = localStorage.getItem('chatRoadmapId');
+          if (chatId) {
+            existingMessages = await fetchRoadmapMessages();
+          }
+        }
+
+        const merged = [...existingMessages];
+        
+        // Add roadmap analysis to messages if we have enough messages
+        if (analysis && existingMessages.length >= 9 && (existingMessages.length - 9) % 4 === 0) {
+          merged.push({ role: 'agent', kind: 'roadmap', payload: analysis });
+        }
+        
+        if (merged.length > 0) {
+          setMessages(merged);
         }
       } catch (error) {
         console.error('Failed to load existing messages:', error);
@@ -165,3 +181,4 @@ export function useChatRoadMap() {
     resetChat,
   };
 }
+
