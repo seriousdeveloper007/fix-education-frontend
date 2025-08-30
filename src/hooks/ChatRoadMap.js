@@ -45,7 +45,7 @@ export function useChatRoadMap() {
         const merged = [...existingMessages];
         
         // Add roadmap analysis to messages if we have enough messages
-        if (analysis && existingMessages.length >= 9 && (existingMessages.length - 9) % 4 === 0) {
+        if (analysis && existingMessages.length >= 10 && (existingMessages.length - 10) % 4 === 0) {
           merged.push({ role: 'agent', kind: 'roadmap', payload: analysis });
         }
         
@@ -78,6 +78,10 @@ export function useChatRoadMap() {
       return;
     }
 
+    if (typeof data === "object" && data?.next_week_topics) {
+      return;
+    }
+
     if(typeof data === "object" && data?.roadmap_id){
       try {
         localStorage.setItem("roadmapId", data.roadmap_id);
@@ -99,6 +103,7 @@ export function useChatRoadMap() {
     // 2) Full message → add as agent
     if (typeof data === "object" && data?.message !== undefined) {
       setMessages(prev => [...prev, { role: "agent", kind: "text", text: String(data.message) }]);
+      setIsLoading(true);
       return;
     }
   

@@ -5,6 +5,8 @@ import TextAreaInput from "../components/chatroadmap/TextareaInput";
 import { MessageList } from "../components/chatroadmap/MessageList";
 import { useChatRoadMap } from "../hooks/ChatRoadMap";
 import { ROTATING_PROMPTS } from "../components/chatroadmap/constants";
+import RoadMapUI from "../components/chatroadmap/RoadMapUI";
+
 
 export default function ChatRoadmap() {
   const {
