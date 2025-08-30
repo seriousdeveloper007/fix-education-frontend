@@ -7,7 +7,6 @@ import {
   Target,
   Play
 } from 'lucide-react';
-import themeConfig from '../themeConfig';
 
 // Utility functions
 const getYouTubeVideoId = (url) => {
@@ -74,19 +73,19 @@ const ResourceItem = ({ url, onClick }) => {
 
   return (
     <div
-      className={themeConfig.roadmap.resourceItem}
+      className="bg-white/80 backdrop-blur-sm border border-white/40 rounded-lg p-3 hover:shadow-md transition-all duration-200 cursor-pointer group"
       onClick={() => onClick(url)}
     >
-      <div className={themeConfig.roadmap.resourceContent}>
+      <div className="flex items-center gap-3">
         <img
           src={metadata.favicon}
           alt="favicon"
-          className={themeConfig.roadmap.resourceFavicon}
+          className="w-5 h-5 rounded flex-shrink-0"
           onError={(e) => {
             e.target.src = 'https://www.google.com/s2/favicons?domain=example.com&sz=32';
           }}
         />
-        <span className={themeConfig.roadmap.resourceTitle}>
+        <span className="text-slate-700 text-sm font-medium group-hover:text-slate-900 transition-colors duration-150 flex-1 line-clamp-2">
           {metadata.title}
         </span>
         <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors duration-150" />
@@ -101,15 +100,15 @@ const YouTubeVideoCard = ({ url, title, onClick }) => {
 
   return (
     <div
-      className={themeConfig.roadmap.videoContainer}
+      className="w-fit bg-white/80 backdrop-blur-sm border border-white/40 rounded-xl transition-all duration-200 cursor-pointer group"
       onClick={() => onClick(url, videoTitle)}
     >
-      <div className={themeConfig.roadmap.videoThumbnailContainer}>
+      <div className="relative overflow-hidden rounded-lg mb-3">
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
             alt={videoTitle}
-            className={themeConfig.roadmap.videoThumbnail}
+            className="h-48 w-auto object-cover transition-transform duration-200 group-hover:scale-105"
             onError={(e) => {
               e.target.src = 'https://via.placeholder.com/400x225/f0f0f0/666666?text=Video+Thumbnail';
             }}
@@ -122,13 +121,13 @@ const YouTubeVideoCard = ({ url, title, onClick }) => {
             </div>
           </div>
         )}
-        <div className={themeConfig.roadmap.videoPlayOverlay}>
-          <div className={themeConfig.roadmap.videoPlayButton}>
+        <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="bg-red-600 text-white p-3 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-transform duration-200">
             <Play className="w-6 h-6" />
           </div>
         </div>
       </div>
-      <h6 className={themeConfig.roadmap.videoTitle}>
+      <h6 className="font-medium text-slate-800 text-sm leading-tight">
         {videoTitle}
       </h6>
     </div>
@@ -160,16 +159,16 @@ const RoadMapUI = ({ title, topics }) => {
     : [];
 
   return (
-    <div className={themeConfig.roadmap.container}>
+    <div className="max-w-4xl mx-auto p-6">
       {/* Header */}
-      <div className={themeConfig.roadmap.header}>
-        <div className={themeConfig.roadmap.titleContainer}>
-          <h1 className={themeConfig.roadmap.title}>
-            <Target className={themeConfig.roadmap.titleIcon} />
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight flex items-center">
+            <Target className="text-3xl mr-3" />
             {title || 'Learning Roadmap'}
           </h1>
         </div>
-        <div className={themeConfig.roadmap.statsText}>
+        <div className="text-sm text-slate-700">
           {weekNumber && (
             <>
               <Calendar className="w-4 h-4 inline mr-1" />
@@ -182,28 +181,28 @@ const RoadMapUI = ({ title, topics }) => {
       </div>
 
       {/* Single Week Content */}
-      <div className={themeConfig.roadmap.weekContainer}>
-        <div className={themeConfig.roadmap.weekCard}>
+      <div className="space-y-8">
+        <div className="bg-white/40 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg p-6 transition-transform hover:-translate-y-1 hover:shadow-xl">
           {weekNumber && (
-            <h2 className={themeConfig.roadmap.weekHeader}>
-              <span className={themeConfig.roadmap.weekBadge}>{weekNumber}</span>
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6 flex items-center">
+              <span className="bg-gradient-to-r from-[#0284c7] to-[#22d3ee] text-white rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold mr-3 shadow-lg">{weekNumber}</span>
               Week {weekNumber}
             </h2>
           )}
 
-          <div className={themeConfig.roadmap.topicContainer}>
+          <div className="space-y-6">
             {sortedTopics.map((topic, idx) => (
-              <div key={`topic-${topic.topic_order}-${idx}`} className={themeConfig.roadmap.topicCard}>
+              <div key={`topic-${topic.topic_order}-${idx}`} className="bg-white/60 backdrop-blur-sm border border-white/20 rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <h3 className={themeConfig.roadmap.topicTitle}>
+                    <h3 className="text-xl font-semibold text-slate-900 mb-2">
                       Topic {topic.topic_order}: {topic.topic_name}
                     </h3>
                   </div>
 
                   {topic.duration_to_complete && (
                     <div className="flex-shrink-0">
-                      <span className={themeConfig.roadmap.durationBadge}>
+                      <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                         <Clock className="w-4 h-4" />
                         {topic.duration_to_complete}
                       </span>
@@ -213,7 +212,7 @@ const RoadMapUI = ({ title, topics }) => {
 
                 {topicTypeLabel(topic.topic_type) && (
                   <div>
-                    <span className={`${themeConfig.roadmap.typeBadge} inline-flex w-fit`}>
+                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 inline-flex w-fit">
                       {topicTypeLabel(topic.topic_type)}
                     </span>
                   </div>
@@ -221,11 +220,11 @@ const RoadMapUI = ({ title, topics }) => {
 
                 {/* Why Learn This Topic */}
                 <div className="mb-6 mt-5">
-                  <h4 className={themeConfig.roadmap.sectionTitle}>
+                  <h4 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
                     <BookOpen className="w-4 h-4" />
                     Why learn this topic:
                   </h4>
-                  <p className={themeConfig.roadmap.description}>
+                  <p className="text-slate-700 leading-relaxed mb-4">
                     {topic.why_learn_this_topic}
                   </p>
                 </div>
@@ -233,7 +232,7 @@ const RoadMapUI = ({ title, topics }) => {
                 {/* Optional video section */}
                 {topic.video_link && (
                   <div className="mb-6">
-                    <h4 className={themeConfig.roadmap.sectionTitle}>
+                    <h4 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
                       <Play className="w-4 h-4" />
                       Video Tutorial:
                     </h4>
@@ -249,8 +248,8 @@ const RoadMapUI = ({ title, topics }) => {
 
                 {/* Optional resources section */}
                 {Array.isArray(topic.resources) && topic.resources.length > 0 && (
-                  <div className={themeConfig.roadmap.resourceSection}>
-                    <h4 className={themeConfig.roadmap.sectionTitle}>
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
                       <ExternalLink className="w-4 h-4" />
                       Resources:
                     </h4>
@@ -269,8 +268,8 @@ const RoadMapUI = ({ title, topics }) => {
 
                 {/* Optional assignment links section */}
                 {Array.isArray(topic.assignment_links) && topic.assignment_links.length > 0 && (
-                  <div className={themeConfig.roadmap.resourceSection}>
-                    <h4 className={themeConfig.roadmap.sectionTitle}>
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
                       <ExternalLink className="w-4 h-4" />
                       Assignments:
                     </h4>

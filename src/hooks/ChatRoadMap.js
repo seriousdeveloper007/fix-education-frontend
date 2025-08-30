@@ -82,7 +82,8 @@ export function useChatRoadMap() {
     }
 
     if (typeof data === "object" && data?.next_week_topics) {
-      setNextWeekTopics(data.next_week_topics);
+      console.log(data.next_week_topics)
+      setNextWeekTopics(data.next_week_topics["topics"]);
       return;
     }
 
