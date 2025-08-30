@@ -5,6 +5,8 @@ import TextAreaInput from "../components/chatroadmap/TextareaInput";
 import { MessageList } from "../components/chatroadmap/MessageList";
 import { useChatRoadMap } from "../hooks/ChatRoadMap";
 import { ROTATING_PROMPTS } from "../components/chatroadmap/constants";
+import RoadMapUI from "../components/chatroadmap/RoadMapUI";
+
 
 export default function ChatRoadmap() {
   const {
@@ -12,9 +14,13 @@ export default function ChatRoadmap() {
     input,
     setInput,
     handleSend,
+    handleCreateRoadmap,
     isLoading,
     resetChat,
-    isLoadingHistory
+    isLoadingHistory,
+    nextWeekTopics,
+    nextModules,
+    roadmapTitle
   } = useChatRoadMap();
 
 
@@ -23,9 +29,17 @@ export default function ChatRoadmap() {
       <Navbar />
       <BackgroundIconCloud />
       <div className="relative z-10 flex-col font-fraunces px-[30px] lg:px-[250px]">
-        {messages.length === 0 && <RoadmapHeading />}
-        {messages.length > 0 && (
-          <MessageList messages={messages} isLoading={isLoading} />
+        {messages.length === 0 && !nextWeekTopics && <RoadmapHeading />}
+        {nextWeekTopics ? (
+          <RoadMapUI title={roadmapTitle} topics={nextWeekTopics} nextModules={nextModules} />
+        ) : (
+          messages.length > 0 && (
+            <MessageList
+              messages={messages}
+              isLoading={isLoading}
+              onCreateRoadmap={handleCreateRoadmap}
+            />
+          )
         )}
         <TextAreaInput
           prompts={ROTATING_PROMPTS}
@@ -34,7 +48,7 @@ export default function ChatRoadmap() {
           onSend={handleSend}
           onReset={resetChat}
           isDisable={isLoadingHistory || isLoading}
-          floating={messages.length > 0}
+          floating={messages.length > 0 || !!nextWeekTopics}
         />
       </div>
     </>

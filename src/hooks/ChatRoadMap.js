@@ -3,34 +3,71 @@ import {
   useRoadmapWebSocket,
   fetchRoadmapMessages,
   fetchRoadmapAnalysis,
+  updateRoadmap,
+  deleteRoadmap
 } from '../services/roadmapService.js';
+import { fetchActiveTopics } from '../services/topicService.js';
 
 export function useChatRoadMap() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [nextWeekTopics, setNextWeekTopics] = useState(null);
+  const [nextModules, setNextModules] = useState([]);
+  const [roadmapTitle, setRoadmapTitle] = useState('');
 
   useEffect(() => {
     const loadExistingMessages = async () => {
-      const chatId = localStorage.getItem('chatRoadmapId');
-
       setIsLoadingHistory(true);
       try {
-        const [existingMessages, analysis] = await Promise.all([
-          chatId ? fetchRoadmapMessages() : Promise.resolve([]),
-          fetchRoadmapAnalysis(),
-        ]);
-
-        const merged = [];
-        if (existingMessages.length > 0) {
-          merged.push(...existingMessages);
-        }
+        // First, get the roadmap analysis
+        const analysis = await fetchRoadmapAnalysis();
+        
+        let existingMessages = [];
+        
         if (analysis) {
+          // If analysis exists, use its chat_id to fetch messages
+          localStorage.setItem('roadmapId', analysis.id);
+          localStorage.setItem('chatRoadmapId', analysis.chat_id);
+          setRoadmapTitle(analysis.title || '');
+          if (Array.isArray(analysis.next_modules)) {
+            setNextModules(analysis.next_modules);
+          }
+          
+          const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
+          if ((analysis.user_id === null || analysis.user_id === undefined) && userId) {
+            await updateRoadmap({ user_id: userId });
+          }
+          
+          // Fetch messages using the chat_id from analysis
+          existingMessages = await fetchRoadmapMessages();
+        } else {
+          // If no analysis, check if we have an existing chatId in localStorage
+          const chatId = localStorage.getItem('chatRoadmapId');
+          if (chatId) {
+            existingMessages = await fetchRoadmapMessages();
+          }
+        }
+
+        const merged = [...existingMessages];
+        
+        // Add roadmap analysis to messages if we have enough messages
+        if (analysis && existingMessages.length >= 10 && (existingMessages.length - 10) % 4 === 0) {
           merged.push({ role: 'agent', kind: 'roadmap', payload: analysis });
         }
+        
         if (merged.length > 0) {
           setMessages(merged);
+        }
+
+        // Fetch active topics for the existing roadmap, if any
+        const roadmapId = analysis?.id ?? parseInt(localStorage.getItem('roadmapId') || '', 10);
+        if (roadmapId) {
+          const topics = await fetchActiveTopics(roadmapId);
+          if (topics.length > 0) {
+            setNextWeekTopics(topics);
+          }
         }
       } catch (error) {
         console.error('Failed to load existing messages:', error);
@@ -54,13 +91,29 @@ export function useChatRoadMap() {
   
     // 1) ChatID → save & stop
     if (typeof data === "object" && data?.chat_id) {
-      try { localStorage.setItem("chatRoadmapId", data.chat_id); } catch {}
+      try { localStorage.setItem("chatRoadmapId", data.chat_id); } catch { /* ignore */ }
+      return;
+    }
+
+    if (typeof data === "object" && data?.next_week_topics) {
+      console.log(data.next_week_topics)
+      setNextWeekTopics(data.next_week_topics["topics"]);
       return;
     }
 
     if(typeof data === "object" && data?.roadmap_id){
-      try { 
-        localStorage.setItem("roadmapId", data.roadmap_id); 
+      try {
+        localStorage.setItem("roadmapId", data.roadmap_id);
+        const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
+        if ((data.roadmap?.user_id === null || data.roadmap?.user_id === undefined) && userId) {
+          updateRoadmap({ user_id: userId });
+        }
+        if (data.roadmap?.title) {
+          setRoadmapTitle(data.roadmap.title);
+        }
+        if (Array.isArray(data.roadmap?.next_modules)) {
+          setNextModules(data.roadmap.next_modules);
+        }
         setMessages(prev => [
           ...prev,
           {
@@ -68,13 +121,14 @@ export function useChatRoadMap() {
             kind: "roadmap",
             payload: data.roadmap,
           }
-        ]);    
-      } catch {}
+        ]);
+      } catch { /* ignore */ }
     }
   
     // 2) Full message → add as agent
     if (typeof data === "object" && data?.message !== undefined) {
       setMessages(prev => [...prev, { role: "agent", kind: "text", text: String(data.message) }]);
+      setIsLoading(true);
       return;
     }
   
@@ -123,10 +177,33 @@ export function useChatRoadMap() {
     setInput('');
   }, [input, messages, connect, sendMessage]);
 
-  const resetChat = useCallback(() => {
+  const handleCreateRoadmap = useCallback(() => {
+    const text = 'create roadmap';
+    setIsLoading(true);
+    sendMessage({ text, message_type: 'text' });
+    setMessages(prev => [...prev, { role: 'user', text }]);
+  }, [sendMessage]);
+
+  const resetChat = useCallback(async () => {
     setMessages([]);
     setInput('');
     setIsLoading(false);
+    setNextWeekTopics(null);
+    setNextModules([]);
+    setRoadmapTitle('');
+    const roadmapId = localStorage.getItem('roadmapId');
+    if (roadmapId) {
+      try {
+        await deleteRoadmap(roadmapId);
+      } catch (e) {
+        console.error('Failed to delete roadmap:', e);
+      }
+      try {
+        localStorage.removeItem('roadmapId');
+      } catch (e) {
+        console.warn('Failed to clear roadmapId from localStorage:', e);
+      }
+    }
     try {
       localStorage.removeItem('chatRoadmapId');
     } catch (e) {
@@ -139,8 +216,13 @@ export function useChatRoadMap() {
     input,
     setInput,
     handleSend,
+    handleCreateRoadmap,
     isLoading,
     isLoadingHistory,
     resetChat,
+    nextWeekTopics,
+    nextModules,
+    roadmapTitle,
   };
 }
+

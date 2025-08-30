@@ -11,7 +11,7 @@ export function useTypewriter({
     () => (Array.isArray(prompts) && prompts.length ? prompts : ['Type here…']),
     [prompts]
   );
-
+    
   const [display, setDisplay] = useState('');
 
   const iRef = useRef(0);          // which prompt

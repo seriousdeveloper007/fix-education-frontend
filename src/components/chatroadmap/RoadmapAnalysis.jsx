@@ -1,7 +1,7 @@
 import React from "react";
 import themeConfig from "../themeConfig";
 
-export default function RoadmapAnalysis({ roadmap }) {
+export default function RoadmapAnalysis({ roadmap, onCreateRoadmap }) {
   const btn = themeConfig.buttons
   const skills = Array.isArray(roadmap?.skills_already_have)
     ? roadmap.skills_already_have
@@ -40,7 +40,7 @@ export default function RoadmapAnalysis({ roadmap }) {
               Duration
             </p>
             <p className="text-base text-gray-900">
-              {Number(roadmap?.time_duration) || "—"} weeks
+              {Number(roadmap?.total_weeksuration) || "—"} weeks
             </p>
           </div>
 
@@ -98,7 +98,10 @@ export default function RoadmapAnalysis({ roadmap }) {
 
         {/* Actions */}
         <div className="flex gap-4 pt-6">
-          <button className={`px-4 py-2 text-sm ${btn.secondary}`}>
+          <button
+            className={`px-4 py-2 text-sm ${btn.secondary}`}
+            onClick={onCreateRoadmap}
+          >
             Create roadmap
           </button>
         </div>

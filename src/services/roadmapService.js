@@ -5,8 +5,9 @@ import { API_BASE_URL, WS_BASE_URL } from '../config.js';
 
 export const deleteRoadmap = async (roadmapId) => {
   try {
-    const roadmapId = localStorage.getItem('roadmapId');
-    const response = await fetch(`${API_BASE_URL}/roadmaps/${roadmapId}`, {
+    const id = roadmapId ?? localStorage.getItem('roadmapId');
+    if (!id) return;
+    const response = await fetch(`${API_BASE_URL}/roadmaps/${id}`, {
       method: 'DELETE',
     });
 
@@ -114,34 +115,38 @@ export async function fetchRoadmapMessages() {
   }
 }
 
+
 export async function fetchRoadmapAnalysis() {
   const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
   const chatId = localStorage.getItem('chatRoadmapId');
 
   const fetchAnalysis = async (query) => {
-    const res = await fetch(`${API_BASE_URL}/roadmaps/roadmap_analysis?${query}`);
-    if (!res.ok) {
-      if (res.status === 404) return null;
-      throw new Error('Failed to fetch roadmap analysis');
+    try {
+      const res = await fetch(`${API_BASE_URL}/roadmaps/roadmap_analysis?${query}`);
+      if (!res.ok) {
+        if (res.status === 404) return null;
+        console.error(`Failed to fetch roadmap analysis: ${res.status} ${res.statusText}`);
+        throw new Error('Failed to fetch roadmap analysis');
+      }
+      const data = await res.json();
+      return data.roadmap;
+    } catch (error) {
+      console.error('Error in fetchAnalysis:', error);
+      throw error;
     }
-    const data = await res.json();
-    return data.roadmap;
   };
-
   if (userId) {
     const roadmap = await fetchAnalysis(`user_id=${userId}`);
     if (roadmap) return roadmap;
   }
-
   if (chatId) {
     const roadmap = await fetchAnalysis(`chat_id=${chatId}`);
     if (roadmap) return roadmap;
   }
-
   return null;
 }
 
-export const updateRoadmap = async (updates = {}) => {
+export const updateRoadmap = async (updates = {}, roadmapId) => {
   try {
     const id =
       roadmapId ??
@@ -152,7 +157,7 @@ export const updateRoadmap = async (updates = {}) => {
     }
 
     const res = await fetch(
-      `${API_BASE_URL}/roadmaps/update?roadmap_id=${encodeURIComponent(id)}`,
+      `${API_BASE_URL}/roadmaps/update-user?roadmap_id=${encodeURIComponent(id)}`,
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
