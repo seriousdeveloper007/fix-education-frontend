@@ -4,6 +4,7 @@ import themeConfig from './themeConfig';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
 import { updateChat } from '../services/chatService.js';
+import { updateRoadmap } from '../services/roadmapService.js';
 import PropTypes from 'prop-types';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -80,6 +81,19 @@ localStorage.setItem(
           await updateChat({ user_id: backendUser.id });
         } catch (err) {
           console.error('Failed to update chat with user', err);
+        }
+      }
+
+      // If a roadmap was created anonymously, attach it to the logged-in user
+      const roadmapId = localStorage.getItem('roadmapId');
+      if (roadmapId) {
+        try {
+          const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
+          if (userId) {
+            await updateRoadmap({ user_id: userId }, roadmapId);
+          }
+        } catch (err) {
+          console.error('Failed to update roadmap with user', err);
         }
       }
 
