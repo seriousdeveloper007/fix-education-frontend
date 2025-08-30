@@ -3,7 +3,7 @@ import { AlertCircle, PlayCircle, Video } from 'lucide-react';
 import themeConfig from './themeConfig';
 import PlatformNavbar from './PlatformNavbar';
 import VideoLinkInputCard from './VideoLinkInputCard';
-import DesktopOnly from './DesktopOnly';
+import ResponsiveWrapper from './ResponsiveWrapper';
 import analytics from '../services/posthogService';
 
 function OfferingCard({ icon, iconBg, iconColor, title, description, cfg }) {
@@ -58,7 +58,7 @@ export default function PlatformLanding() {
   const backgroundClasses = 'min-h-screen bg-white';
 
   return (
-    <DesktopOnly>
+    <ResponsiveWrapper>
       <div className={`font-fraunces ${backgroundClasses}`}>
         <PlatformNavbar />
         <div className="flex flex-col items-center justify-start min-h-screen pt-20">
@@ -84,6 +84,6 @@ export default function PlatformLanding() {
           <BenefitsSection cfg={cfg} />
         </div>
       </div>
-    </DesktopOnly>
+    </ResponsiveWrapper>
   );
 }

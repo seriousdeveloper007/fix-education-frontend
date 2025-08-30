@@ -1,18 +1,18 @@
 import { useSearchParams } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
-import { createTab , updateTab} from '../services/tabService';
-import { useYouTubePlayer } from './useYouTubePlayer.js';
-import PlatformNavbar from './PlatformNavbar';
-import StudyRoomNavbar from './StudyRoomNavbar.jsx';
-import VideoLinkInputCard from './VideoLinkInputCard.jsx';
-import themeConfig from './themeConfig';
-import SidePanel from './SidePanel.jsx';
-import { fetchUnattemptedQuestions, createQuestions } from '../services/questionService';
-import DesktopOnly from './DesktopOnly';
-import analytics from '../services/posthogService';
-import LoginCard from './LoginCard';
+import { createTab , updateTab} from '../services/tabService.js';
+import { useYouTubePlayer } from '../hooks/useYouTubePlayer.js';
+import PlatformNavbar from '../components/PlatformNavbar.jsx';
+import StudyRoomNavbar from '../components/studyroom/StudyRoomNavbar.jsx';
+import VideoLinkInputCard from '../components/studyroom/VideoLinkInputCard.jsx';
+import themeConfig from '../config/themeConfig.js';
+import SidePanel from '../components/studyroom/SidePanel.jsx';
+import { fetchUnattemptedQuestions, createQuestions } from '../services/questionService.js';
+import analytics from '../services/posthogService.js';
+import LoginCard from '../components/LoginCard.jsx';
 import { Loader2 } from 'lucide-react';
-import { createVideoChunk } from '../services/videoChunkService';
+import { createVideoChunk } from '../services/videoChunkService.js';
+import ResponsiveWrapper from '../components/ResponsiveWrapper.jsx'
 
 
 
@@ -193,7 +193,7 @@ export default function StudyRoom() {
     const intervalId = setInterval(tickCreateChunk, 20000);
 
     return () => clearInterval(intervalId);
-  }, [showIframe, getCurrentTime, isPreparingRoom]); // ✅ Include dependencies
+  }, [showIframe, getCurrentTime, isPreparingRoom]); // âœ… Include dependencies
 
 
   // Save playback time every 2 seconds
@@ -218,7 +218,7 @@ export default function StudyRoom() {
   
 
   return (
-    <DesktopOnly>
+    <ResponsiveWrapper>
     <div className="relative w-full h-screen flex flex-col font-fraunces bg-white overflow-hidden">
       {!showIframe ? (
         <>
@@ -231,7 +231,7 @@ export default function StudyRoom() {
         <>
             <StudyRoomNavbar videoUrl={videoUrl}
               onTabSelect={(tab) => {
-              pause(); // 👈 Pause video before opening side panel
+              pause(); // 🏹 Pause video before opening side panel
               setSidePanelTab(tab);
               analytics.sideNavbarOpened(tab);
             }}
@@ -273,10 +273,10 @@ export default function StudyRoom() {
        {isLoggedIn && isPreparingRoom && (
           <div className="absolute inset-0 z-50 bg-black/40 flex flex-col items-center justify-center space-y-4">
             <Loader2 className="animate-spin h-12 w-12 text-white" />
-            <p className="text-white text-lg">Preparing study room…</p>
+            <p className="text-white text-lg">Preparing study roomâ€¦</p>
           </div>
         )}
     </div>
-    </DesktopOnly>
+    </ResponsiveWrapper>
   );
 }

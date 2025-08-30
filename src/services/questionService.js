@@ -1,5 +1,5 @@
 import analytics from './posthogService';
-import { API_BASE_URL } from '../config.js';
+import { API_BASE_URL } from '../config/config';
 
 export async function fetchUnattemptedQuestions() {
   const token = localStorage.getItem('token');

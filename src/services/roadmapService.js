@@ -1,6 +1,6 @@
 // services/roadmapService.js
 import { useRef, useEffect } from 'react';
-import { API_BASE_URL, WS_BASE_URL } from '../config.js';
+import { API_BASE_URL, WS_BASE_URL } from '../config/config.js';
 
 
 export const deleteRoadmap = async (roadmapId) => {

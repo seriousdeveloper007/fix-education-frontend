@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; // import Link
-import themeConfig from './themeConfig';
+import themeConfig from '../config/themeConfig';
 import icon from '../assets/logo-without-bg.png';
 
 const Footer = () => {

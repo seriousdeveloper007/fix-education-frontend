@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
-import themeConfig from './themeConfig';
-import { API_BASE_URL } from '../config.js';
+import themeConfig from '../config/themeConfig';
+import { API_BASE_URL } from '../config/config.js';
 import { updateChat } from '../services/chatService.js';
 
 export default function VerifyLearner() {
@@ -17,11 +17,6 @@ export default function VerifyLearner() {
     const token         = queryParams.get('token');
     const redirectParam = queryParams.get('redirect_url');          // may be null
 
-    /** Very small, optional safety-net:  
-     *  – allow any relative path (“/study-room?v=123”)  
-     *  – OR allow absolute URLs whose origin matches current origin  
-     *  Anything else falls back to null → we’ll send them to /platform
-     */
     const getSafeRedirect = (url) => {
       if (!url) return null;
       try {

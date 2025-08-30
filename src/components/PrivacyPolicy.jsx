@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, User, Settings, Share, Globe, Clock, Key, Trash2, Mail } from 'lucide-react';
-import themeConfig from './themeConfig';
+import themeConfig from '../config/themeConfig';
 import Navbar from './Navbar';
 
 const Section = ({ icon: Icon, title, children }) => (

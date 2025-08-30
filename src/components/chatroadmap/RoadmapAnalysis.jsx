@@ -1,5 +1,5 @@
 import React from "react";
-import themeConfig from "../themeConfig";
+import themeConfig from "../../config/themeConfig";
 
 export default function RoadmapAnalysis({ roadmap }) {
   const btn = themeConfig.buttons

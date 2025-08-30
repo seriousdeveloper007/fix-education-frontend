@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import themeConfig from './themeConfig';
+import themeConfig from '../config/themeConfig.js';
 import analytics from '../services/posthogService';
-import { API_BASE_URL } from '../config.js';
+import { API_BASE_URL } from '../config/config.js';
 import { updateChat } from '../services/chatService.js';
 import PropTypes from 'prop-types';
 

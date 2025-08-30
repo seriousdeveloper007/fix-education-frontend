@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import themeConfig from './themeConfig.js';
+import themeConfig from '../config/themeConfig.js';
 import { Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Logo from '../assets/logo-without-bg.png';
-import { CHROME_EXTENSION_LINK } from '../config.js';
+import { CHROME_EXTENSION_LINK } from '../config/config.js';
 
 
 

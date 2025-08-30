@@ -1,10 +1,9 @@
 import axios from 'axios';
-import { API_BASE_URL } from '../config.js'; // Assuming config.js has this
-
+import { API_BASE_URL } from '../config/config'; 
 function authHeaders() {
   const token = localStorage.getItem('token');
   const h = { 'Content-Type': 'application/json' };
-  if (token) h.Authorization = token; // Plain token, as per your curl
+  if (token) h.Authorization = token; 
   return h;
 }
 

@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { WS_BASE_URL } from '../config.js';
+import { WS_BASE_URL } from '../config/config.js';
 
 export function useChatWebSocket({ onMessage, onToken, getPlaybackTime } = {}) {
   const wsRef = useRef(null);

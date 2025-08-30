@@ -1,4 +1,4 @@
-import themeConfig from './themeConfig';
+import themeConfig from '../../config/themeConfig';
 import { X } from 'lucide-react';
 import ChatView from './ChatView';
 import PropTypes from 'prop-types';

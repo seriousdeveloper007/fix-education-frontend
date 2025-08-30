@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import themeConfig from './themeConfig';
+import themeConfig from '../config/themeConfig';
 import analytics from '../services/posthogService';
 
 export default function DesktopOnly({ children }) {
