@@ -12,6 +12,8 @@ export function useChatRoadMap() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [nextWeekTopics, setNextWeekTopics] = useState(null);
+  const [roadmapTitle, setRoadmapTitle] = useState('');
 
   useEffect(() => {
     const loadExistingMessages = async () => {
@@ -26,6 +28,7 @@ export function useChatRoadMap() {
           // If analysis exists, use its chat_id to fetch messages
           localStorage.setItem('roadmapId', analysis.id);
           localStorage.setItem('chatRoadmapId', analysis.chat_id);
+          setRoadmapTitle(analysis.title || '');
           
           const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
           if ((analysis.user_id === null || analysis.user_id === undefined) && userId) {
@@ -79,6 +82,7 @@ export function useChatRoadMap() {
     }
 
     if (typeof data === "object" && data?.next_week_topics) {
+      setNextWeekTopics(data.next_week_topics);
       return;
     }
 
@@ -88,6 +92,9 @@ export function useChatRoadMap() {
         const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
         if ((data.roadmap?.user_id === null || data.roadmap?.user_id === undefined) && userId) {
           updateRoadmap({ user_id: userId });
+        }
+        if (data.roadmap?.title) {
+          setRoadmapTitle(data.roadmap.title);
         }
         setMessages(prev => [
           ...prev,
@@ -156,6 +163,8 @@ export function useChatRoadMap() {
     setMessages([]);
     setInput('');
     setIsLoading(false);
+    setNextWeekTopics(null);
+    setRoadmapTitle('');
     const roadmapId = localStorage.getItem('roadmapId');
     if (roadmapId) {
       try {
@@ -184,6 +193,8 @@ export function useChatRoadMap() {
     isLoading,
     isLoadingHistory,
     resetChat,
+    nextWeekTopics,
+    roadmapTitle,
   };
 }
 
