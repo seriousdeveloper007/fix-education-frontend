@@ -466,9 +466,9 @@ const YouTubeVideoCard = ({ url, title, onClick }) => {
   );
 };
 
-// Future Topics Component
-const FutureTopicsCard = ({ futureTopics }) => {
-  if (!Array.isArray(futureTopics) || futureTopics.length === 0) {
+// Next Modules Component
+const NextModulesCard = ({ nextModules }) => {
+  if (!Array.isArray(nextModules) || nextModules.length === 0) {
     return null;
   }
 
@@ -487,7 +487,7 @@ const FutureTopicsCard = ({ futureTopics }) => {
               </span>
             </h2>
             <div className="bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 px-4 py-2 rounded-full text-sm font-semibold shadow-md border border-indigo-200/50">
-              {futureTopics.length} Modules
+              {nextModules.length} Modules
             </div>
           </div>
         </div>
@@ -495,9 +495,9 @@ const FutureTopicsCard = ({ futureTopics }) => {
         {/* Content */}
         <div className="p-4 sm:p-6">
           <div className="grid gap-4">
-            {futureTopics.map((topicName, index) => (
+            {nextModules.map((module, index) => (
               <div
-                key={`future-topic-${index}`}
+                key={`next-module-${index}`}
                 className="bg-gradient-to-r from-white/90 to-white/80 backdrop-blur-lg border border-white/40 rounded-2xl p-4 sm:p-5 transition-all duration-300 hover:shadow-lg hover:border-white/60 group"
               >
                 <div className="flex items-center gap-4">
@@ -508,10 +508,10 @@ const FutureTopicsCard = ({ futureTopics }) => {
                     </span>
                   </div>
 
-                  {/* Topic Content */}
+                  {/* Module Content */}
                   <div className="flex-1 min-w-0">
                     <h3 className="text-base sm:text-lg font-semibold text-slate-900 leading-tight group-hover:text-indigo-700 transition-colors duration-200">
-                      {topicName}
+                      {module?.ModuleName || module?.module_name || module}
                     </h3>
                   </div>
 
@@ -529,7 +529,7 @@ const FutureTopicsCard = ({ futureTopics }) => {
   );
 };
 
-const RoadMapUI = ({ title, topics, futureTopics }) => {
+const RoadMapUI = ({ title, topics, nextModules }) => {
   const handleVideoClick = (videoLink) => {
     if (!videoLink) return;
     const url = `${window.location.origin}/study-room?video=${encodeURIComponent(videoLink)}&mode=play`;
@@ -702,8 +702,8 @@ const RoadMapUI = ({ title, topics, futureTopics }) => {
         </div>
       </div>
 
-      {/* Future Topics Section */}
-      <FutureTopicsCard futureTopics={futureTopics} />
+      {/* Next Modules Section */}
+      <NextModulesCard nextModules={nextModules} />
     </div>
   );
 };

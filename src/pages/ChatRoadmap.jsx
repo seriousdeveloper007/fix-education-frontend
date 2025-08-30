@@ -19,6 +19,7 @@ export default function ChatRoadmap() {
     resetChat,
     isLoadingHistory,
     nextWeekTopics,
+    nextModules,
     roadmapTitle
   } = useChatRoadMap();
 
@@ -30,7 +31,7 @@ export default function ChatRoadmap() {
       <div className="relative z-10 flex-col font-fraunces px-[30px] lg:px-[250px]">
         {messages.length === 0 && !nextWeekTopics && <RoadmapHeading />}
         {nextWeekTopics ? (
-          <RoadMapUI title={roadmapTitle} topics={nextWeekTopics} />
+          <RoadMapUI title={roadmapTitle} topics={nextWeekTopics} nextModules={nextModules} />
         ) : (
           messages.length > 0 && (
             <MessageList
