@@ -14,6 +14,7 @@ export default function ChatRoadmap() {
     input,
     setInput,
     handleSend,
+    handleCreateRoadmap,
     isLoading,
     resetChat,
     isLoadingHistory,
@@ -32,7 +33,11 @@ export default function ChatRoadmap() {
           <RoadMapUI title={roadmapTitle} topics={nextWeekTopics} />
         ) : (
           messages.length > 0 && (
-            <MessageList messages={messages} isLoading={isLoading} />
+            <MessageList
+              messages={messages}
+              isLoading={isLoading}
+              onCreateRoadmap={handleCreateRoadmap}
+            />
           )
         )}
         <TextAreaInput

@@ -159,6 +159,13 @@ export function useChatRoadMap() {
     setInput('');
   }, [input, messages, connect, sendMessage]);
 
+  const handleCreateRoadmap = useCallback(() => {
+    const text = 'create roadmap';
+    setIsLoading(true);
+    sendMessage({ text, message_type: 'text' });
+    setMessages(prev => [...prev, { role: 'user', text }]);
+  }, [sendMessage]);
+
   const resetChat = useCallback(async () => {
     setMessages([]);
     setInput('');
@@ -190,6 +197,7 @@ export function useChatRoadMap() {
     input,
     setInput,
     handleSend,
+    handleCreateRoadmap,
     isLoading,
     isLoadingHistory,
     resetChat,

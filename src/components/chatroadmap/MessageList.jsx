@@ -5,7 +5,7 @@ import RoadmapAnalysis from "./RoadmapAnalysis";
 
 const FLOATING_FOOTER_PX = 130;
 
-export const MessageList = React.memo(function MessageList({ messages, isLoading }) {
+export const MessageList = React.memo(function MessageList({ messages, isLoading, onCreateRoadmap }) {
   const endRef = useRef(null);
   const bottomGap = FLOATING_FOOTER_PX;
 
@@ -31,7 +31,7 @@ export const MessageList = React.memo(function MessageList({ messages, isLoading
         if (isRoadmap) {
           return (
             <div key={idx} className="mr-auto w-full max-w-3xl">
-              <RoadmapAnalysis roadmap={msg.payload} />
+              <RoadmapAnalysis roadmap={msg.payload} onCreateRoadmap={onCreateRoadmap} />
             </div>
           );
         }
