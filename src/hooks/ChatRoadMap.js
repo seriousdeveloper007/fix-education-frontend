@@ -6,6 +6,7 @@ import {
   updateRoadmap,
   deleteRoadmap
 } from '../services/roadmapService.js';
+import { fetchActiveTopics } from '../services/topicService.js';
 
 export function useChatRoadMap() {
   const [messages, setMessages] = useState([]);
@@ -54,6 +55,15 @@ export function useChatRoadMap() {
         
         if (merged.length > 0) {
           setMessages(merged);
+        }
+
+        // Fetch active topics for the existing roadmap, if any
+        const roadmapId = analysis?.id ?? parseInt(localStorage.getItem('roadmapId') || '', 10);
+        if (roadmapId) {
+          const topics = await fetchActiveTopics(roadmapId);
+          if (topics.length > 0) {
+            setNextWeekTopics(topics);
+          }
         }
       } catch (error) {
         console.error('Failed to load existing messages:', error);
