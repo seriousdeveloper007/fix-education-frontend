@@ -14,6 +14,7 @@ export function useChatRoadMap() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [nextWeekTopics, setNextWeekTopics] = useState(null);
+  const [nextModules, setNextModules] = useState([]);
   const [roadmapTitle, setRoadmapTitle] = useState('');
 
   useEffect(() => {
@@ -30,6 +31,9 @@ export function useChatRoadMap() {
           localStorage.setItem('roadmapId', analysis.id);
           localStorage.setItem('chatRoadmapId', analysis.chat_id);
           setRoadmapTitle(analysis.title || '');
+          if (Array.isArray(analysis.next_modules)) {
+            setNextModules(analysis.next_modules);
+          }
           
           const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
           if ((analysis.user_id === null || analysis.user_id === undefined) && userId) {
@@ -107,6 +111,9 @@ export function useChatRoadMap() {
         if (data.roadmap?.title) {
           setRoadmapTitle(data.roadmap.title);
         }
+        if (Array.isArray(data.roadmap?.next_modules)) {
+          setNextModules(data.roadmap.next_modules);
+        }
         setMessages(prev => [
           ...prev,
           {
@@ -182,6 +189,7 @@ export function useChatRoadMap() {
     setInput('');
     setIsLoading(false);
     setNextWeekTopics(null);
+    setNextModules([]);
     setRoadmapTitle('');
     const roadmapId = localStorage.getItem('roadmapId');
     if (roadmapId) {
@@ -213,6 +221,7 @@ export function useChatRoadMap() {
     isLoadingHistory,
     resetChat,
     nextWeekTopics,
+    nextModules,
     roadmapTitle,
   };
 }
