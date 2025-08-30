@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ExternalLink,
   Clock,
@@ -96,7 +96,7 @@ const ResourceItem = ({ url, onClick }) => {
 };
 
 const YouTubeVideoCard = ({ url, title, onClick }) => {
-  const [videoTitle, setVideoTitle] = useState(title);
+  const [videoTitle] = useState(title);
   const thumbnailUrl = getYouTubeThumbnail(url);
 
   return (
@@ -136,7 +136,7 @@ const YouTubeVideoCard = ({ url, title, onClick }) => {
 };
 
 const RoadMapUI = ({ title, topics }) => {
-  const handleVideoClick = (videoLink, topicName) => {
+  const handleVideoClick = (videoLink) => {
     if (!videoLink) return;
     const url = `${window.location.origin}/study-room?video=${encodeURIComponent(videoLink)}&mode=play`;
     window.open(url, '_blank');
@@ -144,9 +144,10 @@ const RoadMapUI = ({ title, topics }) => {
 
   // Get week number from first topic (assuming all topics are from same week)
   const weekNumber = topics && topics.length > 0 ? topics[0].week_number : null;
+
+  const topicTypeLabel = (type) => {
     if (type === 'learning_video') return 'Video lecture';
-    if (type === 'question') return 'Assignment';
-    if (type === 'assignment') return 'Assignment';
+    if (type === 'question' || type === 'assignment') return 'Assignment';
     return null;
   };
 
@@ -154,9 +155,9 @@ const RoadMapUI = ({ title, topics }) => {
     window.open(resourceLink, '_blank');
   };
 
-  const topicTypeLabel = (type) => {
-  const sortedTopics = Array.isArray(topics) ? 
-    [...topics].sort((a, b) => a.topic_order - b.topic_order) : [];
+  const sortedTopics = Array.isArray(topics)
+    ? [...topics].sort((a, b) => a.topic_order - b.topic_order)
+    : [];
 
   return (
     <div className={themeConfig.roadmap.container}>
