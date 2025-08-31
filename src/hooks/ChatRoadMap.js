@@ -186,21 +186,19 @@ export function useChatRoadMap() {
   }, [sendMessage]);
 
   const handleFollowUp = useCallback(async () => {
-    const text = input.trim();
-    if (!text) return;
+    const message = input.trim();
+    if (!message) return;
 
-    setIsLoading(true);
     try {
-      const chatId = localStorage.getItem('chatRoadmapId');
-      await fetch(`${API_BASE_URL}/roadmaps/followup`, {
+      const roadmap_id = localStorage.getItem('roadmapId');
+      await fetch(`${API_BASE_URL}/topics/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, chat_id: chatId ? parseInt(chatId, 10) : null }),
+        body: JSON.stringify({ message, roadmap_id: roadmap_id ? parseInt(roadmap_id, 10) : null }),
       });
     } catch (error) {
       console.error('Failed to send follow-up:', error);
     } finally {
-      setIsLoading(false);
       setInput('');
     }
   }, [input]);

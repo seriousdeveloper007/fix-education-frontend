@@ -97,7 +97,7 @@ export default function RoadmapAnalysis({ roadmap, onCreateRoadmap }) {
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col gap-2 pt-6">
+        <div className="flex flex-col items-start gap-2 pt-6">
           <button
             className={`px-4 py-2 text-sm ${btn.secondary}`}
             onClick={onCreateRoadmap}
@@ -105,10 +105,11 @@ export default function RoadmapAnalysis({ roadmap, onCreateRoadmap }) {
             Create roadmap
           </button>
 
-          <p className="text-xs text-gray-500 text-center mt-2 italic">
+          <p className="text-xs text-gray-500 mt-2 italic">
             *Continue chatting if you want to change anything in your analysis*
           </p>
         </div>
+
       </div>
     </div>
   );
