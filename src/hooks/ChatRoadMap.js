@@ -7,6 +7,7 @@ import {
   deleteRoadmap
 } from '../services/roadmapService.js';
 import { fetchActiveTopics } from '../services/topicService.js';
+import { API_BASE_URL } from '../config.js';
 
 export function useChatRoadMap() {
   const [messages, setMessages] = useState([]);
@@ -16,6 +17,7 @@ export function useChatRoadMap() {
   const [nextWeekTopics, setNextWeekTopics] = useState(null);
   const [nextModules, setNextModules] = useState([]);
   const [roadmapTitle, setRoadmapTitle] = useState('');
+  const [isUpdatingTopics, setIsUpdatingTopics] = useState(false);
 
   useEffect(() => {
     const loadExistingMessages = async () => {
@@ -184,6 +186,36 @@ export function useChatRoadMap() {
     setMessages(prev => [...prev, { role: 'user', text }]);
   }, [sendMessage]);
 
+  const handleFollowUp = useCallback(async () => {
+    const message = input.trim();
+    if (!message) return;
+
+    setIsUpdatingTopics(true);
+    try {
+      const roadmap_id = localStorage.getItem('roadmapId');
+      const res = await fetch(`${API_BASE_URL}/topics/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, roadmap_id: roadmap_id ? parseInt(roadmap_id, 10) : null }),
+      });
+
+      try {
+        const data = await res.json();
+        const topics = data?.topics || [];
+        if (Array.isArray(topics) && topics.length > 0) {
+          setNextWeekTopics(topics);
+        }
+      } catch {
+        // ignore JSON parse errors
+      }
+    } catch (error) {
+      console.error('Failed to send follow-up:', error);
+    } finally {
+      setInput('');
+      setIsUpdatingTopics(false);
+    }
+  }, [input]);
+
   const resetChat = useCallback(async () => {
     setMessages([]);
     setInput('');
@@ -217,8 +249,10 @@ export function useChatRoadMap() {
     setInput,
     handleSend,
     handleCreateRoadmap,
+    handleFollowUp,
     isLoading,
     isLoadingHistory,
+    isUpdatingTopics,
     resetChat,
     nextWeekTopics,
     nextModules,
