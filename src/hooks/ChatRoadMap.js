@@ -201,7 +201,7 @@ export function useChatRoadMap() {
 
       try {
         const data = await res.json();
-        const topics = data?.topics || data?.topicslist || [];
+        const topics = data?.topics || [];
         if (Array.isArray(topics) && topics.length > 0) {
           setNextWeekTopics(topics);
         }
