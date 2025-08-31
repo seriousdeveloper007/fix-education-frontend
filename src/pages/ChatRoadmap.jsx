@@ -21,6 +21,7 @@ export default function ChatRoadmap() {
     isLoading,
     resetChat,
     isLoadingHistory,
+    isUpdatingTopics,
     nextWeekTopics,
     nextModules,
     roadmapTitle
@@ -42,14 +43,19 @@ export default function ChatRoadmap() {
         {messages.length === 0 && !nextWeekTopics && <RoadmapHeading />}
         {nextWeekTopics ? (
           <>
-            <RoadMapUI title={roadmapTitle} topics={nextWeekTopics} nextModules={nextModules} />
+            <RoadMapUI
+              title={roadmapTitle}
+              topics={nextWeekTopics}
+              nextModules={nextModules}
+              isLoadingTopics={isUpdatingTopics}
+            />
             <TextAreaInput
               prompts={FOLLOW_UP_PROMPTS}
               value={input}
               onChange={setInput}
               onSend={handleFollowUp}
               onReset={resetChat}
-              isDisable={isLoadingHistory || isLoading}
+              isDisable={isLoadingHistory || isLoading || isUpdatingTopics}
               floating={true}
             />
           </>

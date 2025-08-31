@@ -17,6 +17,7 @@ export function useChatRoadMap() {
   const [nextWeekTopics, setNextWeekTopics] = useState(null);
   const [nextModules, setNextModules] = useState([]);
   const [roadmapTitle, setRoadmapTitle] = useState('');
+  const [isUpdatingTopics, setIsUpdatingTopics] = useState(false);
 
   useEffect(() => {
     const loadExistingMessages = async () => {
@@ -189,17 +190,29 @@ export function useChatRoadMap() {
     const message = input.trim();
     if (!message) return;
 
+    setIsUpdatingTopics(true);
     try {
       const roadmap_id = localStorage.getItem('roadmapId');
-      await fetch(`${API_BASE_URL}/topics/update`, {
+      const res = await fetch(`${API_BASE_URL}/topics/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message, roadmap_id: roadmap_id ? parseInt(roadmap_id, 10) : null }),
       });
+
+      try {
+        const data = await res.json();
+        const topics = data?.topics || data?.topicslist || [];
+        if (Array.isArray(topics) && topics.length > 0) {
+          setNextWeekTopics(topics);
+        }
+      } catch {
+        // ignore JSON parse errors
+      }
     } catch (error) {
       console.error('Failed to send follow-up:', error);
     } finally {
       setInput('');
+      setIsUpdatingTopics(false);
     }
   }, [input]);
 
@@ -239,6 +252,7 @@ export function useChatRoadMap() {
     handleFollowUp,
     isLoading,
     isLoadingHistory,
+    isUpdatingTopics,
     resetChat,
     nextWeekTopics,
     nextModules,
