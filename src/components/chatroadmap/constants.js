@@ -26,6 +26,10 @@ export const ROTATING_PROMPTS = [
     "I'm comfortable with data analysis and want to learn MLOps",
 ];
 
+export const FOLLOW_UP_PROMPTS = [
+    "Update next week plan",
+];
+
 
 export const BG_ICONS = [
     { C: SiPython, color: "#3776AB", size: 48, top: "8%", left: "6%" },

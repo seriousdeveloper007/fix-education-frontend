@@ -10,7 +10,6 @@ import {
   ChevronUp,
   Lock
 } from 'lucide-react';
-import TextAreaInput from "./TextareaInput";
 
 // Utility functions
 const getYouTubeVideoId = (url) => {
@@ -149,7 +148,6 @@ const YouTubeVideoCard = ({ url, title, onClick }) => {
 // Topic Dropdown Component
 const TopicsDropdown = ({ topics, weekNumber, handleVideoClick, handleResourceClick }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [weeklyPlan, setWeeklyPlan] = useState('');
 
   const sortedTopics = Array.isArray(topics)
     ? [...topics].sort((a, b) => a.topic_order - b.topic_order)
@@ -315,21 +313,6 @@ const TopicsDropdown = ({ topics, weekNumber, handleVideoClick, handleResourceCl
               </div>
             </div>
           ))}
-
-          {/* Update Weekly Plan textarea */}
-          <div>
-            <h4 className="font-bold text-slate-800 mb-4">Update Weekly Plan:</h4>
-            <TextAreaInput
-              prompts={["Update your weekly plan..."]}
-              value={weeklyPlan}
-              onChange={setWeeklyPlan}
-              onSend={() => {}}
-              isDisable={false}
-              floating={false}
-              showReset={false}
-              rows={2}
-            />
-          </div>
         </div>
       )}
     </div>
