@@ -6,8 +6,9 @@ import {
   Calendar,
   Target,
   Play,
-  Eye,
-  ArrowRight
+  ChevronDown,
+  ChevronUp,
+  Lock
 } from 'lucide-react';
 
 // Utility functions
@@ -144,57 +145,201 @@ const YouTubeVideoCard = ({ url, title, onClick }) => {
   );
 };
 
-// Next Modules Component
-const NextModulesCard = ({ nextModules }) => {
-  if (!Array.isArray(nextModules) || nextModules.length === 0) {
+// Topic Dropdown Component
+const TopicsDropdown = ({ topics, weekNumber, handleVideoClick, handleResourceClick }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+  
+  const sortedTopics = Array.isArray(topics)
+    ? [...topics].sort((a, b) => a.topic_order - b.topic_order)
+    : [];
+
+  const topicTypeLabel = (type) => {
+    if (type === 'learning_video') return 'Video lecture';
+    if (type === 'question' || type === 'assignment') return 'Assignment';
     return null;
-  }
+  };
 
   return (
-    <div className="mt-8">
-      <div className="bg-gradient-to-br from-white/70 via-white/60 to-white/50 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-50/80 to-purple-50/60 border-b border-white/30 p-4 sm:p-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
-              <Eye className="w-6 h-6 sm:w-7 sm:h-7 text-white p-1" />
+    <div className="bg-gradient-to-br from-white/70 via-white/60 to-white/50 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl overflow-hidden">
+      {/* Dropdown Header */}
+      <div 
+        className="bg-gradient-to-r from-slate-50/80 to-slate-100/60 border-b border-white/30 p-4 sm:p-6 cursor-pointer hover:from-slate-100/60 hover:to-slate-50/80 transition-all duration-300"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Week Number and Topics Count */}
+            {weekNumber && (
+              <div className="flex items-center gap-1 bg-slate-100/80 px-3 py-1.5 rounded-lg border border-slate-200/50">
+                <Calendar className="w-4 h-4 text-slate-500" />
+                <span className="font-medium text-sm">Week {weekNumber}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1 bg-emerald-50/80 px-3 py-1.5 rounded-lg border border-emerald-200/50">
+              <BookOpen className="w-4 h-4 text-emerald-600" />
+              <span className="font-medium text-emerald-700 text-sm">{sortedTopics.length} Topics</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 flex-1">
-              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Next Modules
-              </span>
-            </h2>
-            <div className="bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 px-4 py-2 rounded-full text-sm font-semibold shadow-md border border-indigo-200/50">
-              {nextModules.length} Modules
+          </div>
+          
+          {/* Dropdown Toggle */}
+          <div className="flex items-center gap-3">
+            <span className="text-slate-600 font-medium hidden sm:inline">
+              {isExpanded ? 'Hide Topics' : 'Show Topics'}
+            </span>
+            <div className="bg-white/80 p-2 rounded-lg shadow-md border border-white/50">
+              {isExpanded ? (
+                <ChevronUp className="w-5 h-5 text-slate-600" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-slate-600" />
+              )}
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Content */}
-        <div className="p-4 sm:p-6">
-          <div className="grid gap-4">
-            {nextModules.map((module, index) => (
-              <div
-                key={`next-module-${index}`}
-                className="bg-gradient-to-r from-white/90 to-white/80 backdrop-blur-lg border border-white/40 rounded-2xl p-4 sm:p-5 transition-all duration-300 hover:shadow-lg hover:border-white/60 group"
-              >
-                <div className="flex items-center gap-4">
-                  {/* Number Badge */}
-                  <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-sm">
-                      {index + 1}
-                    </span>
+      {/* Dropdown Content */}
+      {isExpanded && (
+        <div className="p-4 sm:p-6 space-y-6 animate-in slide-in-from-top-2 duration-300">
+          {sortedTopics.map((topic, idx) => (
+            <div key={`topic-${topic.topic_order}-${idx}`} className="bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-lg border border-white/40 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
+              {/* Topic Header */}
+              <div className="bg-gradient-to-r from-slate-50/80 to-slate-100/60 border-b border-white/30 p-4 sm:p-6">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 leading-tight">
+                      <span className="bg-gradient-to-r from-[#0284c7] to-[#22d3ee] text-white rounded-lg px-2 py-1 text-sm font-bold mr-2 shadow-md">
+                        {topic.topic_order}
+                      </span>
+                      {topic.topic_name}
+                    </h3>
                   </div>
 
-                  {/* Module Content */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg font-semibold text-slate-900 leading-tight group-hover:text-indigo-700 transition-colors duration-200">
-                      {module?.ModuleName || module?.module_name || module}
-                    </h3>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {topic.duration_to_complete && (
+                      <span className="bg-gradient-to-r from-emerald-100 to-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-md border border-emerald-200/50">
+                        <Clock className="w-4 h-4" />
+                        {topic.duration_to_complete}
+                      </span>
+                    )}
+
+                    {topicTypeLabel(topic.topic_type) && (
+                      <span className="bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold shadow-md border border-blue-200/50">
+                        {topicTypeLabel(topic.topic_type)}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
-            ))}
+
+              {/* Topic Content */}
+              <div className="p-4 sm:p-6 space-y-6">
+                {/* Why Learn This Topic */}
+                <div>
+                  <h4 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <div className="bg-gradient-to-br from-slate-100 to-slate-200 p-2 rounded-lg">
+                      <BookOpen className="w-4 h-4 text-slate-600" />
+                    </div>
+                    Why learn this topic:
+                  </h4>
+                  <div className="bg-gradient-to-r from-slate-50/80 to-white/60 p-4 rounded-xl border border-slate-200/40">
+                    <p className="text-slate-700 leading-relaxed">
+                      {topic.why_learn_this_topic}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Optional video section */}
+                {topic.video_link && (
+                  <div>
+                    <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                      <div className="bg-gradient-to-br from-red-100 to-red-200 p-2 rounded-lg">
+                        <Play className="w-4 h-4 text-red-600" />
+                      </div>
+                      Video Tutorial:
+                    </h4>
+                    <div className="flex justify-center lg:justify-start">
+                      <div className="w-full max-w-md">
+                        <YouTubeVideoCard
+                          url={topic.video_link}
+                          title={topic.video_title}
+                          onClick={handleVideoClick}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Optional resources section */}
+                {Array.isArray(topic.resources) && topic.resources.length > 0 && (
+                  <div>
+                    <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                      <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-2 rounded-lg">
+                        <ExternalLink className="w-4 h-4 text-blue-600" />
+                      </div>
+                      Resources:
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {topic.resources.map((resource, index) => (
+                        <ResourceItem
+                          key={index}
+                          url={resource}
+                          onClick={handleResourceClick}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Optional assignment links section */}
+                {Array.isArray(topic.assignment_links) && topic.assignment_links.length > 0 && (
+                  <div>
+                    <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                      <div className="bg-gradient-to-br from-orange-100 to-orange-200 p-2 rounded-lg">
+                        <ExternalLink className="w-4 h-4 text-orange-600" />
+                      </div>
+                      Assignments:
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {topic.assignment_links.map((link, index) => (
+                        <ResourceItem
+                          key={index}
+                          url={link}
+                          onClick={handleResourceClick}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Individual Locked Module Component
+const LockedModuleCard = ({ module, weekNumber }) => {
+  return (
+    <div className="bg-gradient-to-br from-slate-100/70 via-slate-50/60 to-slate-100/50 backdrop-blur-xl border border-slate-300/40 rounded-2xl shadow-lg overflow-hidden opacity-75">
+      <div className="p-4 sm:p-5">
+        <div className="flex items-center gap-4">
+          {/* Lock Icon */}
+          <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-slate-400 to-slate-500 rounded-full flex items-center justify-center shadow-lg">
+            <Lock className="w-5 h-5 text-white" />
+          </div>
+
+          {/* Module Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm font-medium text-slate-500">
+                Week {weekNumber}
+              </span>
+            </div>
+            <h3 className="text-lg sm:text-xl font-semibold text-slate-700 leading-tight">
+              {module?.ModuleName || module?.module_name || module}
+            </h3>
           </div>
         </div>
       </div>
@@ -209,18 +354,12 @@ const RoadMapUI = ({ title, topics, nextModules }) => {
     window.open(url, '_blank');
   };
 
-  // Get week number from first topic (assuming all topics are from same week)
-  const weekNumber = topics && topics.length > 0 ? topics[0].week_number : null;
-
-  const topicTypeLabel = (type) => {
-    if (type === 'learning_video') return 'Video lecture';
-    if (type === 'question' || type === 'assignment') return 'Assignment';
-    return null;
-  };
-
   const handleResourceClick = (resourceLink) => {
     window.open(resourceLink, '_blank');
   };
+
+  // Get week number from first topic (assuming all topics are from same week)
+  const weekNumber = topics && topics.length > 0 ? topics[0].week_number : null;
 
   const sortedTopics = Array.isArray(topics)
     ? [...topics].sort((a, b) => a.topic_order - b.topic_order)
@@ -230,153 +369,36 @@ const RoadMapUI = ({ title, topics, nextModules }) => {
     <div className="w-full pb-[130px]">
       {/* Header */}
       <div className="mb-8 mt-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight flex items-center">
-            <div className="bg-gradient-to-br from-[#0284c7] to-[#22d3ee] rounded-xl mr-3 shadow-lg">
-              <Target className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-            </div>
-            <span className="bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-              {title || 'Learning Roadmap'}
-            </span>
-          </h1>
-        </div>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
-          {weekNumber && (
-            <div className="flex items-center gap-1 bg-slate-100/80 px-3 py-1.5 rounded-lg border border-slate-200/50">
-              <Calendar className="w-4 h-4 text-slate-500" />
-              <span className="font-medium">Week {weekNumber}</span>
-            </div>
-          )}
-          <div className="flex items-center gap-1 bg-emerald-50/80 px-3 py-1.5 rounded-lg border border-emerald-200/50">
-            <BookOpen className="w-4 h-4 text-emerald-600" />
-            <span className="font-medium text-emerald-700">{sortedTopics.length} Topics</span>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight flex items-center">
+          <div className="bg-gradient-to-br from-[#0284c7] to-[#22d3ee] rounded-xl mr-3 shadow-lg">
+            <Target className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
           </div>
-        </div>
+          <span className="bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+            {title || 'Learning Roadmap'}
+          </span>
+        </h1>
       </div>
 
-      {/* Current Week Topics */}
-      <div>
-        <div className="bg-gradient-to-br from-white/70 via-white/60 to-white/50 backdrop-blur-xl border border-white/40 rounded-3xl shadow-2xl overflow-hidden">
-          <div className="p-4 sm:p-6 space-y-6">
-            {sortedTopics.map((topic, idx) => (
-              <div key={`topic-${topic.topic_order}-${idx}`} className="bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-lg border border-white/40 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
-                {/* Topic Header */}
-                <div className="bg-gradient-to-r from-slate-50/80 to-slate-100/60 border-b border-white/30 p-4 sm:p-6">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 leading-tight">
-                        <span className="bg-gradient-to-r from-[#0284c7] to-[#22d3ee] text-white rounded-lg px-2 py-1 text-sm font-bold mr-2 shadow-md">
-                          {topic.topic_order}
-                        </span>
-                        {topic.topic_name}
-                      </h3>
-                    </div>
+      {/* Current Topics Dropdown */}
+      <TopicsDropdown 
+        topics={sortedTopics}
+        weekNumber={weekNumber}
+        handleVideoClick={handleVideoClick}
+        handleResourceClick={handleResourceClick}
+      />
 
-                    <div className="flex flex-wrap items-center gap-3">
-                      {topic.duration_to_complete && (
-                        <span className="bg-gradient-to-r from-emerald-100 to-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-md border border-emerald-200/50">
-                          <Clock className="w-4 h-4" />
-                          {topic.duration_to_complete}
-                        </span>
-                      )}
-
-                      {topicTypeLabel(topic.topic_type) && (
-                        <span className="bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold shadow-md border border-blue-200/50">
-                          {topicTypeLabel(topic.topic_type)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Topic Content */}
-                <div className="p-4 sm:p-6 space-y-6">
-                  {/* Why Learn This Topic */}
-                  <div>
-                    <h4 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
-                      <div className="bg-gradient-to-br from-slate-100 to-slate-200 p-2 rounded-lg">
-                        <BookOpen className="w-4 h-4 text-slate-600" />
-                      </div>
-                      Why learn this topic:
-                    </h4>
-                    <div className="bg-gradient-to-r from-slate-50/80 to-white/60 p-4 rounded-xl border border-slate-200/40">
-                      <p className="text-slate-700 leading-relaxed">
-                        {topic.why_learn_this_topic}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Optional video section */}
-                  {topic.video_link && (
-                    <div>
-                      <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <div className="bg-gradient-to-br from-red-100 to-red-200 p-2 rounded-lg">
-                          <Play className="w-4 h-4 text-red-600" />
-                        </div>
-                        Video Tutorial:
-                      </h4>
-                      <div className="flex justify-center lg:justify-start">
-                        <div className="w-full max-w-md">
-                          <YouTubeVideoCard
-                            url={topic.video_link}
-                            title={topic.video_title}
-                            onClick={handleVideoClick}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Optional resources section */}
-                  {Array.isArray(topic.resources) && topic.resources.length > 0 && (
-                    <div>
-                      <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-2 rounded-lg">
-                          <ExternalLink className="w-4 h-4 text-blue-600" />
-                        </div>
-                        Resources:
-                      </h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {topic.resources.map((resource, index) => (
-                          <ResourceItem
-                            key={index}
-                            url={resource}
-                            onClick={handleResourceClick}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Optional assignment links section */}
-                  {Array.isArray(topic.assignment_links) && topic.assignment_links.length > 0 && (
-                    <div>
-                      <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <div className="bg-gradient-to-br from-orange-100 to-orange-200 p-2 rounded-lg">
-                          <ExternalLink className="w-4 h-4 text-orange-600" />
-                        </div>
-                        Assignments:
-                      </h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {topic.assignment_links.map((link, index) => (
-                          <ResourceItem
-                            key={index}
-                            url={link}
-                            onClick={handleResourceClick}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Individual Locked Modules */}
+      {Array.isArray(nextModules) && nextModules.length > 0 && (
+        <div className="mt-8 space-y-4">
+          {nextModules.map((module, index) => (
+            <LockedModuleCard 
+              key={`locked-module-${index}`}
+              module={module}
+              weekNumber={index + 2}
+            />
+          ))}
         </div>
-      </div>
-
-      {/* Next Modules Section */}
-      <NextModulesCard nextModules={nextModules} />
+      )}
     </div>
   );
 };

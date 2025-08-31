@@ -6,6 +6,8 @@ import { MessageList } from "../components/chatroadmap/MessageList";
 import { useChatRoadMap } from "../hooks/ChatRoadMap";
 import { ROTATING_PROMPTS } from "../components/chatroadmap/constants";
 import RoadMapUI from "../components/chatroadmap/RoadMapUI";
+import { useEffect } from 'react';
+
 
 
 export default function ChatRoadmap() {
@@ -22,6 +24,13 @@ export default function ChatRoadmap() {
     nextModules,
     roadmapTitle
   } = useChatRoadMap();
+
+  useEffect(() => {
+    if (nextWeekTopics) {
+      // Scroll to top when roadmap is first shown
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [nextWeekTopics]);
 
 
   return (

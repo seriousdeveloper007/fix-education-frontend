@@ -40,7 +40,7 @@ export default function RoadmapAnalysis({ roadmap, onCreateRoadmap }) {
               Duration
             </p>
             <p className="text-base text-gray-900">
-              {Number(roadmap?.total_weeksuration) || "—"} weeks
+              {Number(roadmap?.total_weeks) || "—"} weeks
             </p>
           </div>
 
@@ -97,13 +97,17 @@ export default function RoadmapAnalysis({ roadmap, onCreateRoadmap }) {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-4 pt-6">
+        <div className="flex flex-col gap-2 pt-6">
           <button
             className={`px-4 py-2 text-sm ${btn.secondary}`}
             onClick={onCreateRoadmap}
           >
             Create roadmap
           </button>
+
+          <p className="text-xs text-gray-500 text-center mt-2 italic">
+            *Continue chatting if you want to change anything in your analysis*
+          </p>
         </div>
       </div>
     </div>
