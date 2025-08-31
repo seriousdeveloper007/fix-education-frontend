@@ -7,6 +7,7 @@ import {
   deleteRoadmap
 } from '../services/roadmapService.js';
 import { fetchActiveTopics } from '../services/topicService.js';
+import { API_BASE_URL } from '../config.js';
 
 export function useChatRoadMap() {
   const [messages, setMessages] = useState([]);
@@ -184,6 +185,26 @@ export function useChatRoadMap() {
     setMessages(prev => [...prev, { role: 'user', text }]);
   }, [sendMessage]);
 
+  const handleFollowUp = useCallback(async () => {
+    const text = input.trim();
+    if (!text) return;
+
+    setIsLoading(true);
+    try {
+      const chatId = localStorage.getItem('chatRoadmapId');
+      await fetch(`${API_BASE_URL}/roadmaps/followup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, chat_id: chatId ? parseInt(chatId, 10) : null }),
+      });
+    } catch (error) {
+      console.error('Failed to send follow-up:', error);
+    } finally {
+      setIsLoading(false);
+      setInput('');
+    }
+  }, [input]);
+
   const resetChat = useCallback(async () => {
     setMessages([]);
     setInput('');
@@ -217,6 +238,7 @@ export function useChatRoadMap() {
     setInput,
     handleSend,
     handleCreateRoadmap,
+    handleFollowUp,
     isLoading,
     isLoadingHistory,
     resetChat,
