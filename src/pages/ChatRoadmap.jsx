@@ -4,7 +4,7 @@ import RoadmapHeading from "../components/chatroadmap/RoadmapHeading";
 import TextAreaInput from "../components/chatroadmap/TextareaInput";
 import { MessageList } from "../components/chatroadmap/MessageList";
 import { useChatRoadMap } from "../hooks/ChatRoadMap";
-import { ROTATING_PROMPTS } from "../components/chatroadmap/constants";
+import { ROTATING_PROMPTS, FOLLOW_UP_PROMPTS } from "../components/chatroadmap/constants";
 import RoadMapUI from "../components/chatroadmap/RoadMapUI";
 import { useEffect } from 'react';
 
@@ -44,7 +44,7 @@ export default function ChatRoadmap() {
           <>
             <RoadMapUI title={roadmapTitle} topics={nextWeekTopics} nextModules={nextModules} />
             <TextAreaInput
-              prompts={ROTATING_PROMPTS}
+              prompts={FOLLOW_UP_PROMPTS}
               value={input}
               onChange={setInput}
               onSend={handleFollowUp}
