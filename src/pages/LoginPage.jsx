@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import LoggedOutNavbar from '../components/LoggedOutNavbar';
+import Navbar from '../components/Navbar';
 import LoginCard from '../components/LoginCard';
 import analytics from '../services/posthogService';
 import { BackgroundIconCloud } from '../components/BackgroundIconCloud';
@@ -29,8 +29,8 @@ export default function GoogleLogin() {
 
   return (
     <div className="min-h-screen relative overflow-hidden font-fraunces">
-      {/* Navbar displayed for logged-out users only */}
-      <LoggedOutNavbar hideSignup />
+
+      <Navbar />
 
       {/* Decorative background shared across pages */}
       <BackgroundIconCloud />
