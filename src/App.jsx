@@ -7,7 +7,7 @@ import {
 
 // import LandingPage from './components/LandingPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
-import GoogleLogin from './components/LoginPage';
+import GoogleLogin from './pages/LoginPage';
 import ErrorPage from './components/ErrorPage';
 import VerifyLearner from './components/VerifyLearner';
 import Library from './components/Library';
