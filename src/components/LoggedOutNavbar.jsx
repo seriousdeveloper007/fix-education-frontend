@@ -5,6 +5,7 @@ export default function LoggedOutNavbar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+
   const handleSignInClick = () => {
     navigate('/login?from=roadmap');
   };
@@ -14,6 +15,7 @@ export default function LoggedOutNavbar() {
   };
 
   const showSignIn = !pathname.includes('/login');
+
 
   return (
     <header className="sticky top-0 z-50 w-full h-16 px-6 flex items-center justify-between shadow-md bg-white/40 backdrop-blur-lg font-fraunces">
@@ -33,6 +35,7 @@ export default function LoggedOutNavbar() {
         <button
           onClick={handleSignUpClick}
           className="px-4 py-2 text-[#0284c7] border border-[#0284c7] rounded-lg font-medium hover:bg-[#e0f2fe]"
+
         >
           Sign Up
         </button>
@@ -44,7 +47,10 @@ export default function LoggedOutNavbar() {
             Sign In
           </button>
         )}
+
       </div>
     </header>
   );
 }
+
+

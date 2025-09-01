@@ -29,6 +29,7 @@ export default function GoogleLogin() {
 
   return (
     <div className="min-h-screen relative overflow-hidden font-fraunces">
+
       <Navbar />
 
       {/* Decorative background shared across pages */}
