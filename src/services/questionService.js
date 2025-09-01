@@ -44,8 +44,6 @@ export async function fetchQuestions(tabId) {
   }
 }
 
-
-// In questionService.js
   export async function submitQuestionAnswer({ question_id, answer_text, answer_option }) {
     const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/question-answers`, {
@@ -105,3 +103,10 @@ export async function fetchQuestions(tabId) {
       return { totalNew: 0, data: null };
     }
   }
+
+  export const questionService = {
+    fetchUnattemptedQuestions,
+    fetchQuestions,
+    submitQuestionAnswer,
+    createQuestions
+  };

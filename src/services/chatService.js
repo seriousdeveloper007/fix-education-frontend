@@ -1,11 +1,5 @@
 import { API_BASE_URL } from '../config/config';
-
-function authHeaders() {
-  const token = localStorage.getItem('token');
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers.Authorization = token;
-  return headers;
-}
+import { authHeaders } from '../utils/authUtils';
 
 // Update chat when a chat ID exists in localStorage
 export async function updateChat(payload) {
@@ -32,3 +26,38 @@ export async function updateChat(payload) {
   return data.chat;
 }
 
+export async function loadChatMessages(chatId) {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No authentication token');
+  
+  const res = await fetch(`${API_BASE_URL}/messages/${chatId}`, {
+    headers: authHeaders(),
+  });
+  
+  if (!res.ok) {
+    throw new Error(`Failed to load messages: ${res.status}`);
+  }
+  
+  return res.json();
+}
+
+export async function createChat(payload) {
+  const res = await fetch(`${API_BASE_URL}/chats`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+  
+  if (!res.ok) {
+    throw new Error(`Failed to create chat: ${res.status}`);
+  }
+  
+  return res.json();
+}
+
+// Export all functions as named exports and as default object
+export const chatService = {
+  updateChat,
+  loadChatMessages,
+  createChat
+};

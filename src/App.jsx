@@ -11,7 +11,7 @@ import GoogleLogin from './components/LoginPage';
 import ErrorPage from './components/ErrorPage';
 import VerifyLearner from './components/VerifyLearner';
 import Library from './components/Library';
-import StudyRoomRouter from './pages/StudyRoomRouter'
+import StudyRoom from './pages/StudyRoom'
 import LibraryDetail from './components/LibraryDetail'; 
 import ChatRoadmap from './pages/ChatRoadmap';
 
@@ -72,7 +72,7 @@ function AppRoutes() {
 
       <Route
         path="/study-room"
-        element={<StudyRoomRouter />}
+        element={<StudyRoom />}
       />
 
       <Route
