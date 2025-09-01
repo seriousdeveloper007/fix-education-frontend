@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import PlatformNavbar from './PlatformNavbar';
 import { fetchQuestions, submitQuestionAnswer } from '../services/questionService';
 import { CheckCircle, AlertCircle } from 'lucide-react';
-import DesktopOnly from './DesktopOnly';
+import ResponsiveWrapper from './ResponsiveWrapper';
 import analytics from '../services/posthogService';
 import themeConfig from './themeConfig';
-import NoteView from './NoteView';
+import NoteView from './studyroom/NoteView';
 import MarkdownRenderer from './MarkdownRenderer';
 
 
@@ -255,7 +255,7 @@ export default function LibraryDetail() {
 
   if (view === 'notes') {
     return (
-      <DesktopOnly>
+      <ResponsiveWrapper>
         <div className="min-h-screen bg-white flex flex-col font-fraunces">
           <PlatformNavbar defaultTab="Library" />
 
@@ -274,12 +274,12 @@ export default function LibraryDetail() {
             </div>
           </div>
         </div>
-      </DesktopOnly>
+      </ResponsiveWrapper>
     );
   }
 
   return (
-    <DesktopOnly>
+    <ResponsiveWrapper>
     <div className="min-h-screen bg-white flex flex-col font-fraunces">
       <PlatformNavbar defaultTab="Library" />
 
@@ -370,6 +370,6 @@ export default function LibraryDetail() {
         </div>
       </div>
     </div>
-    </DesktopOnly>
+    </ResponsiveWrapper>
   );
 }

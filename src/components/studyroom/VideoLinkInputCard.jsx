@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlayCircle, Loader2, Youtube } from 'lucide-react';
-import analytics from '../services/posthogService';
+import analytics from '../../services/posthogService';
 
 
 function isValidYouTubeUrl(url) {

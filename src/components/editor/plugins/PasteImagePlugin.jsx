@@ -2,7 +2,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useEffect } from 'react';
 import { COMMAND_PRIORITY_LOW, PASTE_COMMAND, $getRoot, $getSelection } from 'lexical';
 import { $createImageNode } from './ImageNode';
-import { uploadImage } from '../../../services/imageService';
+import { uploadImage } from '../../../services/notesImageService';
 
 export default function PasteImagePlugin({ tabId, noteId }) {
   const [editor] = useLexicalComposerContext();

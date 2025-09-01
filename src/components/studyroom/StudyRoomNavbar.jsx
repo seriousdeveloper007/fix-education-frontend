@@ -1,6 +1,6 @@
-import themeConfig from './themeConfig';
+import themeConfig from '../themeConfig';
 import { useEffect, useRef, useState } from 'react';
-import { updateTab } from '../services/tabService';
+import { updateTab } from '../../services/tabService';
 import { ArrowLeft, MessageSquare, PencilLine, Code } from 'lucide-react';
 
 export default function StudyRoomNavbar({

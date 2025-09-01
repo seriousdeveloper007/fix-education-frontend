@@ -2,14 +2,14 @@
 import { useEffect } from 'react';
 import { Download } from 'lucide-react';
 import themeConfig from './themeConfig';
-import { landingContent  } from './landingContent';
+import { landingContent  } from '../constants/landingContent.js';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import Navbar from './OldNavbar';
 import analytics from '../services/posthogService';
 import mobileComparison from '../assets/mobile-youtube-vs-ilon.png';
 import desktopComparison from '../assets/desktop-youtube-vs-ilon.png';
-import { CHROME_EXTENSION_LINK } from '../config.js';
+import { CHROME_EXTENSION_LINK } from '../config';
 
 
 

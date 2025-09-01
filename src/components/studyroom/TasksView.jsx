@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import MarkdownRenderer from './MarkdownRenderer';
-import { fetchTasks, createTasks } from '../services/taskService';
-import themeConfig from './themeConfig';
+import MarkdownRenderer from '../MarkdownRenderer';
+import { fetchTasks, createTasks } from '../../services/taskService';
+import themeConfig from '../themeConfig';
 import { Loader2 } from 'lucide-react';
 
 export default function TasksView() {
