@@ -1,41 +1,48 @@
-import axios from 'axios';
-import { API_BASE_URL } from '../config.js'; // Assuming config.js has this
-
-function authHeaders() {
-  const token = localStorage.getItem('token');
-  const h = { 'Content-Type': 'application/json' };
-  if (token) h.Authorization = token; // Plain token, as per your curl
-  return h;
-}
-
-export async function uploadImage(tabId, noteId, formData) {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/notes/${tabId}/${noteId}/images`, formData, {
-      headers: { ...authHeaders(), 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.detail || 'Failed to upload image');
-  }
-}
-
-export async function deleteImage(tabId, noteId, imageId) {
-  try {
-    await axios.delete(`${API_BASE_URL}/notes/${tabId}/${noteId}/images/${imageId}`, {
-      headers: authHeaders(),
-    });
-  } catch (error) {
-    throw new Error(error.response?.data?.detail || 'Failed to delete image');
-  }
-}
-
-export async function fetchImages(tabId, noteId) {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/notes/${tabId}/${noteId}/images`, {
-      headers: authHeaders(),
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.detail || 'Failed to fetch images');
-  }
-}
+export const imageService = {
+    // Convert file to data URL
+    dataUrlFromFile: (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    },
+    
+    // Create complete image object for attachments
+    createImageObject: async (file) => {
+      const dataUrl = await imageService.dataUrlFromFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      
+      return {
+        file,
+        url: objectUrl,
+        dataUrl,
+        mime: file.type,
+        name: file.name || 'pasted-image.png',
+      };
+    },
+    
+    // Cleanup image URL
+    revokeImageUrl: (imageObj) => {
+      if (imageObj?.url) {
+        URL.revokeObjectURL(imageObj.url);
+      }
+    },
+    
+    // Validate image
+    validateImage: (file) => {
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      
+      if (file.size > maxSize) {
+        throw new Error('Image size must be less than 5MB');
+      }
+      
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error('Only JPEG, PNG, GIF, and WebP images are allowed');
+      }
+      
+      return true;
+    }
+  };

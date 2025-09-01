@@ -11,7 +11,7 @@ import GoogleLogin from './components/LoginPage';
 import ErrorPage from './components/ErrorPage';
 import VerifyLearner from './components/VerifyLearner';
 import Library from './components/Library';
-import StudyRoom from './components/StudyRoom'; 
+import StudyRoom from './pages/StudyRoom'
 import LibraryDetail from './components/LibraryDetail'; 
 import ChatRoadmap from './pages/ChatRoadmap';
 

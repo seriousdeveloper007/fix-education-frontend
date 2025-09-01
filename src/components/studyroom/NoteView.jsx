@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { debounce } from 'lodash';
-import LexicalEditor from './editor/LexicalEditor';
-import { ensureNote, updateNote, fetchNote } from '../services/noteService';
-import { getStoredNoteId, setStoredNoteId, removeStoredNoteId } from '../utils/storage';
+import LexicalEditor from '../editor/LexicalEditor';
+import { ensureNote, updateNote, fetchNote } from '../../services/noteService';
+import { getStoredNoteId, setStoredNoteId, removeStoredNoteId } from '../../utils/storage';
 
 function StatusChip({ state }) {
   const map = {
