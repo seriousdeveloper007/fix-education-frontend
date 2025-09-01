@@ -73,6 +73,9 @@ localStorage.setItem(
       );
       localStorage.setItem('token', appJwt);
 
+
+
+
       // If an anonymous chat exists, attach it to the logged-in user
       const chatRoadmapId = localStorage.getItem('chatRoadmapId');
       const chatId = localStorage.getItem('chatId');
@@ -90,11 +93,17 @@ localStorage.setItem(
         try {
           const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
           if (userId) {
+            analytics.userSignupTiming("after_roadmap", true);
             await updateRoadmap({ user_id: userId }, roadmapId);
           }
         } catch (err) {
           console.error('Failed to update roadmap with user', err);
         }
+      }
+      else{
+
+        analytics.userSignupTiming("before_roadmap", false);
+
       }
 
       window.dispatchEvent(new CustomEvent('userLoggedIn', {
