@@ -32,13 +32,6 @@ export default function LoggedOutNavbar() {
 
       {/* RIGHT: actions */}
       <div className="flex items-center space-x-4">
-        <button
-          onClick={handleSignUpClick}
-          className="px-4 py-2 text-[#0284c7] border border-[#0284c7] rounded-lg font-medium hover:bg-[#e0f2fe]"
-
-        >
-          Sign Up
-        </button>
         {showSignIn && (
           <button
             onClick={handleSignInClick}
