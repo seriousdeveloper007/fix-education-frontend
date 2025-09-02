@@ -7,6 +7,8 @@ import { useChatRoadMap } from "../hooks/ChatRoadMap";
 import { ROTATING_PROMPTS, FOLLOW_UP_PROMPTS } from "../components/chatroadmap/constants";
 import RoadMapUI from "../components/chatroadmap/RoadMapUI";
 import { useEffect } from 'react';
+import analytics from "../services/posthogService";
+
 
 
 
@@ -24,7 +26,8 @@ export default function ChatRoadmap() {
     isUpdatingTopics,
     nextWeekTopics,
     nextModules,
-    roadmapTitle
+    roadmapTitle,
+    sessionStartTime
   } = useChatRoadMap();
 
   useEffect(() => {
@@ -33,6 +36,42 @@ export default function ChatRoadmap() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [nextWeekTopics]);
+
+
+  // Track page load and session start
+  useEffect(() => {
+    analytics.roadmapChatPageLoaded();
+    
+    // Track if user starts chatting (first message)
+    if (messages.length === 1 && messages[0].role === 'user') {
+      analytics.roadmapChatStarted();
+    }
+  }, []);
+
+  // Track when roadmap is first shown
+  useEffect(() => {
+    if (nextWeekTopics) {
+      // Scroll to top when roadmap is first shown
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Track roadmap creation completion
+      analytics.roadmapCreationCompleted(messages.length, Date.now() - sessionStartTime);
+    }
+  }, [nextWeekTopics]);
+
+  // Track page abandonment
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (messages.length > 0 && !nextWeekTopics) {
+        const stage = messages.some(m => m.kind === 'roadmap') ? 'analysis' : 'chat';
+        analytics.roadmapAbandoned(stage, messages.length, Date.now() - sessionStartTime);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [messages.length, nextWeekTopics]);
+
 
 
   return (

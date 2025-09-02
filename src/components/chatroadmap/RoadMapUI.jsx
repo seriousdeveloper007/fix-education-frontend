@@ -10,6 +10,7 @@ import {
   ChevronUp,
   Lock
 } from 'lucide-react';
+import analytics from '../../services/posthogService'
 
 // Utility functions
 const getYouTubeVideoId = (url) => {
@@ -431,13 +432,20 @@ const LockedModuleCard = ({ module, weekNumber }) => {
 };
 
 const RoadMapUI = ({ title, topics, nextModules, isLoadingTopics = false }) => {
-  const handleVideoClick = (videoLink) => {
+  const handleVideoClick = (videoLink , videoTitle) => {
     if (!videoLink) return;
+  // Track the click
+    analytics.roadmapVideoClicked(videoLink)
+
     const url = `${window.location.origin}/study-room?video=${encodeURIComponent(videoLink)}&mode=play`;
     window.open(url, '_blank');
   };
 
   const handleResourceClick = (resourceLink) => {
+    if (!resourceLink) return;
+
+
+  analytics.roadmapResourceClicked(resourceLink)
     window.open(resourceLink, '_blank');
   };
 

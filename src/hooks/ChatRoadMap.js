@@ -8,6 +8,8 @@ import {
 } from '../services/roadmapService.js';
 import { fetchActiveTopics } from '../services/topicService.js';
 import { API_BASE_URL } from '../config.js';
+import analytics from '../services/posthogService.js';
+
 
 export function useChatRoadMap() {
   const [messages, setMessages] = useState([]);
@@ -18,6 +20,7 @@ export function useChatRoadMap() {
   const [nextModules, setNextModules] = useState([]);
   const [roadmapTitle, setRoadmapTitle] = useState('');
   const [isUpdatingTopics, setIsUpdatingTopics] = useState(false);
+  const [sessionStartTime] = useState(Date.now());
 
   useEffect(() => {
     const loadExistingMessages = async () => {
@@ -163,7 +166,26 @@ export function useChatRoadMap() {
     const text = input.trim();
     if (!text) return;
 
+    // Check if user is editing requirements after analysis but before roadmap creation
+    const hasAnalysisCard = messages.some(m => m.kind === 'roadmap');
+    const hasActualRoadmap = nextWeekTopics !== null;
+  
+    if (hasAnalysisCard && !hasActualRoadmap) {
+    // User is chatting after seeing analysis but before creating roadmap
+    const messagesAfterAnalysis = messages.slice(
+      messages.findIndex(m => m.kind === 'roadmap') + 1
+    ).filter(m => m.role === 'user').length + 1;
+    
+    analytics.roadmapEdited('requirement_change', messagesAfterAnalysis);
+  }
+
     setIsLoading(true);
+
+
+    // Track message sent
+    const newMessageCount = messages.length + 1;
+    const sessionDuration = Math.floor((Date.now() - sessionStartTime) / 1000);
+    analytics.roadmapMessageSent(newMessageCount, sessionDuration);
 
     if (messages.length === 0) {
       // first message → wait 3s
@@ -177,11 +199,17 @@ export function useChatRoadMap() {
     }
     setMessages(prev => [...prev, { role: 'user', text }]);
     setInput('');
-  }, [input, messages, connect, sendMessage]);
+  }, [input, messages, connect, sendMessage, nextWeekTopics, sessionStartTime]);
 
   const handleCreateRoadmap = useCallback(() => {
     const text = 'create roadmap';
     setIsLoading(true);
+
+    // Track roadmap creation initiation
+    const timeTaken = Math.floor((Date.now() - sessionStartTime) / 1000);
+    analytics.roadmapAnalysisGenerated(messages.length, timeTaken);
+    
+
     sendMessage({ text, message_type: 'text' });
     setMessages(prev => [...prev, { role: 'user', text }]);
   }, [sendMessage]);
@@ -189,6 +217,10 @@ export function useChatRoadMap() {
   const handleFollowUp = useCallback(async () => {
     const message = input.trim();
     if (!message) return;
+
+    // Track roadmap editing
+    const followUpMessageCount = messages.filter(m => m.role === 'user').length;
+    analytics.roadmapEdited('follow_up', followUpMessageCount);
 
     setIsUpdatingTopics(true);
     try {
@@ -217,6 +249,13 @@ export function useChatRoadMap() {
   }, [input]);
 
   const resetChat = useCallback(async () => {
+
+
+    // Track reset
+    const currentStage = nextWeekTopics ? 'roadmap' : messages.some(m => m.kind === 'roadmap') ? 'analysis' : 'chat';
+    analytics.roadmapReset(currentStage, messages.length);
+    
+
     setMessages([]);
     setInput('');
     setIsLoading(false);
@@ -257,6 +296,7 @@ export function useChatRoadMap() {
     nextWeekTopics,
     nextModules,
     roadmapTitle,
+    sessionStartTime
   };
 }
 

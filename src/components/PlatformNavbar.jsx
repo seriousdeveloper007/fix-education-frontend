@@ -39,6 +39,8 @@ export default function PlatformNavbar({ defaultTab = 'Roadmap' }) {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const cfg = themeConfig.app;
 
   useEffect(() => {
@@ -61,6 +63,10 @@ export default function PlatformNavbar({ defaultTab = 'Roadmap' }) {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
         setMobileMenuOpen(false);
       }
+
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -77,6 +83,17 @@ export default function PlatformNavbar({ defaultTab = 'Roadmap' }) {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
 
@@ -170,14 +187,30 @@ export default function PlatformNavbar({ defaultTab = 'Roadmap' }) {
             {userInfo.emailPrefix}
           </span>
 
-          {/* Desktop: Direct logout button (hidden on mobile) */}
+          {/* Desktop: Dropdown trigger (hidden on mobile) */}
           <button
-            onClick={handleLogout}
-            className="hidden md:flex items-center space-x-1 text-xs text-gray-600 hover:text-gray-800 transition-colors px-2 py-1 rounded hover:bg-gray-100"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="hidden md:flex items-center space-x-1 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="User menu"
           >
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
+            <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
           </button>
+
+          {/* Desktop: Dropdown menu */}
+          {dropdownOpen && (
+            <div
+              ref={dropdownRef}
+              className="hidden md:block absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+            >
+              <button
+                onClick={handleLogout}
+                className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
 
           {/* Mobile: Hamburger menu (hidden on desktop) */}
           <button
