@@ -101,21 +101,19 @@ const ResourceItem = ({ url, onClick }) => {
     </div>
   );
 };
-
 const YouTubeVideoCard = ({ url, title, onClick }) => {
-  const [videoTitle] = useState(title);
   const thumbnailUrl = getYouTubeThumbnail(url);
 
   return (
     <div
       className="bg-gradient-to-br from-white/95 to-white/90 backdrop-blur-md border border-white/50 rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer group transform hover:-translate-y-1 hover:shadow-2xl hover:border-white/70"
-      onClick={() => onClick(url, videoTitle)}
+      onClick={() => onClick(url)}
     >
       <div className="relative overflow-hidden">
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
-            alt={videoTitle}
+            alt="Video thumbnail"
             className="w-full h-48 sm:h-56 object-cover transition-transform duration-500 group-hover:scale-110"
             onError={(e) => {
               e.target.src = 'https://via.placeholder.com/400x225/f0f0f0/666666?text=Video+Thumbnail';
@@ -137,10 +135,19 @@ const YouTubeVideoCard = ({ url, title, onClick }) => {
           </div>
         </div>
       </div>
-      <div className="p-4">
-        <h6 className="font-semibold text-slate-800 text-sm leading-tight line-clamp-2">
-          {videoTitle}
-        </h6>
+    </div>
+  );
+};
+// Video Skeleton Component
+const VideoSkeleton = () => {
+  return (
+    <div className="w-full max-w-md">
+      <div className="bg-gradient-to-br from-white/95 to-white/90 backdrop-blur-md border border-white/50 rounded-2xl overflow-hidden animate-pulse">
+        <div className="w-full h-48 sm:h-56 bg-slate-200"></div>
+        <div className="p-4">
+          <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
+          <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+        </div>
       </div>
     </div>
   );
@@ -248,15 +255,7 @@ const TopicsDropdown = ({ topics, weekNumber, handleVideoClick, handleResourceCl
                         <div className="w-8 h-8 bg-slate-200 rounded-lg"></div>
                         <div className="w-32 h-5 bg-slate-200 rounded"></div>
                       </div>
-                      <div className="w-full max-w-md">
-                        <div className="bg-gradient-to-br from-white/95 to-white/90 backdrop-blur-md border border-white/50 rounded-2xl overflow-hidden">
-                          <div className="w-full h-48 sm:h-56 bg-slate-200"></div>
-                          <div className="p-4">
-                            <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
-                            <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                          </div>
-                        </div>
-                      </div>
+                      <VideoSkeleton />
                     </div>
 
                     {/* Resources Skeleton */}
@@ -331,8 +330,8 @@ const TopicsDropdown = ({ topics, weekNumber, handleVideoClick, handleResourceCl
                     </div>
                   </div>
 
-                  {/* Optional video section */}
-                  {topic.video_link && (
+                  {/* Video section - Show skeleton if type is 'learning_video' but no video_link */}
+                  {topic.topic_type === 'learning_video' && (
                     <div>
                       <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <div className="bg-gradient-to-br from-red-100 to-red-200 p-2 rounded-lg">
@@ -341,13 +340,17 @@ const TopicsDropdown = ({ topics, weekNumber, handleVideoClick, handleResourceCl
                         Video Tutorial:
                       </h4>
                       <div className="flex justify-center lg:justify-start">
-                        <div className="w-full max-w-md">
-                          <YouTubeVideoCard
-                            url={topic.video_link}
-                            title={topic.video_title}
-                            onClick={handleVideoClick}
-                          />
-                        </div>
+                        {topic.video_link ? (
+                          <div className="w-full max-w-md">
+                            <YouTubeVideoCard
+                              url={topic.video_link}
+                              title={topic.video_title}
+                              onClick={handleVideoClick}
+                            />
+                          </div>
+                        ) : (
+                          <VideoSkeleton />
+                        )}
                       </div>
                     </div>
                   )}

@@ -129,7 +129,20 @@ export function useChatRoadMap() {
         ]);
       } catch { /* ignore */ }
     }
-  
+
+    if (typeof data === "object" && data?.topic_id && data?.video_link) {
+      setNextWeekTopics(prev => {
+        if (!Array.isArray(prev)) return prev;
+        return prev.map(topic => {
+          const id = topic.id ?? topic.topic_id;
+          return id === data.topic_id
+            ? { ...topic, video_link: data.video_link }
+            : topic;
+        });
+      });
+      return;
+    }
+
     // 2) Full message → add as agent
     if (typeof data === "object" && data?.message !== undefined) {
       setMessages(prev => [...prev, { role: "agent", kind: "text", text: String(data.message) }]);
