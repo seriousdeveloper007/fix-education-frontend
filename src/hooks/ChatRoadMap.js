@@ -58,7 +58,7 @@ export function useChatRoadMap() {
         const merged = [...existingMessages];
         
         // Add roadmap analysis to messages if we have enough messages
-        if (analysis && existingMessages.length >= 10 && (existingMessages.length - 10) % 4 === 0) {
+        if (analysis && existingMessages.length >= 18 && (existingMessages.length - 18) % 4 === 0) {
           merged.push({ role: 'agent', kind: 'roadmap', payload: analysis });
         }
         
