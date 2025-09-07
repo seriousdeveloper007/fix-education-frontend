@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import themeConfig from './themeConfig';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
@@ -12,7 +11,6 @@ const GOOGLE_ENDPOINT = `${API_BASE_URL}/user/auth/web/google`;
 
 export default function LoginCard({ redirectUri = null, heading }) {
   const cfg = themeConfig.website;
-  const navigate = useNavigate();
 
   /* ───────── local state ───────── */
   const [email, setEmail] = useState('');
@@ -116,7 +114,6 @@ localStorage.setItem(
     setError(err.message);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    navigate('/error');
   } finally {
     setLoading(false);
   }
