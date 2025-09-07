@@ -440,8 +440,7 @@ const RoadMapUI = ({ title, topics, nextModules, isLoadingTopics = false }) => {
   // Track the click
     analytics.roadmapVideoClicked(videoLink)
 
-    const url = `${window.location.origin}/study-room?video=${encodeURIComponent(videoLink)}&mode=play`;
-    window.open(url, '_blank');
+    window.open(videoLink, '_blank');
   };
 
   const handleResourceClick = (resourceLink) => {
