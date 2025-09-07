@@ -1,9 +1,9 @@
-import themeConfig from './themeConfig';
-import React, { useState, useEffect, useRef } from 'react';
+import themeConfig from '../themeConfig';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, LogOut, Menu, X, Route } from 'lucide-react';
-import analytics from '../services/posthogService';
-import Logo from '../assets/logo-without-bg.png';
+import analytics from '../../services/posthogService';
+import Logo from '../../assets/logo-without-bg.png';
 
 
 function UserAvatar({ profilePicture, emailPrefix }) {

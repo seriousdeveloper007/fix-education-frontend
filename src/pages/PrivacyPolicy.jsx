@@ -1,9 +1,8 @@
 
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, User, Settings, Share, Globe, Clock, Key, Trash2, Mail } from 'lucide-react';
-import themeConfig from './themeConfig';
-import Navbar from './Navbar';
+import themeConfig from '../components/themeConfig';
+import Navbar from '../components/navbar/Navbar';
 
 const Section = ({ icon: Icon, title, children }) => (
   <div className="mt-12">

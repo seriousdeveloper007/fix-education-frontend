@@ -1,5 +1,5 @@
 import { BackgroundIconCloud } from "../components/BackgroundIconCloud";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/navbar/Navbar";
 import RoadmapHeading from "../components/chatroadmap/RoadmapHeading";
 import TextAreaInput from "../components/chatroadmap/TextareaInput";
 import { MessageList } from "../components/chatroadmap/MessageList";

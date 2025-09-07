@@ -6,9 +6,8 @@ import {
 } from 'react-router-dom';
 
 // import LandingPage from './components/LandingPage';
-import PrivacyPolicy from './components/PrivacyPolicy';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import GoogleLogin from './pages/LoginPage';
-import ErrorPage from './components/ErrorPage';
 import ChatRoadmap from './pages/ChatRoadmap';
 
 
@@ -59,7 +58,6 @@ function AppRoutes() {
       />
 
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-      <Route path="/error" element={<ErrorPage />} />
 
       <Route
         path="/roadmap"
