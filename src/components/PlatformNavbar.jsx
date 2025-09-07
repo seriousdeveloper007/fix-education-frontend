@@ -1,10 +1,9 @@
 import themeConfig from './themeConfig';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, LogOut, Menu, X } from 'lucide-react';
+import { ChevronDown, LogOut, Menu, X, Route } from 'lucide-react';
 import analytics from '../services/posthogService';
 import Logo from '../assets/logo-without-bg.png';
-import { FolderKanban, BookOpenCheck, LibraryBig, Route } from 'lucide-react';
 
 
 function UserAvatar({ profilePicture, emailPrefix }) {
@@ -105,25 +104,9 @@ export default function PlatformNavbar({ defaultTab = 'Roadmap' }) {
 
   const handleTabClick = (tab) => {
     setSelected(tab);
-
     setMobileMenuOpen(false);
     analytics.navbarOptionClicked(tab);
-    switch (tab) {
-      // case 'My Space':
-      //   navigate('/platform');
-      //   break;
-      case 'Study Room':
-        navigate('/study-room');
-        break;
-      case 'Library':
-        navigate('/library');
-        break;
-      case 'Roadmap':
-        navigate('/roadmap');
-        break;
-      default:
-        break;
-    }
+    navigate('/roadmap');
   };
 
   const handleBrandClick = () => {
@@ -131,16 +114,13 @@ export default function PlatformNavbar({ defaultTab = 'Roadmap' }) {
 
     setMobileMenuOpen(false);
     analytics.navbarOptionClicked('Roadmap');
-    navigate('/platform');
+    navigate('/roadmap');
   };
 
-  const navigationTabs = ['Roadmap', 'Study Room', 'Library'];
+  const navigationTabs = ['Roadmap'];
 
   const icons = {
-    // 'My Space': <FolderKanban className="w-5 h-5 text-indigo-600 group-hover:text-indigo-800" />,
-    'Study Room': <BookOpenCheck className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 group-hover:text-cyan-800" />,
-    'Library': <LibraryBig className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 group-hover:text-emerald-800" />,
-    'Roadmap': <Route className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 group-hover:text-purple-800" />
+    Roadmap: <Route className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 group-hover:text-purple-800" />
   };
 
 

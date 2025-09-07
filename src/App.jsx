@@ -9,10 +9,6 @@ import {
 import PrivacyPolicy from './components/PrivacyPolicy';
 import GoogleLogin from './pages/LoginPage';
 import ErrorPage from './components/ErrorPage';
-import VerifyLearner from './components/VerifyLearner';
-import Library from './components/Library';
-import StudyRoom from './pages/StudyRoom'
-import LibraryDetail from './components/LibraryDetail'; 
 import ChatRoadmap from './pages/ChatRoadmap';
 
 
@@ -62,41 +58,6 @@ function AppRoutes() {
         }
       />
 
-      {/* Single Protected PlatformLanding Route */}
-      {/* <Route
-        path="/platform"
-        element={
-          <PrivateRoute>
-            <PlatformLanding />
-          </PrivateRoute>
-        }
-      /> */}
-
-      <Route
-        path="/study-room"
-        element={<StudyRoom />}
-      />
-
-      <Route
-        path="/library"
-        element={
-          <PrivateRoute>
-            <Library />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/library/:tabId"
-        element={
-          <PrivateRoute>
-            <LibraryDetail />
-          </PrivateRoute>
-        }
-      />
-
-      {/* Public Routes */}
-      <Route path="/verify-learner" element={<VerifyLearner />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/error" element={<ErrorPage />} />
 
