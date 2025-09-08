@@ -37,7 +37,7 @@ function AppRoutes() {
         path="/"
         element={
           isLoggedIn() ? (
-            <Navigate to="/start-learning" replace />
+            <Navigate to="/learn-now" replace />
           ) : (
             // <LandingPage />
             <StartLearningPage />
@@ -50,7 +50,7 @@ function AppRoutes() {
         path="/login"
         element={
           isLoggedIn() ? (
-            <Navigate to="/start-learning" replace />
+            <Navigate to="/learn-now" replace />
           ) : (
             <GoogleLogin />
           )
@@ -60,7 +60,7 @@ function AppRoutes() {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
       <Route
-        path="/start-learning"
+        path="/learn-now"
         element={<StartLearningPage />}
       />
 
@@ -69,7 +69,7 @@ function AppRoutes() {
         path="*"
         element={
           isLoggedIn() ? (
-            <Navigate to="/start-learning" replace />
+            <Navigate to="/learn-now" replace />
           ) : (
             <Navigate to="/" replace />
           )
