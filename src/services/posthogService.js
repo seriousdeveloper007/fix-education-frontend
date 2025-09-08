@@ -15,24 +15,15 @@ function capture(event, properties = {}) {
 }
 
 const analytics = {
-  websiteLoaded: () => capture('website_loaded'), 
+  websiteLoaded: () => capture('website_loaded'),
   loginPageLoaded: () => capture('login_page_loaded'),
   loginEmailSubmitted: (email) => capture('login_email_submitted', { email }),
   navbarOptionClicked: (option) => capture('navbar_option_clicked', { option }),
-  sideNavbarOpened: (tab) => capture('side_navbar_opened', { tab }),
-  sideNavbarClosed: (tab) => capture('side_navbar_closed', { tab }),
-  doubtAsked: () => capture('doubt_asked'),
-  questionAttempted: (questionId) => capture('question_attempted', { question_id: questionId }),
-  libraryPageLoaded: () => capture('library_page_loaded'),
-  libraryDetailPageLoaded: () => capture('library_detail_page_loaded'),
-  youtubeLearningStarted: (url) => capture('youtube_learning_started', { url }),
-  desktopViewLoaded: () => capture('desktop_view_loaded'),
-  
   roadmapChatPageLoaded: () => capture('roadmap_chat_page_loaded'),
   roadmapChatStarted: () => capture('roadmap_chat_started'),
-  roadmapMessageSent: (messageCount, sessionDuration) => capture('roadmap_message_sent', { 
+  roadmapMessageSent: (messageCount, sessionDuration) => capture('roadmap_message_sent', {
     message_count: messageCount,
-    session_duration_seconds: sessionDuration 
+    session_duration_seconds: sessionDuration
   }),
   roadmapAnalysisGenerated: (messageCount, timeTaken) => capture('roadmap_analysis_generated', { 
     messages_before_analysis: messageCount,

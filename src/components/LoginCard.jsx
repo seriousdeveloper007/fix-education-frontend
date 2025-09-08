@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import themeConfig from './themeConfig';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
-import { updateChat } from '../services/chatService.js';
-import { updateRoadmap } from '../services/roadmapService.js';
 import PropTypes from 'prop-types';
+import { attachUserToStartLearningChat } from '../services/chatService';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const GOOGLE_ENDPOINT = `${API_BASE_URL}/user/auth/web/google`;
 
 export default function LoginCard({ redirectUri = null, heading }) {
   const cfg = themeConfig.website;
-  const navigate = useNavigate();
 
   /* ───────── local state ───────── */
   const [email, setEmail] = useState('');
@@ -73,38 +70,7 @@ localStorage.setItem(
       );
       localStorage.setItem('token', appJwt);
 
-
-
-
-      // If an anonymous chat exists, attach it to the logged-in user
-      const chatRoadmapId = localStorage.getItem('chatRoadmapId');
-      const chatId = localStorage.getItem('chatId');
-      if (chatRoadmapId || chatId) {
-        try {
-          await updateChat({ user_id: backendUser.id });
-        } catch (err) {
-          console.error('Failed to update chat with user', err);
-        }
-      }
-
-      // If a roadmap was created anonymously, attach it to the logged-in user
-      const roadmapId = localStorage.getItem('roadmapId');
-      if (roadmapId) {
-        try {
-          const { id: userId } = JSON.parse(localStorage.getItem('user') || '{}');
-          if (userId) {
-            analytics.userSignupTiming("after_roadmap", true);
-            await updateRoadmap({ user_id: userId }, roadmapId);
-          }
-        } catch (err) {
-          console.error('Failed to update roadmap with user', err);
-        }
-      }
-      else{
-
-        analytics.userSignupTiming("before_roadmap", false);
-
-      }
+      await attachUserToStartLearningChat(backendUser.id);
 
       window.dispatchEvent(new CustomEvent('userLoggedIn', {
         detail: { user: backendUser, token: appJwt }
@@ -116,7 +82,6 @@ localStorage.setItem(
     setError(err.message);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    navigate('/error');
   } finally {
     setLoading(false);
   }

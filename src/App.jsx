@@ -6,14 +6,9 @@ import {
 } from 'react-router-dom';
 
 // import LandingPage from './components/LandingPage';
-import PrivacyPolicy from './components/PrivacyPolicy';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import GoogleLogin from './pages/LoginPage';
-import ErrorPage from './components/ErrorPage';
-import VerifyLearner from './components/VerifyLearner';
-import Library from './components/Library';
-import StudyRoom from './pages/StudyRoom'
-import LibraryDetail from './components/LibraryDetail'; 
-import ChatRoadmap from './pages/ChatRoadmap';
+import StartLearningPage from './pages/StartLearningPage';
 
 
 export default function App() {
@@ -42,10 +37,10 @@ function AppRoutes() {
         path="/"
         element={
           isLoggedIn() ? (
-            <Navigate to="/roadmap" replace />
+            <Navigate to="/learn-now" replace />
           ) : (
             // <LandingPage />
-            <ChatRoadmap />
+            <StartLearningPage />
           )
         }
       />
@@ -55,54 +50,18 @@ function AppRoutes() {
         path="/login"
         element={
           isLoggedIn() ? (
-            <Navigate to="/roadmap" replace />
+            <Navigate to="/learn-now" replace />
           ) : (
             <GoogleLogin />
           )
         }
       />
 
-      {/* Single Protected PlatformLanding Route */}
-      {/* <Route
-        path="/platform"
-        element={
-          <PrivateRoute>
-            <PlatformLanding />
-          </PrivateRoute>
-        }
-      /> */}
-
-      <Route
-        path="/study-room"
-        element={<StudyRoom />}
-      />
-
-      <Route
-        path="/library"
-        element={
-          <PrivateRoute>
-            <Library />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/library/:tabId"
-        element={
-          <PrivateRoute>
-            <LibraryDetail />
-          </PrivateRoute>
-        }
-      />
-
-      {/* Public Routes */}
-      <Route path="/verify-learner" element={<VerifyLearner />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-      <Route path="/error" element={<ErrorPage />} />
 
       <Route
-        path="/roadmap"
-        element={<ChatRoadmap />}
+        path="/learn-now"
+        element={<StartLearningPage />}
       />
 
       {/* Fallback */}
@@ -110,7 +69,7 @@ function AppRoutes() {
         path="*"
         element={
           isLoggedIn() ? (
-            <Navigate to="/roadmap" replace />
+            <Navigate to="/learn-now" replace />
           ) : (
             <Navigate to="/" replace />
           )

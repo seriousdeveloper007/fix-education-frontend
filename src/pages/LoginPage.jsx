@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 
-import Navbar from '../components/Navbar';
+import Navbar from '../components/navbar/Navbar';
 import LoginCard from '../components/LoginCard';
 import analytics from '../services/posthogService';
 import { BackgroundIconCloud } from '../components/BackgroundIconCloud';
 
 export default function GoogleLogin() {
-  const [fromRoadmap, setFromRoadmap] = useState(false);
+  const [fromStartLearning, setFromStartLearning] = useState(false);
 
   // Detect special parameters in the URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
-    if (params.get('from') === 'roadmap') {
-      setFromRoadmap(true);
+    if (params.get('from') === 'start-learning') {
+      setFromStartLearning(true);
     }
 
     if (params.has('from')) {
@@ -38,7 +38,7 @@ export default function GoogleLogin() {
       {/* Content wrapper above background */}
       <div className="relative z-10 flex items-start justify-center px-[30px] lg:px-[250px] pt-16 pb-10">
         <LoginCard
-          heading={fromRoadmap ? 'Sign In to Secure Your Roadmap' : undefined}
+          heading={fromStartLearning ? 'Sign In to Start Learning' : undefined}
         />
       </div>
     </div>

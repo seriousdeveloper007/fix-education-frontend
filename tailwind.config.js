@@ -1,3 +1,5 @@
+/* eslint-env node */
+/* eslint-disable no-undef */
 module.exports = {
   content: [
     './src/**/*.{js,jsx,ts,tsx}',

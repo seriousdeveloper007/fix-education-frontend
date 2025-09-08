@@ -1,4 +1,4 @@
-import Logo from '../assets/logo-without-bg.png';
+import Logo from '../../assets/logo-without-bg.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function LoggedOutNavbar() {
@@ -7,11 +7,7 @@ export default function LoggedOutNavbar() {
 
 
   const handleSignInClick = () => {
-    navigate('/login?from=roadmap');
-  };
-
-  const handleSignUpClick = () => {
-    navigate('/signup');
+    navigate('/login?from=start-learning');
   };
 
   const showSignIn = !pathname.includes('/login');

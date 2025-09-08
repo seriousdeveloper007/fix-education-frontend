@@ -7,7 +7,7 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import katex from 'katex';
 
-import CodeBlock from './studyroom/CodeBlock';
+import CodeBlock from './CodeBlock';
 
 // Pre-process text to fix common formatting issues
 const preprocessMarkdown = (text = '') => {

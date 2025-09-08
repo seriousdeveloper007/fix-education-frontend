@@ -1,7 +1,6 @@
-import React from 'react';
 import LoggedOutNavbar from './LoggedOutNavbar.jsx';
 import PlatformNavbar from './PlatformNavbar.jsx';
-import { isLoggedIn } from '../utils/authUtils.js';
+import { isLoggedIn } from '../../utils/authUtils.js';
 
 export default function Navbar() {
 
