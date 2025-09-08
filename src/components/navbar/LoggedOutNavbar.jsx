@@ -7,7 +7,7 @@ export default function LoggedOutNavbar() {
 
 
   const handleSignInClick = () => {
-    navigate('/login?from=roadmap');
+    navigate('/login?from=start-learning');
   };
 
   const showSignIn = !pathname.includes('/login');

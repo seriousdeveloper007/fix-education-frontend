@@ -8,7 +8,7 @@ import {
 // import LandingPage from './components/LandingPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import GoogleLogin from './pages/LoginPage';
-import ChatRoadmap from './pages/ChatRoadmap';
+import StartLearningPage from './pages/StartLearningPage';
 
 
 export default function App() {
@@ -37,10 +37,10 @@ function AppRoutes() {
         path="/"
         element={
           isLoggedIn() ? (
-            <Navigate to="/roadmap" replace />
+            <Navigate to="/start-learning" replace />
           ) : (
             // <LandingPage />
-            <ChatRoadmap />
+            <StartLearningPage />
           )
         }
       />
@@ -50,7 +50,7 @@ function AppRoutes() {
         path="/login"
         element={
           isLoggedIn() ? (
-            <Navigate to="/roadmap" replace />
+            <Navigate to="/start-learning" replace />
           ) : (
             <GoogleLogin />
           )
@@ -60,8 +60,8 @@ function AppRoutes() {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
       <Route
-        path="/roadmap"
-        element={<ChatRoadmap />}
+        path="/start-learning"
+        element={<StartLearningPage />}
       />
 
       {/* Fallback */}
@@ -69,7 +69,7 @@ function AppRoutes() {
         path="*"
         element={
           isLoggedIn() ? (
-            <Navigate to="/roadmap" replace />
+            <Navigate to="/start-learning" replace />
           ) : (
             <Navigate to="/" replace />
           )
