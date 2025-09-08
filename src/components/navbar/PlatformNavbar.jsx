@@ -31,7 +31,7 @@ function UserAvatar({ profilePicture, emailPrefix }) {
   );
 }
 
-export default function PlatformNavbar({ defaultTab = 'Roadmap' }) {
+export default function PlatformNavbar({ defaultTab = 'Start Learning' }) {
   const [selected, setSelected] = useState(defaultTab);
   const [userInfo, setUserInfo] = useState({ emailPrefix: '', profilePicture: '' });
   const navigate = useNavigate();
@@ -106,21 +106,21 @@ export default function PlatformNavbar({ defaultTab = 'Roadmap' }) {
     setSelected(tab);
     setMobileMenuOpen(false);
     analytics.navbarOptionClicked(tab);
-    navigate('/roadmap');
+    navigate('/start-learning');
   };
 
   const handleBrandClick = () => {
-    setSelected('Roadmap');
+    setSelected('Start Learning');
 
     setMobileMenuOpen(false);
-    analytics.navbarOptionClicked('Roadmap');
-    navigate('/roadmap');
+    analytics.navbarOptionClicked('Start Learning');
+    navigate('/start-learning');
   };
 
-  const navigationTabs = ['Roadmap'];
+  const navigationTabs = ['Start Learning'];
 
   const icons = {
-    Roadmap: <Route className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 group-hover:text-purple-800" />
+    'Start Learning': <Route className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 group-hover:text-purple-800" />
   };
 
 
