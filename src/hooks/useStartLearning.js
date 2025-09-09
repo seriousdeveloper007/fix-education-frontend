@@ -57,20 +57,12 @@ export function useStartLearning() {
         if (data && data.chat_id) {
           try { localStorage.setItem('chatStartLearningId', String(data.chat_id)); } catch (_) {}
         }
+    
 
-        // Special case: direct first few lesson recommendations payload
-        const firstFewLessons = data?.first_few_recommended_lessons;
-        if (firstFewLessons) {
-          setMessages((prev) => [...prev, { role: 'assistant', type: 'first_recommendation', payload: firstFewLessons }]);
-          setIsAwaitingResponse(false);
-          return;
-        }
-
-        // Special case: first few lesson recommendation message
-        const messageType = data?.message_type;
-        const hasNoText = !(typeof data?.message === 'string' && data.message.trim() !== '');
-        if (messageType === 'first_few_lesson_recommendation' && hasNoText && data?.payload) {
-          setMessages((prev) => [...prev, { role: 'assistant', type: 'first_recommendation', payload: data.payload }]);
+        // Special case: roadmap recommendation message
+        if (data?.roadmap_recommended) {
+          console.log('Processing roadmap_recommended:');
+          setMessages((prev) => [...prev, { role: 'assistant', type: 'roadmap_recommendation', payload: data.roadmap_recommended.payload }]);
           setIsAwaitingResponse(false);
           return;
         }
@@ -170,17 +162,11 @@ export function useStartLearning() {
           const text = m?.text ?? '';
           const type = m?.message_type;
           const payload = m?.payload;
-          const firstFewLessons = m?.first_few_recommended_lessons;
-
-          // Special case to surface FirstRecommendation view (new payload shape)
-          if (firstFewLessons) {
-            return { role: 'assistant', type: 'first_recommendation', payload: firstFewLessons };
-          }
-
+         
           // Special case to surface FirstRecommendation view (legacy shape)
           const hasNoText = !(typeof text === 'string' && text.trim() !== '');
-          if (type === 'first_few_lesson_recommendation' && hasNoText && payload) {
-            return { role: 'assistant', type: 'first_recommendation', payload };
+          if (type === 'roadmap_recommended' && hasNoText && payload) {
+            return { role: 'assistant', type: 'roadmap_recommendation', payload };
           }
 
           if (typeof text !== 'string' || text.trim() === '') return null;
