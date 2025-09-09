@@ -9,6 +9,7 @@ import {
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import GoogleLogin from './pages/LoginPage';
 import StartLearningPage from './pages/StartLearningPage';
+import ShortLessonPage from './pages/ShortLessonPage';
 
 
 export default function App() {
@@ -63,6 +64,8 @@ function AppRoutes() {
         path="/learn-now"
         element={<StartLearningPage />}
       />
+
+      <Route path="/short-lesson/:miniLesson" element={<ShortLessonPage />} />
 
       {/* Fallback */}
       <Route

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BookOpen, Info, ChevronRight, Target, Play, CheckCircle, Clock } from 'lucide-react';
 
 const RoadmapComponent = ({ data }) => {
@@ -9,6 +10,7 @@ const RoadmapComponent = ({ data }) => {
 
   const [hoveredTopic, setHoveredTopic] = useState(null);
   const [completedTopics, setCompletedTopics] = useState(new Set());
+  const navigate = useNavigate();
 
   // --- NEW: small helper to ensure we display the proper lesson title
   const getLessonTitle = (lesson, fallback) => {
@@ -18,10 +20,11 @@ const RoadmapComponent = ({ data }) => {
     return fallback ?? '';
   };
 
-  const handleTopicClick = (topicIndex) => {
+  const handleTopicClick = (topic, topicIndex) => {
     const next = new Set(completedTopics);
     next.has(topicIndex) ? next.delete(topicIndex) : next.add(topicIndex);
     setCompletedTopics(next);
+    navigate(`/short-lesson/${encodeURIComponent(topic)}`);
   };
 
   return (
@@ -85,7 +88,7 @@ const RoadmapComponent = ({ data }) => {
                           <button
                             type="button"
                             key={topicIndex}
-                            onClick={() => handleTopicClick(topicIndex)}
+                            onClick={() => handleTopicClick(topic, topicIndex)}
                             onMouseEnter={() => setHoveredTopic(topicIndex)}
                             onMouseLeave={() => setHoveredTopic(null)}
                             className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${
