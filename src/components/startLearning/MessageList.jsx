@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from "react";
 import MarkdownRenderer from "../MarkdownRenderer";
 import { LoadingDots } from "../startLearning/LoadingDots";
-import FirstRecommendation from "../startLearning/FirstRecommendation";
+import RoadmapView from "./RoadmapRecommendation";
 
 const FLOATING_FOOTER_PX = 130;
 
@@ -25,7 +25,7 @@ export const MessageList = React.memo(function MessageList({ messages, isLoading
     >
       {messages.map((msg, idx) => {
         const isUser = msg.role === "user";
-        const isFirstRecommendation = msg.type === 'first_recommendation';
+        const isFirstRecommendation = msg.type === 'roadmap_recommendation';
 
         const base = "px-3 py-2 rounded-xl text-sm break-words";
         const bubble = isUser
@@ -35,7 +35,7 @@ export const MessageList = React.memo(function MessageList({ messages, isLoading
         if (isFirstRecommendation) {
           return (
             <div key={idx} className="mr-auto w-full max-w-full">
-              <FirstRecommendation data={msg.payload} />
+              <RoadmapView data={msg.payload} />
             </div>
           );
         }
