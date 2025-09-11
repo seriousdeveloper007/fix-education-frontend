@@ -24,7 +24,10 @@ const RoadmapComponent = ({ data }) => {
     const next = new Set(completedTopics);
     next.has(topicIndex) ? next.delete(topicIndex) : next.add(topicIndex);
     setCompletedTopics(next);
-    navigate(`/short-lesson/${encodeURIComponent(topic)}`);
+    const lessonTitle = getLessonTitle(currentLesson, 'Current Lesson');
+    navigate(`/short-lesson/${encodeURIComponent(topic)}`, {
+      state: { lessonName: lessonTitle, miniLessonList: currentLesson?.mini_lessons || [] },
+    });
   };
 
   return (
