@@ -35,7 +35,7 @@ export const MessageList = React.memo(function MessageList({ messages, isLoading
         if (isFirstRecommendation) {
           return (
             <div key={idx} className="mr-auto w-full max-w-full">
-              <RoadmapView data={msg.payload} />
+              <RoadmapView data={msg.payload} messageId={msg.id} isFromDatabase={false} />
             </div>
           );
         }

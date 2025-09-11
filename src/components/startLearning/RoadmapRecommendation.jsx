@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Info, ChevronRight, Target, Play, CheckCircle, Clock } from 'lucide-react';
+import { useRoadmap } from '../../hooks/useRoadmap';
+import { Trash2 } from 'lucide-react'; 
 
-const RoadmapComponent = ({ data }) => {
+const RoadmapComponent = ({ data , messageId, isFromDatabase = false  }) => {
   const moduleName = data?.module_name ?? 'Learning Roadmap';
   const currentLesson = data?.current_lesson;
   const futureLessons = Array.isArray(data?.future_lessons) ? data.future_lessons : [];
@@ -10,6 +12,9 @@ const RoadmapComponent = ({ data }) => {
 
   const [hoveredTopic, setHoveredTopic] = useState(null);
   const [completedTopics, setCompletedTopics] = useState(new Set());
+
+const { finalizeRoadmap, resetRoadmap, findMiniLessonByTopic } = useRoadmap();
+const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
   // --- NEW: small helper to ensure we display the proper lesson title
@@ -20,13 +25,56 @@ const RoadmapComponent = ({ data }) => {
     return fallback ?? '';
   };
 
-  const handleTopicClick = (topic, topicIndex) => {
+const handleReset = async () => {
+  if (!confirm('Are you sure you want to delete your roadmap and start over?')) return;
+  
+  try {
+    setIsProcessing(true);
+    await resetRoadmap();
+  } catch (error) {
+    console.error('Error resetting roadmap:', error);
+    alert('Failed to reset roadmap. Please try again.');
+  } finally {
+    setIsProcessing(false);
+  }
+};
+const handleTopicClick = async (topic, topicIndex) => {
+  console.log('DEBUG handleTopicClick:', {
+    topic,
+    isFromDatabase,
+    messageId,
+    hasMessageId: !!messageId
+  });
+  setIsProcessing(true);
+  
+  try {
     const next = new Set(completedTopics);
     next.has(topicIndex) ? next.delete(topicIndex) : next.add(topicIndex);
     setCompletedTopics(next);
-    navigate(`/short-lesson/${encodeURIComponent(topic)}`);
-  };
 
+    if (!isFromDatabase && messageId) {
+      // First time click - finalize roadmap
+      await finalizeRoadmap(messageId, topic);
+      navigate(`/short-lesson/${encodeURIComponent(topic)}`);
+    } else {
+      // Already finalized - find mini-lesson ID
+      try {
+        const result = await findMiniLessonByTopic(topic);
+        if (result?.mini_lesson_id) {
+          navigate(`/short-lesson/${result.mini_lesson_id}`);
+        } else {
+          navigate(`/short-lesson/${encodeURIComponent(topic)}`);
+        }
+      } catch (error) {
+        navigate(`/short-lesson/${encodeURIComponent(topic)}`);
+      }
+    }
+  } catch (error) {
+    console.error('Error handling mini-lesson click:', error);
+  } finally {
+    setIsProcessing(false);
+  }
+};
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
       {/* Header */}
@@ -41,6 +89,16 @@ const RoadmapComponent = ({ data }) => {
           </div>
         </div>
       </div>
+      {isFromDatabase && (
+  <button
+    onClick={handleReset}
+    disabled={isProcessing}
+    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+  >
+    <Trash2 className="w-4 h-4" />
+    <span className="hidden sm:inline">Reset</span>
+  </button>
+)}
 
       {/* Roadmap Content */}
       <div className="p-4 sm:p-6">
@@ -209,7 +267,6 @@ const RoadmapComponent = ({ data }) => {
     </div>
   );
 };
-
-export default function RoadmapView({ data }) {
-  return <RoadmapComponent data={data} />;
+export default function RoadmapView({ data, messageId, isFromDatabase = false }) {
+  return <RoadmapComponent data={data} messageId={messageId} isFromDatabase={isFromDatabase} />;
 }

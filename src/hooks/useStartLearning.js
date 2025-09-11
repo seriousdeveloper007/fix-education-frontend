@@ -212,9 +212,12 @@ export function useStartLearning() {
       }
     } catch (_) {}
 
-    const payloadObj = chatIdFromStorage
-      ? (userIdFromStorage ? { chat_id: chatIdFromStorage, user_id: userIdFromStorage, text: trimmed } : { chat_id: chatIdFromStorage, text: trimmed })
-      : { text: trimmed };
+    const payloadObj = {
+      text: trimmed,
+      ...(chatIdFromStorage ? { chat_id: chatIdFromStorage } : {}),
+      ...(userIdFromStorage ? { user_id: userIdFromStorage } : {}),
+    };
+    
     const payload = JSON.stringify(payloadObj);
 
     const send = (socket) => {
