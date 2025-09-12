@@ -234,7 +234,7 @@ export default function ShortLessonPage() {
         <Navbar />
         <div className="flex-1 min-h-0 min-w-0 px-4 py-5 max-w-5xl mx-auto w-full flex flex-col">
           <div className="shrink-0 flex items-center justify-between">
-            <h1 className="text-2xl font-bold truncate">{miniLesson || 'Interactive Lesson'}</h1>
+            <h3 className="truncate text-2xl md:text-3xl font-semibold leading-tight tracking-tight" style={{ fontFamily: 'Francus' }}>{miniLesson || 'Interactive Lesson'}</h3>
           </div>
           <div className="mt-4 flex-1 min-h-0 flex items-center justify-center">
             <div className="p-4 rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-800 max-w-md">
@@ -256,7 +256,7 @@ export default function ShortLessonPage() {
 
       <div className="flex-1 min-w-0 px-4 py-5 max-w-5xl mx-auto w-full flex flex-col overflow-x-hidden">
         <div className="shrink-0 flex items-center justify-between mb-4 min-w-0">
-          <h1 className="text-2xl font-bold truncate">{miniLesson || 'Interactive Lesson'}</h1>
+          <div className="truncate text-xl" style={{ fontFamily: 'Francus' }}>{miniLesson || 'Interactive Lesson'}</div>
         </div>
 
         {/* LESSON CANVAS */}
