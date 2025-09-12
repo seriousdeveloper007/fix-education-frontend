@@ -63,8 +63,10 @@ export default function ShortLessonPage() {
   const miniLesson = decodeURIComponent(miniLessonParam || '');
   const location = useLocation();
   const { search, state } = location;
-  const lessonName = state?.lessonName || '';
-  const miniLessonList = state?.miniLessonList || [];
+  const lessonName = React.useMemo(() => state?.lessonName || '', [state?.lessonName]); 
+  const miniLessonList = React.useMemo(() => state?.miniLessonList || [], [state?.miniLessonList]);
+
+
 
   const params = new URLSearchParams(search);
   const artifactOverride = params.get('artifact');
