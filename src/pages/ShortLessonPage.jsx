@@ -1,7 +1,7 @@
 import React, { Suspense, useState, useEffect, useCallback } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import Navbar from '../components/navbar/Navbar';
-import { API_BASE_URL } from '../config';
+import { useShortLesson } from '../hooks/useShortLesson';
 
 // ---------- Error Boundary ----------
 class SafeBoundary extends React.Component {
@@ -59,17 +59,26 @@ function Remote({ url, exportName = 'default', ...props }) {
 
 // ---------- Page ----------
 export default function ShortLessonPage() {
-  const { miniLesson } = useParams();
-  const lessonName = decodeURIComponent(miniLesson || '');
-  const { search } = useLocation();
+  const { miniLesson: miniLessonParam } = useParams();
+  const miniLesson = decodeURIComponent(miniLessonParam || '');
+  const location = useLocation();
+  const { search, state } = location;
+  const lessonName = React.useMemo(() => state?.lessonName || '', [state?.lessonName]); 
+  const miniLessonList = React.useMemo(() => state?.miniLessonList || [], [state?.miniLessonList]);
+
+
 
   const params = new URLSearchParams(search);
   const artifactOverride = params.get('artifact');
   const exportName = params.get('export') || 'default';
 
-  const [artifactUrl, setArtifactUrl] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { artifactUrl, loading, error } = useShortLesson({
+    miniLesson,
+    lessonName,
+    miniLessonList,
+    artifactOverride,
+  });
+
 
   // 👇 TTS State
   const [caption, setCaption] = useState('');
@@ -205,52 +214,6 @@ export default function ShortLessonPage() {
     };
   }, []);
 
-  // Fetch artifact
-  useEffect(() => {
-    if (artifactOverride) {
-      setArtifactUrl(artifactOverride);
-      setLoading(false);
-      return;
-    }
-
-    if (!lessonName) {
-      setError('No lesson name provided');
-      setLoading(false);
-      return;
-    }
-
-    const fetchArtifact = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/mini-lesson`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mini_lesson: lessonName }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        const filename = data?.react_code;
-
-        if (!filename || typeof filename !== 'string') {
-          throw new Error('Invalid or missing artifact filename in response');
-        }
-
-        const fullUrl = `${API_BASE_URL.replace(/\/$/, '')}/artifacts/${filename}`;
-        setArtifactUrl(fullUrl);
-      } catch (err) {
-        console.error('Failed to fetch lesson artifact:', err);
-        setError(err.message || 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchArtifact();
-  }, [lessonName, artifactOverride]);
-
   // Loading
   if (loading) {
     return (
@@ -270,7 +233,7 @@ export default function ShortLessonPage() {
         <Navbar />
         <div className="flex-1 min-h-0 min-w-0 px-4 py-5 max-w-5xl mx-auto w-full flex flex-col">
           <div className="shrink-0 flex items-center justify-between">
-            <h1 className="text-2xl font-bold truncate">{lessonName || 'Interactive Lesson'}</h1>
+            <h1 className="text-2xl font-bold truncate">{miniLesson || 'Interactive Lesson'}</h1>
           </div>
           <div className="mt-4 flex-1 min-h-0 flex items-center justify-center">
             <div className="p-4 rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-800 max-w-md">
@@ -292,7 +255,7 @@ export default function ShortLessonPage() {
 
       <div className="flex-1 min-w-0 px-4 py-5 max-w-5xl mx-auto w-full flex flex-col overflow-x-hidden">
         <div className="shrink-0 flex items-center justify-between mb-4 min-w-0">
-          <h1 className="text-2xl font-bold truncate">{lessonName || 'Interactive Lesson'}</h1>
+          <h1 className="text-2xl font-bold truncate">{miniLesson || 'Interactive Lesson'}</h1>
         </div>
 
         {/* LESSON CANVAS */}
@@ -304,7 +267,7 @@ export default function ShortLessonPage() {
                   <Remote
                     url={artifactUrl}
                     exportName={exportName}
-                    lessonId={lessonName || 'unknown-lesson'}
+                    lessonId={miniLesson || 'unknown-lesson'}
                     viewport="mobile"
                     theme="light"
                     speak={speak} // 👈 Passed to dynamic module
