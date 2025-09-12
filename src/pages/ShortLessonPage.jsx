@@ -1,6 +1,7 @@
 import React, { Suspense, useState, useEffect, useCallback } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import Navbar from '../components/navbar/Navbar';
+import Loader from '../components/Loader';
 import { useShortLesson } from '../hooks/useShortLesson';
 
 // ---------- Error Boundary ----------
@@ -219,8 +220,8 @@ export default function ShortLessonPage() {
     return (
       <div className="lesson-page-container min-h-[100dvh] w-[100dvw] max-w-[100dvw] flex flex-col overflow-x-hidden">
         <Navbar />
-        <div className="flex-1 min-h-0 min-w-0 flex items-center justify-center text-gray-600">
-          Preparing your lesson…
+        <div className="flex-1 min-h-0 min-w-0 flex items-center justify-center">
+          <Loader />
         </div>
       </div>
     );
