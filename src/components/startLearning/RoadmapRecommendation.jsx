@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Info, ChevronRight, Target, Play, CheckCircle, Clock } from 'lucide-react';
-
-const RoadmapComponent = ({ data }) => {
+import { createRoadmap } from '../../services/chatService';
+export default function RoadmapComponent ({ data , messageId }) {
   const moduleName = data?.module_name ?? 'Learning Roadmap';
   const currentLesson = data?.current_lesson;
   const futureLessons = Array.isArray(data?.future_lessons) ? data.future_lessons : [];
@@ -20,7 +20,26 @@ const RoadmapComponent = ({ data }) => {
     return fallback ?? '';
   };
 
-  const handleTopicClick = (topic, topicIndex) => {
+  const handleTopicClick = async (topic, topicIndex) => {
+    const userStr = localStorage.getItem("user");
+    let user_id = null;
+    
+    if (userStr) {
+      const userObj = JSON.parse(userStr);  // Parse the JSON string
+      user_id = userObj.id;
+    }
+    const apiPayload = {
+      message_id: messageId,
+      user_id: user_id,
+      mini_lesson_name: topic,
+      payload: data
+    };
+
+    const response = await createRoadmap(apiPayload);
+
+    console.log('Roadmap created successfully:', response);
+
+
     const next = new Set(completedTopics);
     next.has(topicIndex) ? next.delete(topicIndex) : next.add(topicIndex);
     setCompletedTopics(next);
@@ -213,6 +232,3 @@ const RoadmapComponent = ({ data }) => {
   );
 };
 
-export default function RoadmapView({ data }) {
-  return <RoadmapComponent data={data} />;
-}

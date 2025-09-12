@@ -62,7 +62,12 @@ export function useStartLearning() {
         // Special case: roadmap recommendation message
         if (data?.roadmap_recommended) {
           console.log('Processing roadmap_recommended:');
-          setMessages((prev) => [...prev, { role: 'assistant', type: 'roadmap_recommendation', payload: data.roadmap_recommended.payload }]);
+          setMessages((prev) => [...prev, 
+            { role: 'assistant', 
+              type: 'roadmap_recommendation', 
+              payload: data.roadmap_recommended.payload ,
+              messageId: data.roadmap_recommended.id  
+            }]);
           setIsAwaitingResponse(false);
           return;
         }
@@ -211,7 +216,7 @@ export function useStartLearning() {
         }
       }
     } catch (_) {}
-
+    //update this to send the user_id properly and recieve it in the backend and update the user_id as well in the userchats
     const payloadObj = chatIdFromStorage
       ? (userIdFromStorage ? { chat_id: chatIdFromStorage, user_id: userIdFromStorage, text: trimmed } : { chat_id: chatIdFromStorage, text: trimmed })
       : { text: trimmed };
