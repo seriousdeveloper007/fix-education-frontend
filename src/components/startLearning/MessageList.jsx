@@ -24,6 +24,7 @@ export const MessageList = React.memo(function MessageList({ messages, isLoading
       style={{ paddingBottom: bottomGap }}
     >
       {messages.map((msg, idx) => {
+      
         const isUser = msg.role === "user";
         const isFirstRecommendation = msg.type === 'roadmap_recommendation';
 
@@ -35,7 +36,7 @@ export const MessageList = React.memo(function MessageList({ messages, isLoading
         if (isFirstRecommendation) {
           return (
             <div key={idx} className="mr-auto w-full max-w-full">
-              <RoadmapComponent data={msg.payload} messageId={msg.messageId}  />
+              <RoadmapComponent msg={msg} />
             </div>
           );
         }

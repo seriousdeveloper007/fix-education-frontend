@@ -10,6 +10,7 @@ export function useStartLearning() {
   const lastOpenedAtRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [isAwaitingResponse, setIsAwaitingResponse] = useState(false);
+  const [hasRoadmap , setHasRoadmap] =useState(null)
 
   const resolvedUrl = `${WS_BASE_URL}/ws/learning-started`;
 
