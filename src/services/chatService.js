@@ -36,3 +36,75 @@ export async function fetchStartLearningChatMessages(chatId) {
     return [];
   }
 } 
+export async function findLatestChatStartLearningId (userId)  {
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    
+    const token = localStorage.getItem('token');
+    if (token) {
+      headers['Authorization'] = token;
+    }
+
+    const response = await fetch('http://localhost:8000/chats/latest', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({
+        user_id: userId
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.chat_id; // Returns the chat_id or null
+  } catch (error) {
+    console.error('Error fetching latest chat:', error);
+    return null;
+  }
+};
+export async function createRoadmap(data) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/create-roadmap`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating roadmap:', error);
+    throw error;
+  }
+}
+
+
+export async function checkRoadmap(data) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/find-roadmap`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating roadmap:', error);
+    throw error;
+  }
+}

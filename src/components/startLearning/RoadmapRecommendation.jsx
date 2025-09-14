@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Info, ChevronRight, Target, Play, CheckCircle, Clock } from 'lucide-react';
+import { createRoadmap } from '../../services/chatService';
 
-const RoadmapComponent = ({ data }) => {
+export default function RoadmapComponent({ props }) {
+
+  const data = props?.payload
+  console.log(props)
   const moduleName = data?.module_name ?? 'Learning Roadmap';
   const currentLesson = data?.current_lesson;
   const futureLessons = Array.isArray(data?.future_lessons) ? data.future_lessons : [];
   const whyThisRoadmap = data?.why_this_roadmap ?? '';
-
   const [hoveredTopic, setHoveredTopic] = useState(null);
   const [completedTopics, setCompletedTopics] = useState(new Set());
   const navigate = useNavigate();
 
-  // --- NEW: small helper to ensure we display the proper lesson title
+  // Helper to ensure we display the proper lesson title
   const getLessonTitle = (lesson, fallback) => {
     const n = lesson?.name;
     if (typeof n === 'string' && n.trim()) return n.trim();
@@ -27,6 +30,7 @@ const RoadmapComponent = ({ data }) => {
     const miniLessonName = miniLesson?.name || `Topic ${topicIndex + 1}`;
     navigate(`/short-lesson/${encodeURIComponent(miniLessonName)}`, {
       state: miniLesson
+  
     });
   };
 
@@ -88,6 +92,7 @@ const RoadmapComponent = ({ data }) => {
                         const isHovered = hoveredTopic === topicIndex;
                         const topicName = miniLesson?.name || `Topic ${topicIndex + 1}`;
 
+
                         return (
                           <button
                             type="button"
@@ -95,23 +100,21 @@ const RoadmapComponent = ({ data }) => {
                             onClick={() => handleTopicClick(miniLesson, topicIndex)}
                             onMouseEnter={() => setHoveredTopic(topicIndex)}
                             onMouseLeave={() => setHoveredTopic(null)}
-                            className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${
-                              isCompleted 
-                                ? 'border-green-200 bg-green-50' 
-                                : isHovered 
-                                  ? 'border-indigo-200 bg-indigo-50' 
+                            className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${isCompleted
+                                ? 'border-green-200 bg-green-50'
+                                : isHovered
+                                  ? 'border-indigo-200 bg-indigo-50'
                                   : 'border-gray-200'
-                            }`}
+                              }`}
                           >
                             <div className="flex items-center justify-between p-4">
                               <div className="flex items-center gap-3 flex-1">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
-                                  isCompleted 
-                                    ? 'bg-green-100 text-green-600' 
-                                    : isHovered 
-                                      ? 'bg-indigo-100 text-indigo-600' 
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${isCompleted
+                                    ? 'bg-green-100 text-green-600'
+                                    : isHovered
+                                      ? 'bg-indigo-100 text-indigo-600'
                                       : 'bg-gray-100 text-gray-400'
-                                }`}>
+                                  }`}>
                                   {isCompleted ? (
                                     <CheckCircle className="w-4 h-4" />
                                   ) : isHovered ? (
@@ -120,33 +123,31 @@ const RoadmapComponent = ({ data }) => {
                                     <Clock className="w-4 h-4" />
                                   )}
                                 </div>
-                                <h5 className={`text-base font-semibold transition-colors ${
-                                  isCompleted 
-                                    ? 'text-green-800' 
-                                    : isHovered 
-                                      ? 'text-indigo-800' 
+                                <h5 className={`text-base font-semibold transition-colors ${isCompleted
+                                    ? 'text-green-800'
+                                    : isHovered
+                                      ? 'text-indigo-800'
                                       : 'text-slate-800'
-                                }`}>
+
+                                  }`}>
                                   {topicName}
                                 </h5>
                               </div>
-                              <ChevronRight className={`w-4 h-4 transition-all duration-200 ${
-                                isCompleted 
-                                  ? 'text-green-600' 
-                                  : isHovered 
-                                    ? 'text-indigo-600 transform translate-x-1' 
+                              <ChevronRight className={`w-4 h-4 transition-all duration-200 ${isCompleted
+                                  ? 'text-green-600'
+                                  : isHovered
+                                    ? 'text-indigo-600 transform translate-x-1'
                                     : 'text-slate-500 group-hover:text-slate-700'
-                              }`} />
+                                }`} />
                             </div>
-                            
+
                             {/* Progress indicator */}
-                            <div className={`h-1 transition-all duration-300 ${
-                              isCompleted 
-                                ? 'bg-gradient-to-r from-green-400 to-green-500' 
-                                : isHovered 
-                                  ? 'bg-gradient-to-r from-indigo-400 to-blue-500' 
+                            <div className={`h-1 transition-all duration-300 ${isCompleted
+                                ? 'bg-gradient-to-r from-green-400 to-green-500'
+                                : isHovered
+                                  ? 'bg-gradient-to-r from-indigo-400 to-blue-500'
                                   : 'bg-gray-200'
-                            }`} />
+                              }`} />
                           </button>
                         );
                       })
@@ -217,3 +218,4 @@ const RoadmapComponent = ({ data }) => {
 export default function RoadmapView({ data }) {
   return <RoadmapComponent data={data} />;
 }
+
