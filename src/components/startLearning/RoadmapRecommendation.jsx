@@ -20,13 +20,13 @@ const RoadmapComponent = ({ data }) => {
     return fallback ?? '';
   };
 
-  const handleTopicClick = (topic, topicIndex) => {
+  const handleTopicClick = (miniLesson, topicIndex) => {
     const next = new Set(completedTopics);
     next.has(topicIndex) ? next.delete(topicIndex) : next.add(topicIndex);
     setCompletedTopics(next);
-    const lessonTitle = getLessonTitle(currentLesson, 'Current Lesson');
-    navigate(`/short-lesson/${encodeURIComponent(topic)}`, {
-      state: { lessonName: lessonTitle, miniLessonList: currentLesson?.mini_lessons || [] },
+    const miniLessonName = miniLesson?.name || `Topic ${topicIndex + 1}`;
+    navigate(`/short-lesson/${encodeURIComponent(miniLessonName)}`, {
+      state: miniLesson
     });
   };
 
@@ -83,15 +83,16 @@ const RoadmapComponent = ({ data }) => {
                 <div className="p-4">
                   <div className="space-y-3">
                     {currentLesson?.mini_lessons && currentLesson.mini_lessons.length > 0 ? (
-                      currentLesson.mini_lessons.map((topic, topicIndex) => {
+                      currentLesson.mini_lessons.map((miniLesson, topicIndex) => {
                         const isCompleted = completedTopics.has(topicIndex);
                         const isHovered = hoveredTopic === topicIndex;
+                        const topicName = miniLesson?.name || `Topic ${topicIndex + 1}`;
 
                         return (
                           <button
                             type="button"
                             key={topicIndex}
-                            onClick={() => handleTopicClick(topic, topicIndex)}
+                            onClick={() => handleTopicClick(miniLesson, topicIndex)}
                             onMouseEnter={() => setHoveredTopic(topicIndex)}
                             onMouseLeave={() => setHoveredTopic(null)}
                             className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${
@@ -126,7 +127,7 @@ const RoadmapComponent = ({ data }) => {
                                       ? 'text-indigo-800' 
                                       : 'text-slate-800'
                                 }`}>
-                                  {topic}
+                                  {topicName}
                                 </h5>
                               </div>
                               <ChevronRight className={`w-4 h-4 transition-all duration-200 ${
