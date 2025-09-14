@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Info, ChevronRight, Target, Play, CheckCircle, Clock } from 'lucide-react';
 import { createRoadmap } from '../../services/chatService';
-export default function RoadmapComponent({ msg }) {
 
-  const data = msg?.payload
-  console.log(data.current_lesson.name, data.current_lesson.id)
+export default function RoadmapComponent({ props }) {
+
+  const data = props?.payload
+  console.log(props)
   const moduleName = data?.module_name ?? 'Learning Roadmap';
   const currentLesson = data?.current_lesson;
   const futureLessons = Array.isArray(data?.future_lessons) ? data.future_lessons : [];
@@ -14,7 +15,7 @@ export default function RoadmapComponent({ msg }) {
   const [completedTopics, setCompletedTopics] = useState(new Set());
   const navigate = useNavigate();
 
-  // --- NEW: small helper to ensure we display the proper lesson title
+  // Helper to ensure we display the proper lesson title
   const getLessonTitle = (lesson, fallback) => {
     const n = lesson?.name;
     if (typeof n === 'string' && n.trim()) return n.trim();
@@ -22,35 +23,70 @@ export default function RoadmapComponent({ msg }) {
     return fallback ?? '';
   };
 
-  const handleTopicClick = async (topic, topicIndex) => {
+  // Helper to get mini lesson name - handles both string and object formats
+  const getMiniLessonName = (miniLesson) => {
+    if (typeof miniLesson === 'string') {
+      return miniLesson;
+    }
+    if (typeof miniLesson === 'object' && miniLesson !== null) {
+      return miniLesson.name || '';
+    }
+    return '';
+  };
 
-  if( !data?.current_lesson?.id)
-    {
-      const userStr = localStorage.getItem("user");
-      let user_id = null;
+  // Helper to get the complete mini lesson data for navigation
+  const getMiniLessonData = (miniLesson) => {
+    if (typeof miniLesson === 'string') {
+      return { name: miniLesson };
+    }
+    if (typeof miniLesson === 'object' && miniLesson !== null) {
+      return miniLesson;
+    }
+    return { name: '' };
+  };
 
-      if (userStr) {
-        const userObj = JSON.parse(userStr);  // Parse the JSON string
-        user_id = userObj.id;
-      }
-      const apiPayload = {
-        message_id: msg.messageId,
-        user_id: user_id,
-        name: topic,
-        payload: data
-      };
+  const handleTopicClick = async (miniLesson, topicIndex) => {
+    const topicName = getMiniLessonName(miniLesson);
+    const miniLessonData = getMiniLessonData(miniLesson);
+    const existing_id =typeof miniLesson === "object" && miniLesson !== null? miniLesson.id: null;
+    console.log(existing_id)
+    if(!existing_id){
+    
+    const userStr = localStorage.getItem("user");
+    let user_id = null;
 
-      const response = await createRoadmap(apiPayload);
+    if (userStr) {
+      const userObj = JSON.parse(userStr);
+      user_id = userObj.id;
+    }
+    
+    const apiPayload = {
+      message_id: props.messageId,
+      user_id: user_id,
+      name: topicName,
+      payload: data
+    };
+    console.log(apiPayload)
+    const response = await createRoadmap(apiPayload);
+    console.log('Roadmap created successfully:', response);
 
-      console.log('Roadmap created successfully:', response);
     }
 
     const next = new Set(completedTopics);
     next.has(topicIndex) ? next.delete(topicIndex) : next.add(topicIndex);
     setCompletedTopics(next);
+    
     const lessonTitle = getLessonTitle(currentLesson, 'Current Lesson');
-    navigate(`/short-lesson/${encodeURIComponent(topic)}`, {
-      state: { lessonName: lessonTitle, miniLessonList: currentLesson?.mini_lessons || [] },
+    
+    // Pass both the lesson name and the complete mini lessons array for navigation
+    const miniLessonsForNavigation = currentLesson?.mini_lessons || [];
+    
+    navigate(`/short-lesson/${encodeURIComponent(topicName)}`, {
+      state: { 
+        lessonName: lessonTitle, 
+        miniLessonList: miniLessonsForNavigation,
+        currentMiniLesson: miniLessonData
+      },
     });
   };
 
@@ -107,15 +143,16 @@ export default function RoadmapComponent({ msg }) {
                 <div className="p-4">
                   <div className="space-y-3">
                     {currentLesson?.mini_lessons && currentLesson.mini_lessons.length > 0 ? (
-                      currentLesson.mini_lessons.map((topic, topicIndex) => {
+                      currentLesson.mini_lessons.map((miniLesson, topicIndex) => {
                         const isCompleted = completedTopics.has(topicIndex);
                         const isHovered = hoveredTopic === topicIndex;
+                        const topicName = getMiniLessonName(miniLesson);
 
                         return (
                           <button
                             type="button"
                             key={topicIndex}
-                            onClick={() => handleTopicClick(topic, topicIndex)}
+                            onClick={() => handleTopicClick(miniLesson, topicIndex)}
                             onMouseEnter={() => setHoveredTopic(topicIndex)}
                             onMouseLeave={() => setHoveredTopic(null)}
                             className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${isCompleted
@@ -147,7 +184,7 @@ export default function RoadmapComponent({ msg }) {
                                       ? 'text-indigo-800'
                                       : 'text-slate-800'
                                   }`}>
-                                  {topic}
+                                  {topicName}
                                 </h5>
                               </div>
                               <ChevronRight className={`w-4 h-4 transition-all duration-200 ${isCompleted
@@ -231,4 +268,3 @@ export default function RoadmapComponent({ msg }) {
     </div>
   );
 };
-

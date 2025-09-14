@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState  ,useEffect} from 'react';
 import Navbar from '../components/navbar/Navbar';
 import { BackgroundIconCloud } from '../components/BackgroundIconCloud';
 import RoadmapHeading from '../components/startLearning/RoadmapHeading';
@@ -6,11 +6,16 @@ import TextAreaInput from '../components/startLearning/TextareaInput';
 import { MessageList } from '../components/startLearning/MessageList';
 import { ROTATING_PROMPTS } from '../components/startLearning/constants';
 import { useStartLearning } from '../hooks/useStartLearning';
+import RoadmapComponent from '../components/startLearning/RoadmapRecommendation';
 
 export default function StartLearningPage() {
   const [input, setInput] = useState('');
 
-  const { messages, isAwaitingResponse, startLearning, reset } = useStartLearning();
+  const { messages, isAwaitingResponse, startLearning, reset , roadmapStatus  , RoadmapStatusCheck , roadmapData} = useStartLearning();
+  
+  useEffect( () => {
+    RoadmapStatusCheck();  
+  }, []);
 
   const handleSend = () => {
     const text = input.trim();
@@ -29,19 +34,35 @@ export default function StartLearningPage() {
       <Navbar />
       <BackgroundIconCloud />
       <div className="relative z-10 flex-col font-fraunces px-[30px] lg:px-[250px]">
-        {messages.length === 0 && <RoadmapHeading />}
-        {messages.length > 0 && (
-          <MessageList messages={messages} isLoading={isAwaitingResponse} />
+        
+        {/* Loading state */}
+        {roadmapStatus === "checking" && (
+          <div>Loading...</div>
         )}
-        <TextAreaInput
-          prompts={ROTATING_PROMPTS}
-          value={input}
-          onChange={setInput}
-          onSend={handleSend}
-          onReset={handleReset}
-          isDisable={isAwaitingResponse}
-          floating={messages.length > 0}
-        />
+  
+        {/* Roadmap present */}
+        {roadmapStatus === "present" && (
+          <RoadmapComponent props = {{"payload":roadmapData}} />  
+        )}
+  
+        {/* No roadmap */}
+        {roadmapStatus === "none" && (
+          <>
+            {messages.length === 0 && <RoadmapHeading />}
+            {messages.length > 0 && (
+              <MessageList messages={messages} isLoading={isAwaitingResponse} />
+            )}
+            <TextAreaInput
+              prompts={ROTATING_PROMPTS}
+              value={input}
+              onChange={setInput}
+              onSend={handleSend}
+              onReset={handleReset}
+              isDisable={isAwaitingResponse}
+              floating={messages.length > 0}
+            />
+          </>
+        )}
       </div>
     </>
   );

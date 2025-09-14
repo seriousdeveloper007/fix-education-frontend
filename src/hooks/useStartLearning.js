@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { WS_BASE_URL } from '../config';
-import { fetchStartLearningChatMessages } from '../services/chatService';
+import { fetchStartLearningChatMessages, checkRoadmap } from '../services/chatService';
 
 export function useStartLearning() {
   const socketRef = useRef(null);
@@ -10,9 +10,49 @@ export function useStartLearning() {
   const lastOpenedAtRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [isAwaitingResponse, setIsAwaitingResponse] = useState(false);
-  const [hasRoadmap , setHasRoadmap] =useState(null)
+  const [roadmapStatus, setRoadmapStatus] = useState("checking")
+  const [roadmapData, setRoadmapData] = useState(null)
+
 
   const resolvedUrl = `${WS_BASE_URL}/ws/learning-started`;
+
+  const RoadmapStatusCheck = useCallback(async () => {
+    console.log("checking roadmap");
+
+    let userIdFromStorage = null;
+
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const userObj = JSON.parse(userStr);
+        if (userObj && userObj.id != null) {
+          userIdFromStorage = userObj.id;
+        }
+      }
+
+      // Only proceed if we have a valid user ID
+      if (userIdFromStorage) {
+        const data = await checkRoadmap({ user_id: userIdFromStorage });
+
+        if (data) {
+          setRoadmapData(data)
+          setRoadmapStatus("present");
+        }
+        else {
+          setRoadmapStatus("none");
+        }
+      }
+      else {
+        setRoadmapStatus("none");
+      }
+
+    } catch (error) {
+      console.error("Error checking roadmap:", error);
+      setRoadmapStatus("none");
+    }
+  }, []);
+
+
 
   const connectIfNeeded = useCallback(() => {
     const existing = socketRef.current;
@@ -30,8 +70,8 @@ export function useStartLearning() {
           reject(err);
         };
         const cleanup = () => {
-          try { existing.removeEventListener('open', handleOpen); } catch (_) {}
-          try { existing.removeEventListener('error', handleError); } catch (_) {}
+          try { existing.removeEventListener('open', handleOpen); } catch (_) { }
+          try { existing.removeEventListener('error', handleError); } catch (_) { }
         };
         existing.addEventListener('open', handleOpen);
         existing.addEventListener('error', handleError);
@@ -56,19 +96,20 @@ export function useStartLearning() {
       try {
         const data = JSON.parse(event.data);
         if (data && data.chat_id) {
-          try { localStorage.setItem('chatStartLearningId', String(data.chat_id)); } catch (_) {}
+          try { localStorage.setItem('chatStartLearningId', String(data.chat_id)); } catch (_) { }
         }
-    
+
 
         // Special case: roadmap recommendation message
         if (data?.roadmap_recommended) {
           console.log('Processing roadmap_recommended:');
-          setMessages((prev) => [...prev, 
-            { role: 'assistant', 
-              type: 'roadmap_recommendation', 
-              payload: data.roadmap_recommended.payload ,
-              messageId: data.roadmap_recommended.id  
-            }]);
+          setMessages((prev) => [...prev,
+          {
+            role: 'assistant',
+            type: 'roadmap_recommendation',
+            payload: data.roadmap_recommended.payload,
+            messageId: data.roadmap_recommended.id
+          }]);
           setIsAwaitingResponse(false);
           return;
         }
@@ -128,8 +169,8 @@ export function useStartLearning() {
         reject(err);
       };
       const cleanup = () => {
-        try { socket.removeEventListener('open', handleOpen); } catch (_) {}
-        try { socket.removeEventListener('error', handleError); } catch (_) {}
+        try { socket.removeEventListener('open', handleOpen); } catch (_) { }
+        try { socket.removeEventListener('error', handleError); } catch (_) { }
       };
       socket.addEventListener('open', handleOpen);
       socket.addEventListener('error', handleError);
@@ -141,7 +182,7 @@ export function useStartLearning() {
     return () => {
       const socket = socketRef.current;
       if (socket) {
-        try { socket.close(); } catch (_) {}
+        try { socket.close(); } catch (_) { }
       }
       socketRef.current = null;
     };
@@ -155,7 +196,7 @@ export function useStartLearning() {
       if (raw != null && String(raw).trim() !== '') {
         chatIdFromStorage = String(raw).trim();
       }
-    } catch (_) {}
+    } catch (_) { }
 
     if (!chatIdFromStorage) return;
 
@@ -168,7 +209,7 @@ export function useStartLearning() {
           const text = m?.text ?? '';
           const type = m?.message_type;
           const payload = m?.payload;
-         
+
           // Special case to surface FirstRecommendation view (legacy shape)
           const hasNoText = !(typeof text === 'string' && text.trim() !== '');
           if (type === 'roadmap_recommended' && hasNoText && payload) {
@@ -205,7 +246,7 @@ export function useStartLearning() {
       if (raw != null && String(raw).trim() !== '') {
         chatIdFromStorage = String(raw).trim();
       }
-    } catch (_) {}
+    } catch (_) { }
 
     let userIdFromStorage = null;
     try {
@@ -216,15 +257,25 @@ export function useStartLearning() {
           userIdFromStorage = String(userObj.id);
         }
       }
-    } catch (_) {}
-    //update this to send the user_id properly and recieve it in the backend and update the user_id as well in the userchats
-    const payloadObj = chatIdFromStorage
-      ? (userIdFromStorage ? { chat_id: chatIdFromStorage, user_id: userIdFromStorage, text: trimmed } : { chat_id: chatIdFromStorage, text: trimmed })
-      : { text: trimmed };
+    } catch (_) { }
+    const payloadObj = { text: trimmed };
+
+    if (chatIdFromStorage) {
+      payloadObj.chat_id = chatIdFromStorage;
+    }
+
+    if (userIdFromStorage) {
+      payloadObj.user_id = userIdFromStorage;
+    }
+
     const payload = JSON.stringify(payloadObj);
 
+
     const send = (socket) => {
-      try { socket.send(payload); } catch (_) {}
+      try { 
+        socket.send(payload); 
+
+      } catch (_) { }
     };
 
     (async () => {
@@ -245,12 +296,12 @@ export function useStartLearning() {
   const reset = useCallback(() => {
     const socket = socketRef.current;
     if (socket) {
-      try { socket.close(); } catch (_) {}
+      try { socket.close(); } catch (_) { }
     }
     socketRef.current = null;
     setMessages([]);
     setIsAwaitingResponse(false);
-    try { localStorage.removeItem('chatStartLearningId'); } catch (_) {}
+    try { localStorage.removeItem('chatStartLearningId'); } catch (_) { }
   }, []);
 
   return {
@@ -260,5 +311,8 @@ export function useStartLearning() {
     isAwaitingResponse,
     startLearning,
     reset,
+    RoadmapStatusCheck,
+    roadmapStatus,
+    roadmapData
   };
 } 

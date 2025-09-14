@@ -36,7 +36,7 @@ export const MessageList = React.memo(function MessageList({ messages, isLoading
         if (isFirstRecommendation) {
           return (
             <div key={idx} className="mr-auto w-full max-w-full">
-              <RoadmapComponent msg={msg} />
+              <RoadmapComponent props={msg} />
             </div>
           );
         }
@@ -52,15 +52,3 @@ export const MessageList = React.memo(function MessageList({ messages, isLoading
     </div>
   );
 });
-
-
-// user clicks on the minilesson - you fetch the message id , payload , minilesson name , userid and call the create roadmap api 
-//create roadmap api will create all the ids and return you the minilesson_id - redirect to short_lesson/mini_id
-//on learn-now - show the roadmap and not chat 
-//whenever user lands on the learn-now - if call find-roadmap with the roamdap_id , user_id , chat_id . if yes show else show chat_id 
-
-
-
-
-// AI Payload - dict1
-// API PAYLOAD - dict2 
