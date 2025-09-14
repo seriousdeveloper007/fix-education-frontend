@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { WS_BASE_URL } from '../config';
-import { fetchStartLearningChatMessages, checkRoadmap } from '../services/chatService';
+import { fetchStartLearningChatMessages } from '../services/chatService';
+import { fetchRoadmap } from '../services/roadmapService';
 
 export function useStartLearning() {
   const socketRef = useRef(null);
@@ -32,7 +33,7 @@ export function useStartLearning() {
 
       // Only proceed if we have a valid user ID
       if (userIdFromStorage) {
-        const data = await checkRoadmap({ user_id: userIdFromStorage });
+        const data = await fetchRoadmap({ user_id: userIdFromStorage });
 
         if (data) {
           setRoadmapData(data)

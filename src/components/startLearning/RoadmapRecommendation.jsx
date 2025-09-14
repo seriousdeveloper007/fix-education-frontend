@@ -217,7 +217,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Info, ChevronRight, Target, Play, Clock } from 'lucide-react';
-import { createRoadmap } from '../../services/chatService';
+import { createRoadmap } from '../../services/roadmapService';
 
 export default function RoadmapComponent({ props }) {
 
@@ -239,6 +239,7 @@ export default function RoadmapComponent({ props }) {
   };
 
   const handleMiniLessonClick = (miniLesson, miniLessonIndex) => {
+    createRoadmap(props).catch(() => {});
     const miniLessonName = miniLesson?.name || `Mini Lesson ${miniLessonIndex + 1}`;
     navigate(`/short-lesson/${encodeURIComponent(miniLessonName)}`, {
       state: miniLesson
