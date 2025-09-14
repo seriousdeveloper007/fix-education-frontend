@@ -3,7 +3,7 @@ import themeConfig from './themeConfig';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
 import PropTypes from 'prop-types';
-import { attachUserToStartLearningChat } from '../services/chatService';
+import { attachUserToStartLearningChat , findLatestChatStartLearningId } from '../services/chatService';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const GOOGLE_ENDPOINT = `${API_BASE_URL}/user/auth/web/google`;
@@ -71,6 +71,14 @@ localStorage.setItem(
       localStorage.setItem('token', appJwt);
 
       await attachUserToStartLearningChat(backendUser.id);
+
+      const existing_chatStartLearningId = await findLatestChatStartLearningId(backendUser.id)
+      if(existing_chatStartLearningId){
+        localStorage.setItem("chatStartLearningId" , existing_chatStartLearningId) ;
+      }
+
+
+      //await attachUserToRoadmap(backendUser.id);
 
       window.dispatchEvent(new CustomEvent('userLoggedIn', {
         detail: { user: backendUser, token: appJwt }

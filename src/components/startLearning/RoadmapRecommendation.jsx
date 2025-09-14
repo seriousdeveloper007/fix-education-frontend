@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Info, ChevronRight, Target, Play, CheckCircle, Clock } from 'lucide-react';
+import { createRoadmap } from '../../services/chatService';
 
-const RoadmapComponent = ({ data }) => {
+export default function RoadmapComponent({ props }) {
+
+  const data = props?.payload
+  console.log(props)
   const moduleName = data?.module_name ?? 'Learning Roadmap';
   const currentLesson = data?.current_lesson;
   const futureLessons = Array.isArray(data?.future_lessons) ? data.future_lessons : [];
   const whyThisRoadmap = data?.why_this_roadmap ?? '';
-
   const [hoveredTopic, setHoveredTopic] = useState(null);
   const [completedTopics, setCompletedTopics] = useState(new Set());
   const navigate = useNavigate();
 
-  // --- NEW: small helper to ensure we display the proper lesson title
+  // Helper to ensure we display the proper lesson title
   const getLessonTitle = (lesson, fallback) => {
     const n = lesson?.name;
     if (typeof n === 'string' && n.trim()) return n.trim();
@@ -20,13 +23,70 @@ const RoadmapComponent = ({ data }) => {
     return fallback ?? '';
   };
 
-  const handleTopicClick = (topic, topicIndex) => {
+  // Helper to get mini lesson name - handles both string and object formats
+  const getMiniLessonName = (miniLesson) => {
+    if (typeof miniLesson === 'string') {
+      return miniLesson;
+    }
+    if (typeof miniLesson === 'object' && miniLesson !== null) {
+      return miniLesson.name || '';
+    }
+    return '';
+  };
+
+  // Helper to get the complete mini lesson data for navigation
+  const getMiniLessonData = (miniLesson) => {
+    if (typeof miniLesson === 'string') {
+      return { name: miniLesson };
+    }
+    if (typeof miniLesson === 'object' && miniLesson !== null) {
+      return miniLesson;
+    }
+    return { name: '' };
+  };
+
+  const handleTopicClick = async (miniLesson, topicIndex) => {
+    const topicName = getMiniLessonName(miniLesson);
+    const miniLessonData = getMiniLessonData(miniLesson);
+    const existing_id =typeof miniLesson === "object" && miniLesson !== null? miniLesson.id: null;
+    console.log(existing_id)
+    if(!existing_id){
+    
+    const userStr = localStorage.getItem("user");
+    let user_id = null;
+
+    if (userStr) {
+      const userObj = JSON.parse(userStr);
+      user_id = userObj.id;
+    }
+    
+    const apiPayload = {
+      message_id: props.messageId,
+      user_id: user_id,
+      name: topicName,
+      payload: data
+    };
+    console.log(apiPayload)
+    const response = await createRoadmap(apiPayload);
+    console.log('Roadmap created successfully:', response);
+
+    }
+
     const next = new Set(completedTopics);
     next.has(topicIndex) ? next.delete(topicIndex) : next.add(topicIndex);
     setCompletedTopics(next);
+    
     const lessonTitle = getLessonTitle(currentLesson, 'Current Lesson');
-    navigate(`/short-lesson/${encodeURIComponent(topic)}`, {
-      state: { lessonName: lessonTitle, miniLessonList: currentLesson?.mini_lessons || [] },
+    
+    // Pass both the lesson name and the complete mini lessons array for navigation
+    const miniLessonsForNavigation = currentLesson?.mini_lessons || [];
+    
+    navigate(`/short-lesson/${encodeURIComponent(topicName)}`, {
+      state: { 
+        lessonName: lessonTitle, 
+        miniLessonList: miniLessonsForNavigation,
+        currentMiniLesson: miniLessonData
+      },
     });
   };
 
@@ -83,34 +143,33 @@ const RoadmapComponent = ({ data }) => {
                 <div className="p-4">
                   <div className="space-y-3">
                     {currentLesson?.mini_lessons && currentLesson.mini_lessons.length > 0 ? (
-                      currentLesson.mini_lessons.map((topic, topicIndex) => {
+                      currentLesson.mini_lessons.map((miniLesson, topicIndex) => {
                         const isCompleted = completedTopics.has(topicIndex);
                         const isHovered = hoveredTopic === topicIndex;
+                        const topicName = getMiniLessonName(miniLesson);
 
                         return (
                           <button
                             type="button"
                             key={topicIndex}
-                            onClick={() => handleTopicClick(topic, topicIndex)}
+                            onClick={() => handleTopicClick(miniLesson, topicIndex)}
                             onMouseEnter={() => setHoveredTopic(topicIndex)}
                             onMouseLeave={() => setHoveredTopic(null)}
-                            className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${
-                              isCompleted 
-                                ? 'border-green-200 bg-green-50' 
-                                : isHovered 
-                                  ? 'border-indigo-200 bg-indigo-50' 
+                            className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${isCompleted
+                                ? 'border-green-200 bg-green-50'
+                                : isHovered
+                                  ? 'border-indigo-200 bg-indigo-50'
                                   : 'border-gray-200'
-                            }`}
+                              }`}
                           >
                             <div className="flex items-center justify-between p-4">
                               <div className="flex items-center gap-3 flex-1">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
-                                  isCompleted 
-                                    ? 'bg-green-100 text-green-600' 
-                                    : isHovered 
-                                      ? 'bg-indigo-100 text-indigo-600' 
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${isCompleted
+                                    ? 'bg-green-100 text-green-600'
+                                    : isHovered
+                                      ? 'bg-indigo-100 text-indigo-600'
                                       : 'bg-gray-100 text-gray-400'
-                                }`}>
+                                  }`}>
                                   {isCompleted ? (
                                     <CheckCircle className="w-4 h-4" />
                                   ) : isHovered ? (
@@ -119,33 +178,30 @@ const RoadmapComponent = ({ data }) => {
                                     <Clock className="w-4 h-4" />
                                   )}
                                 </div>
-                                <h5 className={`text-base font-semibold transition-colors ${
-                                  isCompleted 
-                                    ? 'text-green-800' 
-                                    : isHovered 
-                                      ? 'text-indigo-800' 
+                                <h5 className={`text-base font-semibold transition-colors ${isCompleted
+                                    ? 'text-green-800'
+                                    : isHovered
+                                      ? 'text-indigo-800'
                                       : 'text-slate-800'
-                                }`}>
-                                  {topic}
+                                  }`}>
+                                  {topicName}
                                 </h5>
                               </div>
-                              <ChevronRight className={`w-4 h-4 transition-all duration-200 ${
-                                isCompleted 
-                                  ? 'text-green-600' 
-                                  : isHovered 
-                                    ? 'text-indigo-600 transform translate-x-1' 
+                              <ChevronRight className={`w-4 h-4 transition-all duration-200 ${isCompleted
+                                  ? 'text-green-600'
+                                  : isHovered
+                                    ? 'text-indigo-600 transform translate-x-1'
                                     : 'text-slate-500 group-hover:text-slate-700'
-                              }`} />
+                                }`} />
                             </div>
-                            
+
                             {/* Progress indicator */}
-                            <div className={`h-1 transition-all duration-300 ${
-                              isCompleted 
-                                ? 'bg-gradient-to-r from-green-400 to-green-500' 
-                                : isHovered 
-                                  ? 'bg-gradient-to-r from-indigo-400 to-blue-500' 
+                            <div className={`h-1 transition-all duration-300 ${isCompleted
+                                ? 'bg-gradient-to-r from-green-400 to-green-500'
+                                : isHovered
+                                  ? 'bg-gradient-to-r from-indigo-400 to-blue-500'
                                   : 'bg-gray-200'
-                            }`} />
+                              }`} />
                           </button>
                         );
                       })
@@ -212,7 +268,3 @@ const RoadmapComponent = ({ data }) => {
     </div>
   );
 };
-
-export default function RoadmapView({ data }) {
-  return <RoadmapComponent data={data} />;
-}
