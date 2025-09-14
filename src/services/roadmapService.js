@@ -2,8 +2,7 @@ import { API_BASE_URL } from '../config';
 
 export async function createRoadmap(messageData) {
   try {
-    const body = { message_data: messageData };
-
+    const body = messageData
     try {
       const userStr = localStorage.getItem('user');
       if (userStr) {
@@ -13,6 +12,8 @@ export async function createRoadmap(messageData) {
         }
       }
     } catch (_) { }
+
+    console.log('Request body:', body);
 
     const response = await fetch(`${API_BASE_URL}/create-roadmap`, {
       method: 'POST',

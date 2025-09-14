@@ -42,7 +42,9 @@ export default function StartLearningPage() {
   
         {/* Roadmap present */}
         {roadmapStatus === "present" && (
-          <RoadmapComponent props = {{"payload":roadmapData}} />  
+          <div className="my-10">
+            <RoadmapComponent message={roadmapData} />  
+          </div>
         )}
   
         {/* No roadmap */}

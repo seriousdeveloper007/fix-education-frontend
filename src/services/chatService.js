@@ -36,31 +36,3 @@ export async function fetchStartLearningChatMessages(chatId) {
     return [];
   }
 } 
-export async function findLatestChatStartLearningId (userId)  {
-  try {
-    const headers = { 'Content-Type': 'application/json' };
-    
-    const token = localStorage.getItem('token');
-    if (token) {
-      headers['Authorization'] = token;
-    }
-
-    const response = await fetch('http://localhost:8000/chats/latest', {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify({
-        user_id: userId
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.chat_id; // Returns the chat_id or null
-  } catch (error) {
-    console.error('Error fetching latest chat:', error);
-    return null;
-  }
-};
