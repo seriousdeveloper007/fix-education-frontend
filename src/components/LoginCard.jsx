@@ -3,7 +3,7 @@ import themeConfig from './themeConfig';
 import analytics from '../services/posthogService';
 import { API_BASE_URL } from '../config.js';
 import PropTypes from 'prop-types';
-import { attachUserToStartLearningChat , findLatestChatStartLearningId } from '../services/chatService';
+import { attachUserToStartLearningChat  } from '../services/chatService';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const GOOGLE_ENDPOINT = `${API_BASE_URL}/user/auth/web/google`;

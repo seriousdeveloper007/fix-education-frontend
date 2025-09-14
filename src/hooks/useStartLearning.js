@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { WS_BASE_URL } from '../config';
-import { fetchStartLearningChatMessages, checkRoadmap } from '../services/chatService';
+import { fetchStartLearningChatMessages } from '../services/chatService';
+import { fetchRoadmap } from '../services/roadmapService';
 
 export function useStartLearning() {
   const socketRef = useRef(null);
@@ -12,7 +13,6 @@ export function useStartLearning() {
   const [isAwaitingResponse, setIsAwaitingResponse] = useState(false);
   const [roadmapStatus, setRoadmapStatus] = useState("checking")
   const [roadmapData, setRoadmapData] = useState(null)
-
 
   const resolvedUrl = `${WS_BASE_URL}/ws/learning-started`;
 
@@ -32,9 +32,10 @@ export function useStartLearning() {
 
       // Only proceed if we have a valid user ID
       if (userIdFromStorage) {
-        const data = await checkRoadmap({ user_id: userIdFromStorage });
+        const data = await fetchRoadmap({ user_id: userIdFromStorage });
 
         if (data) {
+          console.log("roadmap data", data)
           setRoadmapData(data)
           setRoadmapStatus("present");
         }
@@ -51,8 +52,6 @@ export function useStartLearning() {
       setRoadmapStatus("none");
     }
   }, []);
-
-
 
   const connectIfNeeded = useCallback(() => {
     const existing = socketRef.current;
@@ -99,28 +98,14 @@ export function useStartLearning() {
           try { localStorage.setItem('chatStartLearningId', String(data.chat_id)); } catch (_) { }
         }
 
-
-        // Special case: roadmap recommendation message
-        if (data?.roadmap_recommended) {
-          console.log('Processing roadmap_recommended:');
-          setMessages((prev) => [...prev,
-          {
-            role: 'assistant',
-            type: 'roadmap_recommendation',
-            payload: data.roadmap_recommended.payload,
-            messageId: data.roadmap_recommended.id
-          }]);
-          setIsAwaitingResponse(false);
-          return;
-        }
-
+        // Handle token messages (streaming)
         const token = data?.token;
         if (typeof token === 'string') {
           setMessages((prev) => {
             const next = [...prev];
             const last = next[next.length - 1];
-            if (!last || last.role === 'user') {
-              next.push({ role: 'assistant', text: token });
+            if (!last || last.message_from === 'user') {
+              next.push({ message_from: 'assistant', text: token });
             } else {
               next[next.length - 1] = { ...last, text: String((last.text ?? '')) + token };
             }
@@ -130,18 +115,31 @@ export function useStartLearning() {
           return;
         }
 
-        const assistantText = typeof data?.message === 'string' ? data.message : null;
-        if (assistantText) {
-          setMessages((prev) => {
-            const next = [...prev];
-            const last = next[next.length - 1];
-            if (!last || last.role === 'user') {
-              next.push({ role: 'assistant', text: String(assistantText) });
-            } else {
-              next[next.length - 1] = { ...last, text: String((last.text ?? '')) + String(assistantText) };
+        // Handle message with type checking
+        const message = data?.message;
+        if (message && typeof message === 'object') {
+          if (message.message_type === 'roadmap_recommended') {
+            // Pass the complete message object for roadmap recommendation
+            setMessages((prev) => [...prev, {
+              message_from: 'assistant',
+              ...message // Spread the entire message object
+            }]);
+          } else {
+            // Handle normal text messages
+            const assistantText = message.text || '';
+            if (assistantText) {
+              setMessages((prev) => {
+                const next = [...prev];
+                const last = next[next.length - 1];
+                if (!last || last.message_from === 'user') {
+                  next.push({ message_from: 'assistant', text: String(assistantText) });
+                } else {
+                  next[next.length - 1] = { ...last, text: String((last.text ?? '')) + String(assistantText) };
+                }
+                return next;
+              });
             }
-            return next;
-          });
+          }
           setIsAwaitingResponse(false);
         }
       } catch (_) {
@@ -188,7 +186,6 @@ export function useStartLearning() {
     };
   }, []);
 
-  // Fetch existing messages if a chat is already present in localStorage
   const fetchExistingMessages = useCallback(async () => {
     let chatIdFromStorage = null;
     try {
@@ -203,25 +200,12 @@ export function useStartLearning() {
     try {
       const data = await fetchStartLearningChatMessages(chatIdFromStorage);
       if (!Array.isArray(data)) return;
-      const mapped = data
-        .map((m) => {
-          const role = m?.message_from === 'user' ? 'user' : 'assistant';
-          const text = m?.text ?? '';
-          const type = m?.message_type;
-          const payload = m?.payload;
-
-          // Special case to surface FirstRecommendation view (legacy shape)
-          const hasNoText = !(typeof text === 'string' && text.trim() !== '');
-          if (type === 'roadmap_recommended' && hasNoText && payload) {
-            return { role: 'assistant', type: 'roadmap_recommendation', payload };
-          }
-
-          if (typeof text !== 'string' || text.trim() === '') return null;
-          return { role, text: String(text) };
-        })
-        .filter(Boolean);
-      if (mapped.length > 0) {
-        setMessages(mapped);
+      
+      // Just pass the messages through as-is, let the components handle display logic
+      const validMessages = data.filter(m => m && typeof m === 'object');
+      
+      if (validMessages.length > 0) {
+        setMessages(validMessages);
       }
     } catch (_) {
       // ignore
@@ -232,12 +216,13 @@ export function useStartLearning() {
     fetchExistingMessages();
   }, [fetchExistingMessages]);
 
+
   const startLearning = useCallback((text) => {
     const trimmed = (text || '').trim();
     if (!trimmed) return;
 
     // Push the user message immediately and show loading
-    setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
+    setMessages((prev) => [...prev, { message_from: 'user', text: trimmed }]);
     setIsAwaitingResponse(true);
 
     let chatIdFromStorage = null;
@@ -270,11 +255,9 @@ export function useStartLearning() {
 
     const payload = JSON.stringify(payloadObj);
 
-
     const send = (socket) => {
       try { 
         socket.send(payload); 
-
       } catch (_) { }
     };
 
@@ -315,4 +298,4 @@ export function useStartLearning() {
     roadmapStatus,
     roadmapData
   };
-} 
+}

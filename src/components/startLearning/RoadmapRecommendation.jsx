@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Info, ChevronRight, Target, Play, CheckCircle, Clock } from 'lucide-react';
-import { createRoadmap } from '../../services/chatService';
+import { BookOpen, Info, ChevronRight, Target, Play, Clock } from 'lucide-react';
+import { createRoadmap } from '../../services/roadmapService';
 
-export default function RoadmapComponent({ props }) {
+export default function RoadmapComponent({ message }) {
+  // The message is the raw API response - extract data from payload
+  console.log("input data", message)
+  const data = message?.payload || {};
+  const messageId = message?.id || message?.message_id;
+  
 
-  const data = props?.payload
-  console.log(props)
-  const moduleName = data?.module_name ?? 'Learning Roadmap';
-  const currentLesson = data?.current_lesson;
+  const moduleName = data?.module_name || 'Learning Roadmap';
+  const currentLesson = data?.current_lesson || null;
   const futureLessons = Array.isArray(data?.future_lessons) ? data.future_lessons : [];
-  const whyThisRoadmap = data?.why_this_roadmap ?? '';
-  const [hoveredTopic, setHoveredTopic] = useState(null);
-  const [completedTopics, setCompletedTopics] = useState(new Set());
+  const whyThisRoadmap = data?.why_this_roadmap || '';
+  
+  const [hoveredMiniLesson, setHoveredMiniLesson] = useState(null);
   const navigate = useNavigate();
 
   // Helper to ensure we display the proper lesson title
@@ -20,19 +23,44 @@ export default function RoadmapComponent({ props }) {
     const n = lesson?.name;
     if (typeof n === 'string' && n.trim()) return n.trim();
     if (typeof n === 'number') return `Lesson ${n}`;
-    return fallback ?? '';
+    return fallback || '';
   };
 
-  const handleTopicClick = (miniLesson, topicIndex) => {
-    const next = new Set(completedTopics);
-    next.has(topicIndex) ? next.delete(topicIndex) : next.add(topicIndex);
-    setCompletedTopics(next);
-    const miniLessonName = miniLesson?.name || `Topic ${topicIndex + 1}`;
-    navigate(`/short-lesson/${encodeURIComponent(miniLessonName)}`, {
-      state: miniLesson
-  
-    });
+  const handleMiniLessonClick = (miniLesson, miniLessonIndex) => {
+    const miniLessonName = miniLesson?.name || `Mini Lesson ${miniLessonIndex + 1}`;
+    
+    // Only create roadmap if mini lesson has no id key
+    if (!miniLesson?.id) {
+      const messageData = {
+        message_id: messageId,
+        payload: data,
+        mini_lesson_name: miniLessonName
+      };
+      
+      createRoadmap(messageData).catch((error) => {
+        console.error('Error creating roadmap:', error);
+      });
+    }
+    
+    // navigate(`/short-lesson/${encodeURIComponent(miniLessonName)}`, {
+    //   state: miniLesson
+    // });
   };
+
+  // If no payload or data, show error state
+  if (!data || Object.keys(data).length === 0) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <p className="text-yellow-700">No roadmap data available</p>
+        <details className="mt-2">
+          <summary className="cursor-pointer text-xs text-yellow-600">Debug Info</summary>
+          <pre className="mt-2 text-xs bg-yellow-100 p-2 rounded overflow-auto">
+            {JSON.stringify(message, null, 2)}
+          </pre>
+        </details>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -58,7 +86,7 @@ export default function RoadmapComponent({ props }) {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Current Lesson - Styled like future lessons but expanded */}
+            {/* Current Lesson */}
             <div className="relative">
               <div className="bg-white border-2 border-indigo-200 rounded-lg overflow-hidden shadow-sm">
                 {/* Current Lesson Header */}
@@ -83,77 +111,56 @@ export default function RoadmapComponent({ props }) {
                   </div>
                 </div>
 
-                {/* Topics - Expanded Content */}
+                {/* Mini Lessons */}
                 <div className="p-4">
                   <div className="space-y-3">
                     {currentLesson?.mini_lessons && currentLesson.mini_lessons.length > 0 ? (
-                      currentLesson.mini_lessons.map((miniLesson, topicIndex) => {
-                        const isCompleted = completedTopics.has(topicIndex);
-                        const isHovered = hoveredTopic === topicIndex;
-                        const topicName = miniLesson?.name || `Topic ${topicIndex + 1}`;
-
+                      currentLesson.mini_lessons.map((miniLesson, miniLessonIndex) => {
+                        const isHovered = hoveredMiniLesson === miniLessonIndex;
+                        const miniLessonName = miniLesson?.name || `Mini Lesson ${miniLessonIndex + 1}`;
 
                         return (
                           <button
                             type="button"
-                            key={topicIndex}
-                            onClick={() => handleTopicClick(miniLesson, topicIndex)}
-                            onMouseEnter={() => setHoveredTopic(topicIndex)}
-                            onMouseLeave={() => setHoveredTopic(null)}
-                            className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${isCompleted
-                                ? 'border-green-200 bg-green-50'
-                                : isHovered
-                                  ? 'border-indigo-200 bg-indigo-50'
-                                  : 'border-gray-200'
-                              }`}
+                            key={miniLessonIndex}
+                            onClick={() => handleMiniLessonClick(miniLesson, miniLessonIndex)}
+                            onMouseEnter={() => setHoveredMiniLesson(miniLessonIndex)}
+                            onMouseLeave={() => setHoveredMiniLesson(null)}
+                            className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${
+                              isHovered ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200'
+                            }`}
                           >
                             <div className="flex items-center justify-between p-4">
                               <div className="flex items-center gap-3 flex-1">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${isCompleted
-                                    ? 'bg-green-100 text-green-600'
-                                    : isHovered
-                                      ? 'bg-indigo-100 text-indigo-600'
-                                      : 'bg-gray-100 text-gray-400'
-                                  }`}>
-                                  {isCompleted ? (
-                                    <CheckCircle className="w-4 h-4" />
-                                  ) : isHovered ? (
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
+                                  isHovered ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-400'
+                                }`}>
+                                  {isHovered ? (
                                     <Play className="w-3 h-3 ml-0.5" />
                                   ) : (
                                     <Clock className="w-4 h-4" />
                                   )}
                                 </div>
-                                <h5 className={`text-base font-semibold transition-colors ${isCompleted
-                                    ? 'text-green-800'
-                                    : isHovered
-                                      ? 'text-indigo-800'
-                                      : 'text-slate-800'
-
-                                  }`}>
-                                  {topicName}
+                                <h5 className={`text-base font-semibold transition-colors ${
+                                  isHovered ? 'text-indigo-800' : 'text-slate-800'
+                                }`}>
+                                  {miniLessonName}
                                 </h5>
                               </div>
-                              <ChevronRight className={`w-4 h-4 transition-all duration-200 ${isCompleted
-                                  ? 'text-green-600'
-                                  : isHovered
-                                    ? 'text-indigo-600 transform translate-x-1'
-                                    : 'text-slate-500 group-hover:text-slate-700'
-                                }`} />
-                            </div>
-
-                            {/* Progress indicator */}
-                            <div className={`h-1 transition-all duration-300 ${isCompleted
-                                ? 'bg-gradient-to-r from-green-400 to-green-500'
-                                : isHovered
-                                  ? 'bg-gradient-to-r from-indigo-400 to-blue-500'
-                                  : 'bg-gray-200'
+                              <ChevronRight className={`w-4 h-4 transition-all duration-200 ${
+                                isHovered ? 'text-indigo-600 transform translate-x-1' : 'text-slate-500 group-hover:text-slate-700'
                               }`} />
+                            </div>
+                            {/* Progress indicator */}
+                            <div className={`h-1 transition-all duration-300 ${
+                              isHovered ? 'bg-gradient-to-r from-indigo-400 to-blue-500' : 'bg-gray-200'
+                            }`} />
                           </button>
                         );
                       })
                     ) : (
                       <div className="bg-slate-50 border border-gray-200 rounded-lg p-8 text-center">
-                        <p className="text-slate-700">No topics defined for current lesson</p>
+                        <p className="text-slate-700">No mini lessons defined for current lesson</p>
                       </div>
                     )}
                   </div>
@@ -207,15 +214,10 @@ export default function RoadmapComponent({ props }) {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <span>Continue messaging to improve the roadmap</span>
           <span className="text-slate-700 font-medium">
-            Current: {currentLesson?.mini_lessons?.length ?? 0} topics • Future: {futureLessons.length} lessons
+            Current: {currentLesson?.mini_lessons?.length || 0} mini lessons • Future: {futureLessons.length} lessons
           </span>
         </div>
       </div>
     </div>
   );
-};
-
-export default function RoadmapView({ data }) {
-  return <RoadmapComponent data={data} />;
 }
-
