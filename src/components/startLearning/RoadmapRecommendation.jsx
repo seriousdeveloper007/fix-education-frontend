@@ -23,70 +23,14 @@ export default function RoadmapComponent({ props }) {
     return fallback ?? '';
   };
 
-  // Helper to get mini lesson name - handles both string and object formats
-  const getMiniLessonName = (miniLesson) => {
-    if (typeof miniLesson === 'string') {
-      return miniLesson;
-    }
-    if (typeof miniLesson === 'object' && miniLesson !== null) {
-      return miniLesson.name || '';
-    }
-    return '';
-  };
-
-  // Helper to get the complete mini lesson data for navigation
-  const getMiniLessonData = (miniLesson) => {
-    if (typeof miniLesson === 'string') {
-      return { name: miniLesson };
-    }
-    if (typeof miniLesson === 'object' && miniLesson !== null) {
-      return miniLesson;
-    }
-    return { name: '' };
-  };
-
-  const handleTopicClick = async (miniLesson, topicIndex) => {
-    const topicName = getMiniLessonName(miniLesson);
-    const miniLessonData = getMiniLessonData(miniLesson);
-    const existing_id =typeof miniLesson === "object" && miniLesson !== null? miniLesson.id: null;
-    console.log(existing_id)
-    if(!existing_id){
-    
-    const userStr = localStorage.getItem("user");
-    let user_id = null;
-
-    if (userStr) {
-      const userObj = JSON.parse(userStr);
-      user_id = userObj.id;
-    }
-    
-    const apiPayload = {
-      message_id: props.messageId,
-      user_id: user_id,
-      name: topicName,
-      payload: data
-    };
-    console.log(apiPayload)
-    const response = await createRoadmap(apiPayload);
-    console.log('Roadmap created successfully:', response);
-
-    }
-
+  const handleTopicClick = (miniLesson, topicIndex) => {
     const next = new Set(completedTopics);
     next.has(topicIndex) ? next.delete(topicIndex) : next.add(topicIndex);
     setCompletedTopics(next);
-    
-    const lessonTitle = getLessonTitle(currentLesson, 'Current Lesson');
-    
-    // Pass both the lesson name and the complete mini lessons array for navigation
-    const miniLessonsForNavigation = currentLesson?.mini_lessons || [];
-    
-    navigate(`/short-lesson/${encodeURIComponent(topicName)}`, {
-      state: { 
-        lessonName: lessonTitle, 
-        miniLessonList: miniLessonsForNavigation,
-        currentMiniLesson: miniLessonData
-      },
+    const miniLessonName = miniLesson?.name || `Topic ${topicIndex + 1}`;
+    navigate(`/short-lesson/${encodeURIComponent(miniLessonName)}`, {
+      state: miniLesson
+  
     });
   };
 
@@ -146,7 +90,8 @@ export default function RoadmapComponent({ props }) {
                       currentLesson.mini_lessons.map((miniLesson, topicIndex) => {
                         const isCompleted = completedTopics.has(topicIndex);
                         const isHovered = hoveredTopic === topicIndex;
-                        const topicName = getMiniLessonName(miniLesson);
+                        const topicName = miniLesson?.name || `Topic ${topicIndex + 1}`;
+
 
                         return (
                           <button
@@ -183,6 +128,7 @@ export default function RoadmapComponent({ props }) {
                                     : isHovered
                                       ? 'text-indigo-800'
                                       : 'text-slate-800'
+
                                   }`}>
                                   {topicName}
                                 </h5>
@@ -268,3 +214,8 @@ export default function RoadmapComponent({ props }) {
     </div>
   );
 };
+
+export default function RoadmapView({ data }) {
+  return <RoadmapComponent data={data} />;
+}
+
