@@ -38,7 +38,7 @@ function AppRoutes() {
         path="/"
         element={
           isLoggedIn() ? (
-            <Navigate to="/learn-now" replace />
+            <Navigate to="/home" replace />
           ) : (
             // <LandingPage />
             <StartLearningPage />
@@ -51,7 +51,7 @@ function AppRoutes() {
         path="/login"
         element={
           isLoggedIn() ? (
-            <Navigate to="/learn-now" replace />
+            <Navigate to="/home" replace />
           ) : (
             <GoogleLogin />
           )
@@ -61,18 +61,19 @@ function AppRoutes() {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
       <Route
-        path="/learn-now"
+        path="/home"
         element={<StartLearningPage />}
       />
 
-      <Route path="/short-lesson/:miniLesson" element={<ShortLessonPage />} />
+      <Route path="/learn/:id/:miniLessonSlug" element={<ShortLessonPage />} />
+
 
       {/* Fallback */}
       <Route
         path="*"
         element={
           isLoggedIn() ? (
-            <Navigate to="/learn-now" replace />
+            <Navigate to="/home" replace />
           ) : (
             <Navigate to="/" replace />
           )

@@ -319,8 +319,9 @@ const TTSCaptionManager = React.memo(({ speak }) => {
     </div>
   );
 });
+
 // ---------- Lesson Content (Memoized) ----------
-const LessonContent = React.memo(({ artifactUrl, exportName, miniLesson, speak }) => {
+const LessonContent = React.memo(({ artifactUrl, exportName, lessonId, speak }) => {
   return (
     <div className="flex-1 min-w-0 overflow-x-hidden border border-gray-200 rounded-lg bg-white lesson-container-scrollable">
       <div className="lesson-shell">
@@ -330,7 +331,7 @@ const LessonContent = React.memo(({ artifactUrl, exportName, miniLesson, speak }
               <Remote
                 url={artifactUrl}
                 exportName={exportName}
-                lessonId={miniLesson || 'unknown-lesson'}
+                lessonId={lessonId || 'unknown-lesson'}
                 viewport="mobile"
                 theme="light"
                 speak={(text) => {
@@ -360,27 +361,29 @@ const LessonContent = React.memo(({ artifactUrl, exportName, miniLesson, speak }
     </div>
   );
 }, (prevProps, nextProps) => {
-  // Only re-render if artifactUrl, exportName, or miniLesson changes
+  // Only re-render if artifactUrl, exportName, or lessonId changes
   return prevProps.artifactUrl === nextProps.artifactUrl &&
          prevProps.exportName === nextProps.exportName &&
-         prevProps.miniLesson === nextProps.miniLesson;
+         prevProps.lessonId === nextProps.lessonId;
 });
 
 // ---------- Page ----------
 export default function ShortLessonPage() {
-  const { miniLesson: miniLessonParam } = useParams();
-  const miniLesson = decodeURIComponent(miniLessonParam || '');
+  const { id, miniLessonSlug } = useParams();
   const location = useLocation();
   const { search, state } = location;
-  const miniLessonData = state || {};
-  const lessonDisplayName = miniLessonData.name || miniLesson || 'Interactive Lesson';
+  
+  // Convert slug back to readable name for display
+  const lessonDisplayName = miniLessonSlug 
+    ? miniLessonSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    : state?.name || 'Interactive Lesson';
 
   const params = new URLSearchParams(search);
   const artifactOverride = params.get('artifact');
   const exportName = params.get('export') || 'default';
 
   const { artifactUrl, loading, error } = useShortLesson({
-    miniLessonData,
+    miniLessonId: id,
     artifactOverride,
   });
 
@@ -479,7 +482,6 @@ export default function ShortLessonPage() {
           <div className="flex-1 min-h-0 flex items-center justify-center">
             <div className="text-center">
               <Loader />
-              <p className="mt-4 text-gray-600">Loading lesson content...</p>
             </div>
           </div>
         </div>
@@ -519,7 +521,7 @@ export default function ShortLessonPage() {
         <LessonContent 
           artifactUrl={artifactUrl}
           exportName={exportName}
-          miniLesson={miniLesson}
+          lessonId={id}
           speak={speak}
         />
       </div>

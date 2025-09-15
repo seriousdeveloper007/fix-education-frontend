@@ -9,7 +9,6 @@ export default function RoadmapComponent({ message }) {
   const data = message?.payload || {};
   const messageId = message?.id || message?.message_id;
   
-
   const moduleName = data?.module_name || 'Learning Roadmap';
   const currentLesson = data?.current_lesson || null;
   const futureLessons = Array.isArray(data?.future_lessons) ? data.future_lessons : [];
@@ -17,6 +16,11 @@ export default function RoadmapComponent({ message }) {
   
   const [hoveredMiniLesson, setHoveredMiniLesson] = useState(null);
   const navigate = useNavigate();
+
+  // Helper to check if user is authenticated
+  const isAuthenticated = () => {
+    return !!localStorage.getItem('token');
+  };
 
   // Helper to ensure we display the proper lesson title
   const getLessonTitle = (lesson, fallback) => {
@@ -26,25 +30,52 @@ export default function RoadmapComponent({ message }) {
     return fallback || '';
   };
 
-  const handleMiniLessonClick = (miniLesson, miniLessonIndex) => {
-    const miniLessonName = miniLesson?.name || `Mini Lesson ${miniLessonIndex + 1}`;
-    
-    // Only create roadmap if mini lesson has no id key
-    if (!miniLesson?.id) {
+  // Create a URL-friendly slug for names so the path has no %20 etc.
+  const toSlug = (value) => {
+    return String(value || '')
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
+  const handleMiniLessonClick = async (miniLesson, miniLessonIndex) => {
+    let selectedMiniLesson = miniLesson;
+    const fallbackName = `Mini Lesson ${miniLessonIndex + 1}`;
+
+    // If no id, create roadmap and use the returned mini_lesson dict
+    if (!selectedMiniLesson?.id) {
       const messageData = {
         message_id: messageId,
         payload: data,
-        mini_lesson_name: miniLessonName
+        mini_lesson_name: selectedMiniLesson?.name || fallbackName
       };
-      
-      createRoadmap(messageData).catch((error) => {
-        console.error('Error creating roadmap:', error);
-      });
+      try {
+        const result = await createRoadmap(messageData);
+        if (result?.mini_lesson) {
+          selectedMiniLesson = result.mini_lesson;
+        }
+      } catch (error) {
+        console.error('Roadmap creation failed:', error);
+      }
     }
+
+    const miniLessonId = selectedMiniLesson?.id ?? '';
+    const miniLessonName = selectedMiniLesson?.name || fallbackName;
+    const targetUrl = `/learn/${miniLessonId}/${toSlug(miniLessonName)}`;
     
-    // navigate(`/short-lesson/${encodeURIComponent(miniLessonName)}`, {
-    //   state: miniLesson
-    // });
+    if (!isAuthenticated()) {
+      const redirectUri = encodeURIComponent(targetUrl);
+      const customHeading = encodeURIComponent('Save roadmap before start learning');
+      navigate(`/login?redirect=${redirectUri}&heading=${customHeading}`);
+      return;
+    }
+
+    navigate(targetUrl, {
+      state: selectedMiniLesson
+    });
   };
 
   // If no payload or data, show error state
