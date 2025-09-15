@@ -69,7 +69,6 @@ const LessonHeader = React.memo(({ lessonDisplayName }) => {
   );
 });
 
-// ---------- TTS Caption Manager (Isolated State with Smooth Transition) ----------
 const TTSCaptionManager = React.memo(({ speak }) => {
   const [caption, setCaption] = useState('');
   const [currentWordIndex, setCurrentWordIndex] = useState(-1);
@@ -163,11 +162,15 @@ const TTSCaptionManager = React.memo(({ speak }) => {
           let charCount = 0;
           for (let i = 0; i < words.length; i++) {
             if (event.charIndex >= charCount && event.charIndex < charCount + words[i].length) {
+              // Update the current word index state for the sliding window
+              setCurrentWordIndex(i);
+              
               // Update only the word highlighting via DOM manipulation
               if (captionRef.current) {
                 const spans = captionRef.current.querySelectorAll('span');
                 spans.forEach((span, idx) => {
-                  if (idx === i) {
+                  const actualWordIndex = parseInt(span.getAttribute('data-word-index'));
+                  if (actualWordIndex === i) {
                     span.style.background = '#333';
                     span.style.color = '#fff';
                     span.style.fontWeight = '600';
@@ -249,7 +252,8 @@ const TTSCaptionManager = React.memo(({ speak }) => {
 
   const words = caption.split(/\s+/);
   const windowSize = 7;
-  const startIdx = Math.max(0, currentWordIndex - 3);
+  // Center the current word in the window
+  const startIdx = Math.max(0, Math.min(currentWordIndex - 3, words.length - windowSize));
   const endIdx = Math.min(words.length, startIdx + windowSize);
   const visibleWords = words.slice(startIdx, endIdx);
 
@@ -298,7 +302,7 @@ const TTSCaptionManager = React.memo(({ speak }) => {
       )}
       {visibleWords.map((word, i) => (
         <span
-          key={i}
+          key={startIdx + i}
           data-word-index={startIdx + i}
           style={{
             margin: '0 0.2ch',
