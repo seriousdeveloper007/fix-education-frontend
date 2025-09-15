@@ -482,7 +482,6 @@ export default function ShortLessonPage() {
           <div className="flex-1 min-h-0 flex items-center justify-center">
             <div className="text-center">
               <Loader />
-              <p className="mt-4 text-gray-600">Loading lesson content...</p>
             </div>
           </div>
         </div>
