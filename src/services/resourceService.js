@@ -31,3 +31,36 @@ export const findResources = async (mini_lesson_name, mini_lesson_id, max_resour
     throw error;
   }
 };
+
+
+export const generateQuestions = async (mini_lesson_name, mini_lesson_id, max_questions = 3, difficulty_preference = null) => {
+    try {
+      const requestBody = {
+        mini_lesson_name,
+        mini_lesson_id,
+        max_questions
+      };
+  
+      if (difficulty_preference) {
+        requestBody.difficulty_preference = difficulty_preference;
+      }
+  
+      const response = await fetch(`${API_BASE_URL}/resources/generate-questions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error generating questions:', error);
+      throw error;
+    }
+  };
