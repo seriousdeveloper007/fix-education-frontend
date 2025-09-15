@@ -10,6 +10,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import GoogleLogin from './pages/LoginPage';
 import StartLearningPage from './pages/StartLearningPage';
 import ShortLessonPage from './pages/ShortLessonPage';
+import Resources from './components/Resources';
 
 
 export default function App() {
@@ -66,6 +67,8 @@ function AppRoutes() {
       />
 
       <Route path="/short-lesson/:miniLesson" element={<ShortLessonPage />} />
+
+      <Route path="/resources/:id" element={<Resources />} />
 
       {/* Fallback */}
       <Route

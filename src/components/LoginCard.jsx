@@ -72,10 +72,10 @@ localStorage.setItem(
 
       await attachUserToStartLearningChat(backendUser.id);
 
-      const existing_chatStartLearningId = await findLatestChatStartLearningId(backendUser.id)
-      if(existing_chatStartLearningId){
-        localStorage.setItem("chatStartLearningId" , existing_chatStartLearningId) ;
-      }
+      // const existing_chatStartLearningId = await findLatestChatStartLearningId(backendUser.id)
+      // if(existing_chatStartLearningId){
+      //   localStorage.setItem("chatStartLearningId" , existing_chatStartLearningId) ;
+      // }
 
 
       //await attachUserToRoadmap(backendUser.id);

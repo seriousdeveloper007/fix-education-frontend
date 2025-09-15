@@ -8,13 +8,13 @@ export default function RoadmapComponent({ message }) {
   console.log("input data", message)
   const data = message?.payload || {};
   const messageId = message?.id || message?.message_id;
-  
+
 
   const moduleName = data?.module_name || 'Learning Roadmap';
   const currentLesson = data?.current_lesson || null;
   const futureLessons = Array.isArray(data?.future_lessons) ? data.future_lessons : [];
   const whyThisRoadmap = data?.why_this_roadmap || '';
-  
+
   const [hoveredMiniLesson, setHoveredMiniLesson] = useState(null);
   const navigate = useNavigate();
 
@@ -28,7 +28,7 @@ export default function RoadmapComponent({ message }) {
 
   const handleMiniLessonClick = (miniLesson, miniLessonIndex) => {
     const miniLessonName = miniLesson?.name || `Mini Lesson ${miniLessonIndex + 1}`;
-    
+
     // Only create roadmap if mini lesson has no id key
     if (!miniLesson?.id) {
       const messageData = {
@@ -36,12 +36,12 @@ export default function RoadmapComponent({ message }) {
         payload: data,
         mini_lesson_name: miniLessonName
       };
-      
+
       createRoadmap(messageData).catch((error) => {
         console.error('Error creating roadmap:', error);
       });
     }
-    
+
     // navigate(`/short-lesson/${encodeURIComponent(miniLessonName)}`, {
     //   state: miniLesson
     // });
@@ -120,42 +120,53 @@ export default function RoadmapComponent({ message }) {
                         const miniLessonName = miniLesson?.name || `Mini Lesson ${miniLessonIndex + 1}`;
 
                         return (
-                          <button
-                            type="button"
-                            key={miniLessonIndex}
-                            onClick={() => handleMiniLessonClick(miniLesson, miniLessonIndex)}
-                            onMouseEnter={() => setHoveredMiniLesson(miniLessonIndex)}
-                            onMouseLeave={() => setHoveredMiniLesson(null)}
-                            className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${
-                              isHovered ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between p-4">
-                              <div className="flex items-center gap-3 flex-1">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
-                                  isHovered ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-400'
-                                }`}>
-                                  {isHovered ? (
-                                    <Play className="w-3 h-3 ml-0.5" />
-                                  ) : (
-                                    <Clock className="w-4 h-4" />
-                                  )}
+
+                          <div key={miniLessonIndex} className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              key={miniLessonIndex}
+                              onClick={() => handleMiniLessonClick(miniLesson, miniLessonIndex)}
+                              onMouseEnter={() => setHoveredMiniLesson(miniLessonIndex)}
+                              onMouseLeave={() => setHoveredMiniLesson(null)}
+                              className={`group w-full text-left bg-white border rounded-lg shadow-sm hover:shadow-md focus:shadow-md transition-all duration-200 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-[1.01] ${isHovered ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200'
+                                }`}
+                            >
+                              <div className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-3 flex-1">
+                                  <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${isHovered ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-400'
+                                    }`}>
+                                    {isHovered ? (
+                                      <Play className="w-3 h-3 ml-0.5" />
+                                    ) : (
+                                      <Clock className="w-4 h-4" />
+                                    )}
+                                  </div>
+                                  <h5 className={`text-base font-semibold transition-colors ${isHovered ? 'text-indigo-800' : 'text-slate-800'
+                                    }`}>
+                                    {miniLessonName}
+                                  </h5>
                                 </div>
-                                <h5 className={`text-base font-semibold transition-colors ${
-                                  isHovered ? 'text-indigo-800' : 'text-slate-800'
-                                }`}>
-                                  {miniLessonName}
-                                </h5>
+                                <ChevronRight className={`w-4 h-4 transition-all duration-200 ${isHovered ? 'text-indigo-600 transform translate-x-1' : 'text-slate-500 group-hover:text-slate-700'
+                                  }`} />
                               </div>
-                              <ChevronRight className={`w-4 h-4 transition-all duration-200 ${
-                                isHovered ? 'text-indigo-600 transform translate-x-1' : 'text-slate-500 group-hover:text-slate-700'
-                              }`} />
-                            </div>
-                            {/* Progress indicator */}
-                            <div className={`h-1 transition-all duration-300 ${
-                              isHovered ? 'bg-gradient-to-r from-indigo-400 to-blue-500' : 'bg-gray-200'
-                            }`} />
-                          </button>
+                              {/* Progress indicator */}
+                              <div className={`h-1 transition-all duration-300 ${isHovered ? 'bg-gradient-to-r from-indigo-400 to-blue-500' : 'bg-gray-200'
+                                }`} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/resources/${miniLesson?.id}`, {
+                                state: {
+                                  mini_lesson_id: miniLesson?.id ,
+                                  mini_lesson_name: miniLessonName
+                                }
+                              })}
+                              className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200 text-sm font-medium"
+                            >
+                              Resources
+                            </button>
+                          </div>
+
                         );
                       })
                     ) : (
