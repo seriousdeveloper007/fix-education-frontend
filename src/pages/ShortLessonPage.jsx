@@ -4,6 +4,7 @@ import Navbar from '../components/navbar/Navbar';
 import Loader from '../components/Loader';
 import LessonHeader from '../components/lesson/LessonHeader';
 import { useShortLesson } from '../hooks/useShortLesson';
+import { createMiniLesson } from '../services/miniLessonService';
 
 
 // ---------- Error Boundary ----------
@@ -382,13 +383,39 @@ export default function ShortLessonPage() {
     artifactOverride,
   });
 
+  const prefetchNextMiniLesson = useCallback(() => {
+    if (!state) return;
+
+    const miniLessons = Array.isArray(state.miniLessons) ? state.miniLessons : [];
+    const currentIndex = typeof state.miniLessonIndex === 'number' ? state.miniLessonIndex : null;
+
+    if (!miniLessons.length || currentIndex === null) {
+      return;
+    }
+
+    const nextMiniLesson = miniLessons.find((lesson, index) => index > currentIndex && lesson && lesson.id != null);
+
+    if (!nextMiniLesson || nextMiniLesson.id == null) {
+      return;
+    }
+
+    const nextMiniLessonId = nextMiniLesson.id;
+
+    createMiniLesson(nextMiniLessonId).catch((err) => {
+      console.error('Failed to prefetch next mini lesson material:', err);
+    });
+  }, [state]);
+
   const handleStartDiscussion = useCallback(() => {
     if (!id || !miniLessonSlug) return;
+
+    prefetchNextMiniLesson();
+
     navigate(`/${id}/${miniLessonSlug}/topic-discussion${search || ''}`, {
       state,
       replace: false,
     });
-  }, [id, miniLessonSlug, navigate, search, state]);
+  }, [id, miniLessonSlug, navigate, prefetchNextMiniLesson, search, state]);
 
   // Base speak function (will be overridden by TTSCaptionManager)
   const speak = useCallback((text) => {
