@@ -1,10 +1,72 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { WS_BASE_URL } from '../config';
-import {
-  getStoredMiniLessonDiscussionChatId,
-  storeMiniLessonDiscussionChatId,
-  fetchMiniLessonDiscussionMessages,
-} from '../services/miniLessonDiscussionService';
+
+const STORAGE_KEY = 'chatDiscussionID';
+const TEN_MINUTES_MS = 10 * 60 * 1000;
+
+// Local storage utilities
+function readStorage() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(record) {
+  if (typeof window === 'undefined') return;
+  try {
+    if (!record) {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return;
+    }
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(record));
+  } catch {
+    return;
+  }
+}
+
+function clearChatDiscussionId() {
+  writeStorage(null);
+}
+
+function storeChatDiscussionId(chatId) {
+  if (!chatId) {
+    clearChatDiscussionId();
+    return;
+  }
+
+  const record = {
+    id: String(chatId),
+    expiresAt: Date.now() + TEN_MINUTES_MS,
+  };
+
+  writeStorage(record);
+}
+
+function getStoredChatDiscussionId() {
+  const record = readStorage();
+  if (!record) return null;
+
+  if (typeof record.expiresAt === 'number' && record.expiresAt > 0) {
+    if (record.expiresAt < Date.now()) {
+      clearChatDiscussionId();
+      return null;
+    }
+  }
+
+  if (!record.id) {
+    clearChatDiscussionId();
+    return null;
+  }
+
+  return String(record.id);
+}
 
 function sanitizeMessage(message) {
   if (!message || typeof message !== 'object') return null;
@@ -19,13 +81,12 @@ function sanitizeMessage(message) {
   return safe;
 }
 
-export function useMiniLessonDiscussion({ miniLessonId }) {
+export function useChatDiscussion() {
   const [messages, setMessages] = useState([]);
-  const [chatId, setChatId] = useState(() => getStoredMiniLessonDiscussionChatId(miniLessonId));
+  const [chatId, setChatId] = useState(() => getStoredChatDiscussionId());
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isAwaitingResponse, setIsAwaitingResponse] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const socketRef = useRef(null);
   const firstSendAfterOpenRef = useRef(false);
@@ -33,9 +94,8 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
   const userIdRef = useRef(null);
 
   const resolvedUrl = useMemo(() => {
-    if (!miniLessonId) return null;
-    return `${WS_BASE_URL}/ws/mini-lesson-discussion`;
-  }, [miniLessonId]);
+    return `${WS_BASE_URL}/ws/chat-discussion`;
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -52,11 +112,10 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
   }, []);
 
   useEffect(() => {
-    const stored = getStoredMiniLessonDiscussionChatId(miniLessonId);
+    const stored = getStoredChatDiscussionId();
     setChatId(stored ?? null);
     setMessages([]);
     setIsAwaitingResponse(false);
-    setIsLoadingHistory(false);
     lastHandshakeKeyRef.current = null;
 
     const socket = socketRef.current;
@@ -68,13 +127,13 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
       setIsConnected(false);
     }
     firstSendAfterOpenRef.current = false;
-  }, [miniLessonId]);
+  }, []);
 
   useEffect(() => {
-    if (chatId && miniLessonId) {
-      storeMiniLessonDiscussionChatId(chatId, miniLessonId);
+    if (chatId) {
+      storeChatDiscussionId(chatId);
     }
-  }, [chatId, miniLessonId]);
+  }, [chatId]);
 
   const closeSocket = useCallback(() => {
     const socket = socketRef.current;
@@ -85,7 +144,6 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
     setIsConnected(false);
     setIsConnecting(false);
     setIsAwaitingResponse(false);
-    setIsLoadingHistory(false);
   }, []);
 
   useEffect(() => () => {
@@ -97,7 +155,7 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
 
     if (data.chat_id != null) {
       const incomingChatId = String(data.chat_id);
-      storeMiniLessonDiscussionChatId(incomingChatId, miniLessonId);
+      storeChatDiscussionId(incomingChatId);
       setChatId((prev) => (prev === incomingChatId ? prev : incomingChatId));
     }
 
@@ -161,7 +219,7 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
       ]);
       setIsAwaitingResponse(false);
     }
-  }, [miniLessonId]);
+  }, []);
 
   const connect = useCallback(() => {
     const existing = socketRef.current;
@@ -248,12 +306,11 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
 
   const sendHandshake = useCallback((socketInstance, currentChatId) => {
     if (!socketInstance || socketInstance.readyState !== WebSocket.OPEN) return;
-    if (!miniLessonId) return;
 
-    const key = `${miniLessonId}:${currentChatId || ''}`;
+    const key = `chat:${currentChatId || ''}`;
     if (lastHandshakeKeyRef.current === key) return;
 
-    const payload = { mini_lesson_id: miniLessonId };
+    const payload = {};
     if (currentChatId) {
       payload.chat_id = currentChatId;
     }
@@ -267,11 +324,9 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
     } catch {
       lastHandshakeKeyRef.current = null;
     }
-  }, [miniLessonId]);
+  }, []);
 
   useEffect(() => {
-    if (!miniLessonId) return;
-
     let cancelled = false;
     (async () => {
       try {
@@ -288,48 +343,18 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
     return () => {
       cancelled = true;
     };
-  }, [chatId, connect, miniLessonId, sendHandshake]);
-
-  useEffect(() => {
-    if (!chatId) return;
-
-    let cancelled = false;
-    setIsLoadingHistory(true);
-    setMessages([]);
-
-    (async () => {
-      try {
-        const history = await fetchMiniLessonDiscussionMessages(chatId);
-        if (cancelled) return;
-        if (history.length > 0) {
-          const sanitized = history.map((item) => sanitizeMessage(item)).filter(Boolean);
-          setMessages(sanitized);
-        } else {
-          setMessages([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoadingHistory(false);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      setIsLoadingHistory(false);
-    };
-  }, [chatId]);
+  }, [chatId, connect, sendHandshake]);
 
   const sendMessage = useCallback(async (text) => {
     const trimmed = (text || '').trim();
-    if (!trimmed || !miniLessonId) return false;
+    if (!trimmed) return false;
 
     const userMessage = { message_from: 'user', text: trimmed };
     setMessages((prev) => [...prev, userMessage]);
     setIsAwaitingResponse(true);
 
-    const payload = { mini_lesson_id: miniLessonId, text: trimmed };
-    const activeChatId = chatId || getStoredMiniLessonDiscussionChatId(miniLessonId);
+    const payload = { text: trimmed };
+    const activeChatId = chatId || getStoredChatDiscussionId();
     if (activeChatId) {
       payload.chat_id = activeChatId;
     }
@@ -345,7 +370,7 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
       }
       socket.send(JSON.stringify(payload));
       if (activeChatId) {
-        storeMiniLessonDiscussionChatId(activeChatId, miniLessonId);
+        storeChatDiscussionId(activeChatId);
       }
       return true;
     } catch {
@@ -356,7 +381,7 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
       ]);
       return false;
     }
-  }, [chatId, connect, miniLessonId]);
+  }, [chatId, connect]);
 
   return {
     messages,
@@ -364,7 +389,7 @@ export function useMiniLessonDiscussion({ miniLessonId }) {
     isConnecting,
     isConnected,
     isAwaitingResponse,
-    isLoadingHistory,
     sendMessage,
+    clearChatDiscussionId,
   };
 }

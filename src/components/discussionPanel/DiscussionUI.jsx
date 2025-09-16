@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Mic, Square } from 'lucide-react';
+import { Mic, Send, Square } from 'lucide-react';
 import { MessageList } from '../startLearning/MessageList';
 import { useMiniLessonDiscussion } from '../../hooks/useMiniLessonDiscussion';
 
@@ -48,6 +48,7 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
     isLoadingHistory,
     sendMessage,
   } = useMiniLessonDiscussion({ miniLessonId: lessonId });
+  
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const [error, setError] = useState(null);
@@ -56,15 +57,19 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
   const recognitionRef = useRef(null);
   const finalTranscriptRef = useRef('');
   const interimTranscriptRef = useRef('');
+  const shouldContinueRef = useRef(false);
+  const isManualStopRef = useRef(false);
 
   const fallbackMessage = useMemo(
     () => createWelcomeMessage(lessonName),
     [lessonName],
   );
+  
   const displayedMessages = useMemo(
     () => (discussionMessages.length > 0 ? discussionMessages : [fallbackMessage]),
     [discussionMessages, fallbackMessage],
   );
+  
   const isBusy = isAwaitingResponse || isConnecting || isLoadingHistory;
   const isMessageListLoading = isBusy;
   const isMicrophoneDisabled = (!isSpeechSupported && !isRecording) || (isBusy && !isRecording);
@@ -77,41 +82,18 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
     setIsSpeechSupported(Boolean(SpeechRecognition));
   }, []);
 
-  const stopRecording = useCallback(() => {
-    const recognition = recognitionRef.current;
-    if (!recognition) return;
-
-    try {
-      recognition.stop();
-    } catch {
-      // Recognition might already be stopped.
-    }
-  }, []);
-
-  const startRecording = useCallback(() => {
-    if (!isSpeechSupported) {
-      setError('Speech-to-text is not supported in this browser.');
-      return;
-    }
-
+  const createRecognition = useCallback(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setError('Speech-to-text is not supported in this browser.');
-      return;
-    }
+    if (!SpeechRecognition) return null;
 
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
-
-    finalTranscriptRef.current = '';
-    interimTranscriptRef.current = '';
-    setLiveTranscript('');
+    recognition.continuous = true; // Enable continuous recognition
 
     recognition.onstart = () => {
-      setIsRecording(true);
       setError(null);
     };
 
@@ -123,7 +105,7 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
         const transcript = result[0]?.transcript ?? '';
 
         if (result.isFinal) {
-          finalTranscriptRef.current += transcript;
+          finalTranscriptRef.current += transcript + ' ';
         } else {
           interim += transcript;
         }
@@ -135,55 +117,115 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
     };
 
     recognition.onerror = (event) => {
+      // Ignore 'no-speech' error and continue recording
+      if (event.error === 'no-speech') {
+        // Don't restart automatically, just continue listening
+        return;
+      }
+
+      // For other errors, show message but keep recording state if not manually stopped
       const message = recognitionErrorMap[event.error] ??
         'Unable to transcribe your audio. Please try again.';
       setError(message);
-      setIsRecording(false);
-      finalTranscriptRef.current = '';
-      interimTranscriptRef.current = '';
-      setLiveTranscript('');
+      
+      // Only stop recording for critical errors
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed' || event.error === 'audio-capture') {
+        isManualStopRef.current = true;
+        shouldContinueRef.current = false;
+        setIsRecording(false);
+        finalTranscriptRef.current = '';
+        interimTranscriptRef.current = '';
+        setLiveTranscript('');
+      }
     };
 
     recognition.onend = () => {
-      setIsRecording(false);
-      const finalText = `${finalTranscriptRef.current}${interimTranscriptRef.current}`
-        .replace(/\s+/g, ' ')
-        .trim();
-
-      if (finalText) {
-        setError(null);
-        sendMessage(finalText)
-          .then((success) => {
-            if (!success) {
-              setError('Unable to send your message. Please try again.');
+      // If we should continue and it wasn't manually stopped, restart
+      if (shouldContinueRef.current && !isManualStopRef.current) {
+        setTimeout(() => {
+          if (shouldContinueRef.current && !isManualStopRef.current && recognitionRef.current) {
+            try {
+              recognitionRef.current.start();
+            } catch (err) {
+              // Recognition might already be started or stopped
             }
-          })
-          .catch(() => {
-            setError('Unable to send your message. Please try again.');
-          });
+          }
+        }, 100);
+      } else {
+        // Only set recording to false if manually stopped
+        if (isManualStopRef.current) {
+          setIsRecording(false);
+          recognitionRef.current = null;
+          setLiveTranscript('');
+        }
       }
-
-      finalTranscriptRef.current = '';
-      interimTranscriptRef.current = '';
-      setLiveTranscript('');
-      recognitionRef.current = null;
     };
 
+    return recognition;
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    isManualStopRef.current = true;
+    shouldContinueRef.current = false;
+    
+    const recognition = recognitionRef.current;
+    if (!recognition) return;
+
+    try {
+      recognition.stop();
+    } catch {
+      // Recognition might already be stopped.
+    }
+    
+    setIsRecording(false);
+    recognitionRef.current = null;
+    setLiveTranscript('');
+  }, []);
+
+  const startRecording = useCallback(() => {
+    if (!isSpeechSupported) {
+      setError('Speech-to-text is not supported in this browser.');
+      return;
+    }
+
+    // Reset flags and transcripts
+    isManualStopRef.current = false;
+    shouldContinueRef.current = true;
+    finalTranscriptRef.current = '';
+    interimTranscriptRef.current = '';
+    setLiveTranscript('');
+
+    const recognition = createRecognition();
+    if (!recognition) {
+      setError('Unable to initialize speech recognition.');
+      return;
+    }
+
     recognitionRef.current = recognition;
+    setIsRecording(true);
 
     try {
       recognition.start();
     } catch {
       setIsRecording(false);
       recognitionRef.current = null;
+      shouldContinueRef.current = false;
       setError('Unable to start recording. Please try again.');
     }
-  }, [isSpeechSupported, sendMessage]);
+  }, [isSpeechSupported, createRecognition]);
 
   useEffect(() => () => {
-    stopRecording();
+    isManualStopRef.current = true;
+    shouldContinueRef.current = false;
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // Recognition might already be stopped
+      }
+    }
     recognitionRef.current = null;
-  }, [stopRecording]);
+  }, []);
 
   const handleToggleRecording = useCallback(() => {
     if (isRecording) {
@@ -192,6 +234,36 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
       startRecording();
     }
   }, [isRecording, startRecording, stopRecording]);
+
+  const handleSendMessage = useCallback(async () => {
+    const textToSend = `${finalTranscriptRef.current}${interimTranscriptRef.current}`
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (textToSend) {
+      setError(null);
+      try {
+        const success = await sendMessage(textToSend);
+        if (!success) {
+          setError('Unable to send your message. Please try again.');
+        }
+      } catch {
+        setError('Unable to send your message. Please try again.');
+      }
+    }
+
+    // Stop recording and clear everything
+    stopRecording();
+    finalTranscriptRef.current = '';
+    interimTranscriptRef.current = '';
+  }, [sendMessage, stopRecording]);
+
+  const handleCancelRecording = useCallback(() => {
+    // Stop recording and clear everything
+    stopRecording();
+    finalTranscriptRef.current = '';
+    interimTranscriptRef.current = '';
+  }, [stopRecording]);
 
   return (
     <div
@@ -203,42 +275,53 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
       </div>
 
       <div className="mt-auto flex flex-col items-center gap-3 pb-6 pt-4">
-        <div className="relative flex items-center justify-center">
-          {isRecording && <RecordingVisualizer />}
-
-          <button
-            type="button"
-            onClick={handleToggleRecording}
-            className={`relative z-10 flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium shadow-lg transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-60 ${
-              isRecording
-                ? 'bg-red-500 text-white hover:bg-red-600'
-                : 'bg-blue-600 text-white hover:bg-blue-500'
-            }`}
-            disabled={isMicrophoneDisabled}
-            aria-pressed={isRecording}
-          >
-            {isRecording ? (
-              <>
-                <Square className="h-5 w-5" />
-                Stop recording
-              </>
-            ) : (
-              <>
-                <Mic className="h-5 w-5" />
-                Speak
-              </>
-            )}
-          </button>
-        </div>
-
-        {isRecording && (
-          <div className="text-center text-xs text-blue-600">
-            <div className="font-semibold">Listening...</div>
+        {!isRecording ? (
+          <div className="relative flex items-center justify-center">
+            <button
+              type="button"
+              onClick={handleToggleRecording}
+              className="relative z-10 flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium shadow-lg transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-60 bg-blue-600 text-white hover:bg-blue-500"
+              disabled={isMicrophoneDisabled}
+            >
+              <Mic className="h-5 w-5" />
+              Speak
+            </button>
+          </div>
+        ) : (
+          <div className="w-full max-w-md flex flex-col gap-3">
+            <div className="relative flex items-center justify-center">
+              <RecordingVisualizer />
+            </div>
+            
             {liveTranscript && (
-              <div className="mt-1 max-w-xs text-[0.7rem] text-blue-700/80">
-                {liveTranscript}
+              <div className="text-center">
+                <div className="text-xs font-semibold text-blue-600 mb-1">Listening...</div>
+                <div className="max-w-xs mx-auto text-xs text-blue-700/80 bg-blue-50 rounded-lg p-2">
+                  {liveTranscript}
+                </div>
               </div>
             )}
+            
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleSendMessage}
+                className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={!liveTranscript.trim()}
+              >
+                <Send className="h-4 w-4" />
+                Send Message
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleCancelRecording}
+                className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+              >
+                <Square className="h-4 w-4" />
+                Cancel
+              </button>
+            </div>
           </div>
         )}
 
@@ -248,7 +331,7 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
           </p>
         )}
 
-        {error && (
+        {error && !isRecording && (
           <p className="max-w-xs text-center text-xs text-red-500">{error}</p>
         )}
       </div>
