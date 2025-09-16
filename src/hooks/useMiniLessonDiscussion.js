@@ -4,8 +4,9 @@ import { fetchChatMessages } from '../services/chatService';
 
 const STORAGE_KEY = 'chatDiscussionID';
 const TEN_MINUTES_MS = 10 * 60 * 1000;
+const CONNECTION_DELAY_MS = 2000; // 2 second delay to check for existing messages
 
-// Local storage utilities
+// Local storage utilities (unchanged)
 function readStorage() {
   if (typeof window === 'undefined') return null;
   try {
@@ -82,25 +83,30 @@ function sanitizeMessage(message) {
   return safe;
 }
 
-export function useChatDiscussion() {
+export function useChatDiscussion({ miniLessonId }) {
   const [messages, setMessages] = useState([]);
   const [chatId, setChatId] = useState(() => getStoredChatDiscussionId());
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isAwaitingResponse, setIsAwaitingResponse] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  
+  // Connection control states
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [hasExistingMessages, setHasExistingMessages] = useState(false);
 
   const socketRef = useRef(null);
   const firstSendAfterOpenRef = useRef(false);
   const lastHandshakeKeyRef = useRef(null);
   const userIdRef = useRef(null);
-  const hasLoadedHistoryRef = useRef(false);
-  const previousChatIdRef = useRef(null);
+  const connectionTimeoutRef = useRef(null);
 
   const resolvedUrl = useMemo(() => {
-    return `${WS_BASE_URL}/ws/chat-discussion`;
+    return `${WS_BASE_URL}/ws/mini-lesson-discussion`;
   }, []);
 
+  // Get user ID from localStorage
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -115,11 +121,15 @@ export function useChatDiscussion() {
     }
   }, []);
 
+  // Reset everything on mount/unmount
   useEffect(() => {
     const stored = getStoredChatDiscussionId();
     setChatId(stored ?? null);
     setMessages([]);
     setIsAwaitingResponse(false);
+    setHasUserInteracted(false);
+    setInitialLoadComplete(false);
+    setHasExistingMessages(false);
     lastHandshakeKeyRef.current = null;
 
     const socket = socketRef.current;
@@ -131,8 +141,15 @@ export function useChatDiscussion() {
       setIsConnected(false);
     }
     firstSendAfterOpenRef.current = false;
+
+    return () => {
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+      }
+    };
   }, []);
 
+  // Store chatId when it changes
   useEffect(() => {
     if (chatId) {
       storeChatDiscussionId(chatId);
@@ -141,7 +158,10 @@ export function useChatDiscussion() {
 
   const loadExistingMessages = useCallback(async (providedChatId) => {
     const activeChatId = providedChatId || getStoredChatDiscussionId();
-    if (!activeChatId) return;
+    if (!activeChatId) {
+      setInitialLoadComplete(true);
+      return;
+    }
 
     const normalizedChatId = String(activeChatId);
 
@@ -155,34 +175,25 @@ export function useChatDiscussion() {
 
         if (sanitized.length > 0) {
           setMessages(sanitized);
+          setHasExistingMessages(true);
         }
       }
     } catch {
       // Ignore fetch errors and keep existing messages
     } finally {
       setIsLoadingHistory(false);
-      hasLoadedHistoryRef.current = true;
+      setInitialLoadComplete(true);
     }
   }, []);
 
+  // Load existing messages on mount
   useEffect(() => {
-    if (!chatId) return;
-    if (previousChatIdRef.current !== chatId) {
-      previousChatIdRef.current = chatId;
-      hasLoadedHistoryRef.current = false;
-    }
-  }, [chatId]);
-
-  useEffect(() => {
-    if (hasLoadedHistoryRef.current) return;
-
     const storedChatId = chatId || getStoredChatDiscussionId();
-    if (!storedChatId) {
-      hasLoadedHistoryRef.current = true;
-      return;
+    if (storedChatId) {
+      loadExistingMessages(storedChatId);
+    } else {
+      setInitialLoadComplete(true);
     }
-
-    loadExistingMessages(storedChatId);
   }, [chatId, loadExistingMessages]);
 
   const closeSocket = useCallback(() => {
@@ -195,10 +206,6 @@ export function useChatDiscussion() {
     setIsConnecting(false);
     setIsAwaitingResponse(false);
   }, []);
-
-  useEffect(() => () => {
-    closeSocket();
-  }, [closeSocket]);
 
   const handleIncomingData = useCallback((data) => {
     if (!data || typeof data !== 'object') return;
@@ -357,10 +364,13 @@ export function useChatDiscussion() {
   const sendHandshake = useCallback((socketInstance, currentChatId) => {
     if (!socketInstance || socketInstance.readyState !== WebSocket.OPEN) return;
 
-    const key = `chat:${currentChatId || ''}`;
+    const key = `chat:${currentChatId || ''}:lesson:${miniLessonId || ''}`;
     if (lastHandshakeKeyRef.current === key) return;
 
-    const payload = {};
+    const payload = {
+      mini_lesson_id: miniLessonId,
+    };
+    
     if (currentChatId) {
       payload.chat_id = currentChatId;
     }
@@ -374,36 +384,77 @@ export function useChatDiscussion() {
     } catch {
       lastHandshakeKeyRef.current = null;
     }
-  }, []);
+  }, [miniLessonId]);
 
+  // Timer-based connection logic
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const socket = await connect();
-        if (cancelled) return;
-        if (!chatId) {
-          sendHandshake(socket, chatId);
-        }
-      } catch {
-        return;
-      }
-    })();
+    if (!initialLoadComplete) return;
 
-    return () => {
-      cancelled = true;
-    };
-  }, [chatId, connect, sendHandshake]);
+    // Clear any existing timeout
+    if (connectionTimeoutRef.current) {
+      clearTimeout(connectionTimeoutRef.current);
+      connectionTimeoutRef.current = null;
+    }
+
+    // If user has interacted, connect immediately
+    if (hasUserInteracted) {
+      let cancelled = false;
+      (async () => {
+        try {
+          const socket = await connect();
+          if (cancelled) return;
+          sendHandshake(socket, chatId);
+        } catch {
+          return;
+        }
+      })();
+
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    // If no existing messages, connect after a short delay
+    if (!hasExistingMessages) {
+      connectionTimeoutRef.current = setTimeout(() => {
+        let cancelled = false;
+        (async () => {
+          try {
+            const socket = await connect();
+            if (cancelled) return;
+            sendHandshake(socket, chatId);
+          } catch {
+            return;
+          }
+        })();
+
+        return () => {
+          cancelled = true;
+        };
+      }, CONNECTION_DELAY_MS);
+    }
+
+    // If has existing messages, don't connect until user interacts
+    // (handled by the hasUserInteracted case above)
+
+  }, [initialLoadComplete, hasExistingMessages, hasUserInteracted, chatId, connect, sendHandshake]);
 
   const sendMessage = useCallback(async (text) => {
     const trimmed = (text || '').trim();
     if (!trimmed) return false;
 
+    // Mark that user has interacted
+    setHasUserInteracted(true);
+
     const userMessage = { message_from: 'user', text: trimmed };
     setMessages((prev) => [...prev, userMessage]);
     setIsAwaitingResponse(true);
 
-    const payload = { text: trimmed };
+    const payload = {
+      text: trimmed,
+      mini_lesson_id: miniLessonId,
+    };
+    
     const activeChatId = chatId || getStoredChatDiscussionId();
     if (activeChatId) {
       payload.chat_id = activeChatId;
@@ -431,16 +482,22 @@ export function useChatDiscussion() {
       ]);
       return false;
     }
-  }, [chatId, connect]);
+  }, [chatId, connect, miniLessonId]);
 
   const handleClearChatDiscussionId = useCallback(() => {
-    hasLoadedHistoryRef.current = false;
-    previousChatIdRef.current = null;
     clearChatDiscussionId();
     setChatId(null);
     setMessages([]);
     setIsAwaitingResponse(false);
     setIsLoadingHistory(false);
+    setHasUserInteracted(false);
+    setInitialLoadComplete(false);
+    setHasExistingMessages(false);
+    
+    if (connectionTimeoutRef.current) {
+      clearTimeout(connectionTimeoutRef.current);
+      connectionTimeoutRef.current = null;
+    }
   }, []);
 
   return {
@@ -452,6 +509,10 @@ export function useChatDiscussion() {
     isLoadingHistory,
     sendMessage,
     clearChatDiscussionId: handleClearChatDiscussionId,
+    // Debug states
+    hasUserInteracted,
+    initialLoadComplete,
+    hasExistingMessages,
   };
 }
 

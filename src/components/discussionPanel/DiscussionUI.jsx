@@ -267,73 +267,77 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
 
   return (
     <div
-      className="flex-1 min-h-0 w-full flex flex-col"
+      className="flex flex-col h-full w-full relative"
       data-lesson-id={lessonId}
     >
-      <div className="flex-1 min-h-0">
+      {/* Messages area - takes remaining space above fixed controls */}
+      <div className="flex-1 overflow-hidden pb-32">
         <MessageList messages={displayedMessages} isLoading={isMessageListLoading} />
       </div>
 
-      <div className="mt-auto flex flex-col items-center gap-3 pb-6 pt-4">
-        {!isRecording ? (
-          <div className="relative flex items-center justify-center">
-            <button
-              type="button"
-              onClick={handleToggleRecording}
-              className="relative z-10 flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium shadow-lg transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-60 bg-blue-600 text-white hover:bg-blue-500"
-              disabled={isMicrophoneDisabled}
-            >
-              <Mic className="h-5 w-5" />
-              Speak
-            </button>
-          </div>
-        ) : (
-          <div className="w-full max-w-md flex flex-col gap-3">
+      {/* Fixed bottom controls */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-50">
+        <div className="max-w-4xl mx-auto flex flex-col items-center gap-3">
+          {!isRecording ? (
             <div className="relative flex items-center justify-center">
-              <RecordingVisualizer />
+              <button
+                type="button"
+                onClick={handleToggleRecording}
+                className="relative z-10 flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium shadow-lg transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-60 bg-blue-600 text-white hover:bg-blue-500"
+                disabled={isMicrophoneDisabled}
+              >
+                <Mic className="h-5 w-5" />
+                Speak
+              </button>
             </div>
-            
-            {liveTranscript && (
-              <div className="text-center">
-                <div className="text-xs font-semibold text-blue-600 mb-1">Listening...</div>
-                <div className="max-w-xs mx-auto text-xs text-blue-700/80 bg-blue-50 rounded-lg p-2">
-                  {liveTranscript}
-                </div>
+          ) : (
+            <div className="w-full max-w-md flex flex-col gap-3">
+              <div className="relative flex items-center justify-center">
+                <RecordingVisualizer />
               </div>
-            )}
-            
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={handleSendMessage}
-                className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 disabled:cursor-not-allowed disabled:opacity-60"
-                disabled={!liveTranscript.trim()}
-              >
-                <Send className="h-4 w-4" />
-                Send Message
-              </button>
               
-              <button
-                type="button"
-                onClick={handleCancelRecording}
-                className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
-              >
-                <Square className="h-4 w-4" />
-                Cancel
-              </button>
+              {liveTranscript && (
+                <div className="text-center">
+                  <div className="text-xs font-semibold text-blue-600 mb-1">Listening...</div>
+                  <div className="max-w-xs mx-auto text-xs text-blue-700/80 bg-blue-50 rounded-lg p-2">
+                    {liveTranscript}
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleSendMessage}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={!liveTranscript.trim()}
+                >
+                  <Send className="h-4 w-4" />
+                  Send Message
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={handleCancelRecording}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
+                >
+                  <Square className="h-4 w-4" />
+                  Cancel
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {!isSpeechSupported && (
-          <p className="max-w-xs text-center text-xs text-gray-500">
-            Speech-to-text is not supported in this browser.
-          </p>
-        )}
+          {!isSpeechSupported && (
+            <p className="max-w-xs text-center text-xs text-gray-500">
+              Speech-to-text is not supported in this browser.
+            </p>
+          )}
 
-        {error && !isRecording && (
-          <p className="max-w-xs text-center text-xs text-red-500">{error}</p>
-        )}
+          {error && !isRecording && (
+            <p className="max-w-xs text-center text-xs text-red-500">{error}</p>
+          )}
+        </div>
       </div>
     </div>
   );
