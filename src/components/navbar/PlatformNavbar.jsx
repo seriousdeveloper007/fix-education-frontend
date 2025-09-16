@@ -1,7 +1,7 @@
 import themeConfig from '../themeConfig';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, LogOut, Menu, X, Route } from 'lucide-react';
+import { ChevronDown, LogOut, Menu, X, Route, MessageCircle } from 'lucide-react';
 import analytics from '../../services/posthogService';
 import Logo from '../../assets/logo-without-bg.png';
 
@@ -101,6 +101,12 @@ export default function PlatformNavbar({ defaultTab = 'Start Learning' }) {
     window.location.reload();
   };
 
+  const handleFeedbackClick = () => {
+    setMobileMenuOpen(false);
+    analytics.navbarOptionClicked('Send Feedback');
+    navigate('/feedback');
+  };
+
 
   const handleTabClick = (tab) => {
     setSelected(tab);
@@ -161,49 +167,71 @@ export default function PlatformNavbar({ defaultTab = 'Start Learning' }) {
         </nav>
 
         {/* RIGHT: user + dropdown */}
-        <div className="flex items-center space-x-2">
-          <UserAvatar profilePicture={userInfo.profilePicture} emailPrefix={userInfo.emailPrefix} />
-          <span className="hidden sm:block text-xs sm:text-sm font-medium text-gray-800 select-none">
-            {userInfo.emailPrefix}
-          </span>
 
-          {/* Desktop: Dropdown trigger (hidden on mobile) */}
+        <div className="flex items-center space-x-3">
+
+          {/* Mobile: Send Feedback Button (visible only on mobile) */}
           <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="hidden md:flex items-center space-x-1 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            aria-label="User menu"
+            onClick={handleFeedbackClick}
+            className="md:hidden flex items-center space-x-2 px-3 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors duration-200"
           >
-            <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+            <MessageCircle className="w-4 h-4" />
+            <span>Send Feedback</span>
           </button>
 
-          {/* Desktop: Dropdown menu */}
-          {dropdownOpen && (
-            <div
-              ref={dropdownRef}
-              className="hidden md:block absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+          {/* Desktop: Send Feedback Button */}
+
+          <button
+            onClick={handleFeedbackClick}
+            className="hidden md:flex items-center space-x-2 px-3 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors duration-200"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>Send Feedback</span>
+          </button>
+          <div className="flex items-center space-x-2">
+            <UserAvatar profilePicture={userInfo.profilePicture} emailPrefix={userInfo.emailPrefix} />
+            <span className="hidden sm:block text-xs sm:text-sm font-medium text-gray-800 select-none">
+              {userInfo.emailPrefix}
+            </span>
+
+            {/* Desktop: Dropdown trigger (hidden on mobile) */}
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="hidden md:flex items-center space-x-1 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="User menu"
             >
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-            </div>
-          )}
+              <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
 
-          {/* Mobile: Hamburger menu (hidden on desktop) */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? (
-              <X className="w-5 h-5 text-gray-700" />
-            ) : (
-              <Menu className="w-5 h-5 text-gray-700" />
+            {/* Desktop: Dropdown menu */}
+            {dropdownOpen && (
+              <div
+                ref={dropdownRef}
+                className="hidden md:block absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+              >
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
             )}
-          </button>
+
+            {/* Mobile: Hamburger menu (hidden on desktop) */}
+            <button
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-5 h-5 text-gray-700" />
+              ) : (
+                <Menu className="w-5 h-5 text-gray-700" />
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -247,6 +275,15 @@ export default function PlatformNavbar({ defaultTab = 'Start Learning' }) {
                   </span>
                 </div>
               ))}
+
+              {/* Mobile: Send Feedback Button */}
+              <div
+                onClick={handleFeedbackClick}
+                className="flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-indigo-50"
+              >
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+                <span className="font-medium text-indigo-700">Send Feedback</span>
+              </div>
             </nav>
 
             {/* Mobile User Info */}
