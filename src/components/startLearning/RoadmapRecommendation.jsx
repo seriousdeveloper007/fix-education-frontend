@@ -64,7 +64,7 @@ export default function RoadmapComponent({ message }) {
 
     const miniLessonId = selectedMiniLesson?.id ?? '';
     const miniLessonName = selectedMiniLesson?.name || fallbackName;
-    const targetUrl = `/learn/${miniLessonId}/${toSlug(miniLessonName)}`;
+    const targetUrl = `/${miniLessonId}/${toSlug(miniLessonName)}/learn`;
     
     if (!isAuthenticated()) {
       const redirectUri = encodeURIComponent(targetUrl);
