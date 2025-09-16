@@ -24,7 +24,7 @@ export async function attachUserToStartLearningChat(userId) {
   } catch (_) {}
 }
 
-export async function fetchStartLearningChatMessages(chatId) {
+export async function fetchChatMessages(chatId) {
   if (!chatId) return [];
   try {
     const res = await fetch(`${API_BASE_URL}/messages/chat/${encodeURIComponent(chatId)}`);

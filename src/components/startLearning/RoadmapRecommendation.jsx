@@ -5,7 +5,6 @@ import { createRoadmap } from '../../services/roadmapService';
 
 export default function RoadmapComponent({ message }) {
   // The message is the raw API response - extract data from payload
-  console.log("input data", message)
   const data = message?.payload || {};
   const messageId = message?.id || message?.message_id;
   
@@ -64,7 +63,7 @@ export default function RoadmapComponent({ message }) {
 
     const miniLessonId = selectedMiniLesson?.id ?? '';
     const miniLessonName = selectedMiniLesson?.name || fallbackName;
-    const targetUrl = `/learn/${miniLessonId}/${toSlug(miniLessonName)}`;
+    const targetUrl = `/${miniLessonId}/${toSlug(miniLessonName)}/learn`;
     
     if (!isAuthenticated()) {
       const redirectUri = encodeURIComponent(targetUrl);
@@ -73,8 +72,25 @@ export default function RoadmapComponent({ message }) {
       return;
     }
 
+    const miniLessonsList = Array.isArray(currentLesson?.mini_lessons)
+      ? currentLesson.mini_lessons
+      : [];
+
+    const navigationState =
+      selectedMiniLesson && typeof selectedMiniLesson === 'object'
+        ? { ...selectedMiniLesson }
+        : {};
+
+    if (!navigationState.name) {
+      navigationState.name = selectedMiniLesson?.name || fallbackName;
+    }
+
     navigate(targetUrl, {
-      state: selectedMiniLesson
+      state: {
+        ...navigationState,
+        miniLessons: miniLessonsList,
+        miniLessonIndex,
+      }
     });
   };
 
