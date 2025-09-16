@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Mic, Square } from 'lucide-react';
 import { MessageList } from '../startLearning/MessageList';
+import { useMiniLessonDiscussion } from '../../hooks/useMiniLessonDiscussion';
 
 const recognitionErrorMap = {
   'no-speech': 'We did not hear anything. Please try again.',
@@ -40,7 +41,13 @@ const RecordingVisualizer = React.memo(function RecordingVisualizer() {
 });
 
 const DiscussionUI = ({ lessonId, lessonName }) => {
-  const [messages, setMessages] = useState(() => [createWelcomeMessage(lessonName)]);
+  const {
+    messages: discussionMessages,
+    isAwaitingResponse,
+    isConnecting,
+    isLoadingHistory,
+    sendMessage,
+  } = useMiniLessonDiscussion({ miniLessonId: lessonId });
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const [error, setError] = useState(null);
@@ -50,6 +57,18 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
   const finalTranscriptRef = useRef('');
   const interimTranscriptRef = useRef('');
 
+  const fallbackMessage = useMemo(
+    () => createWelcomeMessage(lessonName),
+    [lessonName],
+  );
+  const displayedMessages = useMemo(
+    () => (discussionMessages.length > 0 ? discussionMessages : [fallbackMessage]),
+    [discussionMessages, fallbackMessage],
+  );
+  const isBusy = isAwaitingResponse || isConnecting || isLoadingHistory;
+  const isMessageListLoading = isBusy;
+  const isMicrophoneDisabled = (!isSpeechSupported && !isRecording) || (isBusy && !isRecording);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -57,22 +76,6 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
       window.SpeechRecognition || window.webkitSpeechRecognition;
     setIsSpeechSupported(Boolean(SpeechRecognition));
   }, []);
-
-  useEffect(() => {
-    setMessages((prev) => {
-      if (
-        prev.length === 1 &&
-        prev[0].message_from === 'agent'
-      ) {
-        const updated = createWelcomeMessage(lessonName);
-        if (prev[0].text === updated.text) {
-          return prev;
-        }
-        return [updated];
-      }
-      return prev;
-    });
-  }, [lessonName]);
 
   const stopRecording = useCallback(() => {
     const recognition = recognitionRef.current;
@@ -148,13 +151,16 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
         .trim();
 
       if (finalText) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            message_from: 'user',
-            text: finalText,
-          },
-        ]);
+        setError(null);
+        sendMessage(finalText)
+          .then((success) => {
+            if (!success) {
+              setError('Unable to send your message. Please try again.');
+            }
+          })
+          .catch(() => {
+            setError('Unable to send your message. Please try again.');
+          });
       }
 
       finalTranscriptRef.current = '';
@@ -172,7 +178,7 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
       recognitionRef.current = null;
       setError('Unable to start recording. Please try again.');
     }
-  }, [isSpeechSupported]);
+  }, [isSpeechSupported, sendMessage]);
 
   useEffect(() => () => {
     stopRecording();
@@ -193,7 +199,7 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
       data-lesson-id={lessonId}
     >
       <div className="flex-1 min-h-0">
-        <MessageList messages={messages} isLoading={false} />
+        <MessageList messages={displayedMessages} isLoading={isMessageListLoading} />
       </div>
 
       <div className="mt-auto flex flex-col items-center gap-3 pb-6 pt-4">
@@ -208,7 +214,7 @@ const DiscussionUI = ({ lessonId, lessonName }) => {
                 ? 'bg-red-500 text-white hover:bg-red-600'
                 : 'bg-blue-600 text-white hover:bg-blue-500'
             }`}
-            disabled={!isSpeechSupported && !isRecording}
+            disabled={isMicrophoneDisabled}
             aria-pressed={isRecording}
           >
             {isRecording ? (
