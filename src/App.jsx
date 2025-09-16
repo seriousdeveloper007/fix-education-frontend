@@ -10,7 +10,9 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import GoogleLogin from './pages/LoginPage';
 import StartLearningPage from './pages/StartLearningPage';
 import ShortLessonPage from './pages/ShortLessonPage';
+import FeedbackForm from './components/FeedbackForm';
 import MiniLessonDiscussionPage from './pages/MiniLessonDiscussionPage';
+
 
 
 export default function App() {
@@ -71,6 +73,8 @@ function AppRoutes() {
         path="/:id/:miniLessonSlug/topic-discussion"
         element={<MiniLessonDiscussionPage />}
       />
+
+      <Route path="/feedback" element={<FeedbackForm />} />
 
 
       {/* Fallback */}
