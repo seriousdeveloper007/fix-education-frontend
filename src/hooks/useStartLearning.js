@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { WS_BASE_URL } from '../config';
-import { fetchStartLearningChatMessages } from '../services/chatService';
+import { fetchChatMessages } from '../services/chatService';
 import { fetchRoadmap } from '../services/roadmapService';
 
 export function useStartLearning() {
@@ -198,7 +198,7 @@ export function useStartLearning() {
     if (!chatIdFromStorage) return;
 
     try {
-      const data = await fetchStartLearningChatMessages(chatIdFromStorage);
+      const data = await fetchChatMessages(chatIdFromStorage);
       if (!Array.isArray(data)) return;
       
       // Just pass the messages through as-is, let the components handle display logic

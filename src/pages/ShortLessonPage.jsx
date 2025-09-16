@@ -1,8 +1,11 @@
 import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/navbar/Navbar';
 import Loader from '../components/Loader';
+import LessonHeader from '../components/lesson/LessonHeader';
 import { useShortLesson } from '../hooks/useShortLesson';
+import { createMiniLesson } from '../services/miniLessonService';
+
 
 // ---------- Error Boundary ----------
 class SafeBoundary extends React.Component {
@@ -55,17 +58,6 @@ const Remote = React.memo(({ url, exportName = 'default', ...props }) => {
     >
       <LazyComp {...props} />
     </Suspense>
-  );
-});
-
-// ---------- Lesson Header Component ----------
-const LessonHeader = React.memo(({ lessonDisplayName }) => {
-  return (
-    <div className="shrink-0 flex items-center justify-between mb-4 min-w-0">
-      <div className="truncate text-xl" style={{ fontFamily: 'Francus' }}>
-        {lessonDisplayName}
-      </div>
-    </div>
   );
 });
 
@@ -375,10 +367,10 @@ const LessonContent = React.memo(({ artifactUrl, exportName, lessonId, speak }) 
 export default function ShortLessonPage() {
   const { id, miniLessonSlug } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { search, state } = location;
-  
   // Convert slug back to readable name for display
-  const lessonDisplayName = miniLessonSlug 
+  const lessonDisplayName = miniLessonSlug
     ? miniLessonSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
     : state?.name || 'Interactive Lesson';
 
@@ -390,6 +382,40 @@ export default function ShortLessonPage() {
     miniLessonId: id,
     artifactOverride,
   });
+
+  const prefetchNextMiniLesson = useCallback(() => {
+    if (!state) return;
+
+    const miniLessons = Array.isArray(state.miniLessons) ? state.miniLessons : [];
+    const currentIndex = typeof state.miniLessonIndex === 'number' ? state.miniLessonIndex : null;
+
+    if (!miniLessons.length || currentIndex === null) {
+      return;
+    }
+
+    const nextMiniLesson = miniLessons.find((lesson, index) => index > currentIndex && lesson && lesson.id != null);
+
+    if (!nextMiniLesson || nextMiniLesson.id == null) {
+      return;
+    }
+
+    const nextMiniLessonId = nextMiniLesson.id;
+
+    createMiniLesson(nextMiniLessonId).catch((err) => {
+      console.error('Failed to prefetch next mini lesson material:', err);
+    });
+  }, [state]);
+
+  const handleStartDiscussion = useCallback(() => {
+    if (!id || !miniLessonSlug) return;
+
+    prefetchNextMiniLesson();
+
+    navigate(`/${id}/${miniLessonSlug}/topic-discussion${search || ''}`, {
+      state,
+      replace: false,
+    });
+  }, [id, miniLessonSlug, navigate, prefetchNextMiniLesson, search, state]);
 
   // Base speak function (will be overridden by TTSCaptionManager)
   const speak = useCallback((text) => {
@@ -519,18 +545,19 @@ export default function ShortLessonPage() {
       <Navbar />
 
       <div className="flex-1 min-w-0 px-4 py-5 max-w-5xl mx-auto w-full flex flex-col overflow-x-hidden">
-        <LessonHeader lessonDisplayName={lessonDisplayName} />
-        
-        {/* Lesson Content - Memoized and won't re-render on caption changes */}
-        <LessonContent 
+        <LessonHeader
+          lessonDisplayName={lessonDisplayName}
+          actionLabel="Start Discussion"
+          onActionClick={handleStartDiscussion}
+        />
+
+        <LessonContent
           artifactUrl={artifactUrl}
           exportName={exportName}
           lessonId={id}
           speak={speak}
         />
       </div>
-      
-      {/* TTS Caption Manager - Isolated state management */}
       <TTSCaptionManager speak={speak} />
     </div>
   );
