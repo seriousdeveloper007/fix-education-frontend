@@ -13,8 +13,13 @@ export default function StartLearningPage() {
 
   const { messages, isAwaitingResponse, startLearning, reset , roadmapStatus  , RoadmapStatusCheck , roadmapData} = useStartLearning();
   
-  useEffect( () => {
-    RoadmapStatusCheck();  
+  useEffect(() => {
+    RoadmapStatusCheck();
+    try {
+      localStorage.removeItem('chatDiscussionID');
+    } catch (_) {
+      // Ignore storage errors
+    }
   }, []);
 
   const handleSend = () => {
