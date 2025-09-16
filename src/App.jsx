@@ -12,6 +12,7 @@ import StartLearningPage from './pages/StartLearningPage';
 import ShortLessonPage from './pages/ShortLessonPage';
 import FeedbackForm from './components/FeedbackForm';
 import MiniLessonDiscussionPage from './pages/MiniLessonDiscussionPage';
+import VerifyLearner from './components/VerifyLearner';
 
 
 
@@ -63,10 +64,13 @@ function AppRoutes() {
 
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
+      <Route path="/verify-learner" element={<VerifyLearner />} /> 
+
       <Route
         path="/home"
         element={<StartLearningPage />}
       />
+
 
       <Route path="/:id/:miniLessonSlug/learn" element={<ShortLessonPage />} />
       <Route
