@@ -10,6 +10,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import GoogleLogin from './pages/LoginPage';
 import StartLearningPage from './pages/StartLearningPage';
 import ShortLessonPage from './pages/ShortLessonPage';
+import MiniLessonDiscussionPage from './pages/MiniLessonDiscussionPage';
 
 
 export default function App() {
@@ -65,7 +66,11 @@ function AppRoutes() {
         element={<StartLearningPage />}
       />
 
-      <Route path="/learn/:id/:miniLessonSlug" element={<ShortLessonPage />} />
+      <Route path="/:id/:miniLessonSlug/learn" element={<ShortLessonPage />} />
+      <Route
+        path="/:id/:miniLessonSlug/topic-discussion"
+        element={<MiniLessonDiscussionPage />}
+      />
 
 
       {/* Fallback */}
