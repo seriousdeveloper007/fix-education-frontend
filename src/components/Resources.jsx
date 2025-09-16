@@ -48,6 +48,7 @@ export default function Resources() {
       case 'beginner': return 'bg-green-100 text-green-800';
       case 'intermediate': return 'bg-yellow-100 text-yellow-800';
       case 'advanced': return 'bg-red-100 text-red-800';
+      case 'mixed': return 'bg-purple-100 text-purple-800'; // Added mixed difficulty
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -57,6 +58,7 @@ export default function Resources() {
       case 'practice': return <Target className="w-4 h-4" />;
       case 'tutorial': return <BookOpen className="w-4 h-4" />;
       case 'repository': return <ExternalLink className="w-4 h-4" />;
+      case 'exercise': return <Code className="w-4 h-4" />; // Added exercise type
       default: return <Clock className="w-4 h-4" />;
     }
   };
@@ -105,7 +107,7 @@ export default function Resources() {
           {classification && (
             <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm">
               <span className="font-medium">Category:</span>
-              <span>{classification}</span>
+              <span>{classification.replace('_', ' ')}</span>
             </div>
           )}
         </div>
@@ -157,8 +159,8 @@ export default function Resources() {
                           </div>
                           
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(resource.difficulty)}`}>
-                              {resource.difficulty}
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(resource.resource_difficulty)}`}>
+                              {resource.resource_difficulty}
                             </span>
                             <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
                               {resource.resource_type}
@@ -207,11 +209,11 @@ export default function Resources() {
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-gray-900 mb-2">{question.title}</h3>
                           <div className="flex flex-wrap items-center gap-2 mb-3">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(question.difficulty)}`}>
-                              {question.difficulty}
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(question.question_difficulty)}`}>
+                              {question.question_difficulty}
                             </span>
                             <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                              {question.question_type.replace('_', ' ')}
+                              {question.question_type.replace(/_/g, ' ')}
                             </span>
                           </div>
                           <div className="prose prose-sm max-w-none">
