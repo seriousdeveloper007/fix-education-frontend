@@ -5,7 +5,6 @@ import { createRoadmap } from '../../services/roadmapService';
 
 export default function RoadmapComponent({ message }) {
   // The message is the raw API response - extract data from payload
-  console.log("input data", message)
   const data = message?.payload || {};
   const messageId = message?.id || message?.message_id;
   
