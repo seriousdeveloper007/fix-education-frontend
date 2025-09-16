@@ -2,7 +2,9 @@ import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react
 import { useParams, useLocation } from 'react-router-dom';
 import Navbar from '../components/navbar/Navbar';
 import Loader from '../components/Loader';
+import DiscussionUI from '../components/discussionPanel/DiscussionUI';
 import { useShortLesson } from '../hooks/useShortLesson';
+
 
 // ---------- Error Boundary ----------
 class SafeBoundary extends React.Component {
@@ -58,13 +60,18 @@ const Remote = React.memo(({ url, exportName = 'default', ...props }) => {
   );
 });
 
-// ---------- Lesson Header Component ----------
-const LessonHeader = React.memo(({ lessonDisplayName }) => {
+const LessonHeader = React.memo(({ lessonDisplayName, showDiscussion, onToggleDiscussion }) => {
   return (
-    <div className="shrink-0 flex items-center justify-between mb-4 min-w-0">
-      <div className="truncate text-xl" style={{ fontFamily: 'Francus' }}>
+    <div className="shrink-0 flex items-center justify-between mb-4 min-w-0 gap-4">
+      <div className="truncate text-xl flex-1 min-w-0" style={{ fontFamily: 'Francus' }}>
         {lessonDisplayName}
       </div>
+      <button
+        onClick={onToggleDiscussion}
+        className="shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        {showDiscussion ? 'Go to Lesson' : 'Start Discussion'}
+      </button>
     </div>
   );
 });
@@ -376,7 +383,7 @@ export default function ShortLessonPage() {
   const { id, miniLessonSlug } = useParams();
   const location = useLocation();
   const { search, state } = location;
-  
+  const [showDiscussion, setShowDiscussion] = useState(false);
   // Convert slug back to readable name for display
   const lessonDisplayName = miniLessonSlug 
     ? miniLessonSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
@@ -519,19 +526,25 @@ export default function ShortLessonPage() {
       <Navbar />
 
       <div className="flex-1 min-w-0 px-4 py-5 max-w-5xl mx-auto w-full flex flex-col overflow-x-hidden">
-        <LessonHeader lessonDisplayName={lessonDisplayName} />
-        
-        {/* Lesson Content - Memoized and won't re-render on caption changes */}
-        <LessonContent 
-          artifactUrl={artifactUrl}
-          exportName={exportName}
-          lessonId={id}
-          speak={speak}
+        <LessonHeader 
+          lessonDisplayName={lessonDisplayName} 
+          showDiscussion={showDiscussion}
+          onToggleDiscussion={() => setShowDiscussion(!showDiscussion)}
         />
+        
+        {showDiscussion ? (
+            <DiscussionUI lessonId={id} lessonName={lessonDisplayName} />
+          ) : (
+            // Original lesson content
+            <LessonContent 
+              artifactUrl={artifactUrl}
+              exportName={exportName}
+              lessonId={id}
+              speak={speak}
+            />
+          )}
       </div>
-      
-      {/* TTS Caption Manager - Isolated state management */}
-      <TTSCaptionManager speak={speak} />
+      {!showDiscussion && <TTSCaptionManager speak={speak} />}
     </div>
   );
 }
