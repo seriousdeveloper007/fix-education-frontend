@@ -73,8 +73,25 @@ export default function RoadmapComponent({ message }) {
       return;
     }
 
+    const miniLessonsList = Array.isArray(currentLesson?.mini_lessons)
+      ? currentLesson.mini_lessons
+      : [];
+
+    const navigationState =
+      selectedMiniLesson && typeof selectedMiniLesson === 'object'
+        ? { ...selectedMiniLesson }
+        : {};
+
+    if (!navigationState.name) {
+      navigationState.name = selectedMiniLesson?.name || fallbackName;
+    }
+
     navigate(targetUrl, {
-      state: selectedMiniLesson
+      state: {
+        ...navigationState,
+        miniLessons: miniLessonsList,
+        miniLessonIndex,
+      }
     });
   };
 
