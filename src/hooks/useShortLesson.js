@@ -1,91 +1,69 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { createMiniLesson } from '../services/miniLessonService';
-import { API_BASE_URL } from '../config';
 
-export function useShortLesson({ miniLessonId, artifactOverride }) {
-  const [artifactUrl, setArtifactUrl] = useState(null);
-  const [loading, setLoading] = useState(true);
+function extractLessonUrl(response) {
+  if (!response || typeof response !== 'object') {
+    return null;
+  }
+
+  return (
+    response.vercel_link ||
+    response.vercelLink ||
+    response.vercel_url ||
+    response.vercelUrl ||
+    null
+  );
+}
+
+export function useShortLesson(miniLessonId) {
+  const [lessonUrl, setLessonUrl] = useState(null);
+  const [loading, setLoading] = useState(Boolean(miniLessonId));
   const [error, setError] = useState(null);
-  const retryTimeoutRef = useRef(null);
-  const canceledRef = useRef(false);
 
   useEffect(() => {
-    canceledRef.current = false;
+    if (!miniLessonId) {
+      setLessonUrl(null);
+      setLoading(false);
+      setError('Mini lesson ID is required.');
+      return undefined;
+    }
 
-    const fetchArtifact = async () => {
+    let isCancelled = false;
+
+    async function fetchLesson() {
       setLoading(true);
       setError(null);
 
-      if (artifactOverride) {
-        setArtifactUrl(artifactOverride);
-        setLoading(false);
-        return;
-      }
+      try {
+        const response = await createMiniLesson(miniLessonId);
+        const url = extractLessonUrl(response);
 
-      if (!miniLessonId) {
-        setError('No mini lesson ID provided');
-        setLoading(false);
-        return;
-      }
-
-      const attemptFetch = async (retryCount = 0) => {
-        if (canceledRef.current) return;
-
-        try {
-          const data = await createMiniLesson(miniLessonId);
-
-          const filename = data?.react_code;
-          if (!filename || typeof filename !== 'string') {
-            throw new Error('Invalid or missing artifact filename in response');
-          }
-
-          const url = `${API_BASE_URL.replace(/\/$/, '')}/artifacts/${filename}`;
-          if (!canceledRef.current) {
-            setArtifactUrl(url);
-            setLoading(false);
-          }
-        } catch (err) {
-          if (canceledRef.current) return;
-
-          // Check if it's a 429 error (generation in progress)
-          if (err.message.includes('429') || err.message.includes('generation already in progress')) {
-            // Keep loading state and retry after a delay
-            console.log(`Generation in progress, retrying in 3 seconds... (attempt ${retryCount + 1})`);
-            
-            retryTimeoutRef.current = setTimeout(() => {
-              if (!canceledRef.current) {
-                attemptFetch(retryCount + 1);
-              }
-            }, 5000); // Retry every 3 seconds
+        if (!isCancelled) {
+          if (url) {
+            setLessonUrl(url);
+            setError(null);
           } else {
-            // For other errors, show the error message
-            setError(err.message || 'Unknown error');
-            setLoading(false);
+            setLessonUrl(null);
+            setError('Mini lesson link not found in the response.');
           }
+
+          setLoading(false);
         }
-      };
+      } catch (err) {
+        if (!isCancelled) {
+          setLessonUrl(null);
+          setError(err?.message || 'Failed to load the mini lesson.');
+          setLoading(false);
+        }
+      }
+    }
 
-      attemptFetch();
-    };
-
-    fetchArtifact();
+    fetchLesson();
 
     return () => {
-      canceledRef.current = true;
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
+      isCancelled = true;
     };
-  }, [miniLessonId, artifactOverride]);
+  }, [miniLessonId]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  return { artifactUrl, loading, error };
+  return { lessonUrl, loading, error };
 }
