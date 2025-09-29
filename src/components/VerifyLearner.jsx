@@ -1,46 +1,44 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../config';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { API_BASE_URL } from '../config.js';
 
 export default function VerifyLearner() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState('Verifying...');
+  const [status, setStatus] = useState('Verifying your link…');
 
   useEffect(() => {
     const token = searchParams.get('token');
+
     if (!token) {
-      setStatus('Invalid verification link.');
+      setStatus('This verification link is invalid.');
       return;
     }
 
-    async function verify() {
+    const verify = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/magic-link/verify/`, {
+        const response = await fetch(`${API_BASE_URL}/magic-link/verify/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token }),
         });
 
-        if (!res.ok) {
-          throw new Error('Verification failed');
+        if (!response.ok) {
+          const { detail } = await response
+            .json()
+            .catch(() => ({ detail: 'Verification failed.' }));
+          throw new Error(detail || 'Verification failed.');
         }
 
-        const { user, token: appJwt } = await res.json();
-
-        // Save user + token like in handleSuccessfulLogin
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('token', appJwt);
-
-        setStatus('Verified! Redirecting...');
-        navigate('/');
-      } catch (err) {
-        setStatus(err.message);
+        setStatus('Success! Redirecting you to the login page…');
+        setTimeout(() => navigate('/login'), 1500);
+      } catch (error) {
+        setStatus(error.message);
       }
-    }
+    };
 
     verify();
   }, [searchParams, navigate]);
 
-  return <p>{status}</p>;
+  return <p className="verify-status">{status}</p>;
 }
