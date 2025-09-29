@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Tldraw } from 'tldraw'
 import 'tldraw/tldraw.css'
+import { sendChatMessage } from '../services/chatService'
 
 function ChatDock({
   title = 'Ask, learn, brainstorm, draw',
@@ -131,13 +132,8 @@ function ChatDock({
 
 // --- Page: Tldraw on the left, simple chat on the right ---
 export default function ClassroomPage() {
-  // Example onSend that simply echoes back a canned response.
-  // Replace with your backend call if needed.
-  const onSend = useMemo(() => {
-    return async (text) => {
-      await new Promise(r => setTimeout(r, 250)) // simulate latency
-      return `You said: "${text}"`
-    }
+  const onSend = useCallback(async (text) => {
+    return await sendChatMessage(text)
   }, [])
 
   return (
