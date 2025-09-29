@@ -1,91 +1,170 @@
-import { useState, useEffect, useRef } from 'react';
-import { createMiniLesson } from '../services/miniLessonService';
-import { API_BASE_URL } from '../config';
+// import { useEffect, useState } from 'react';
+// import { createMiniLesson } from '../services/miniLessonService';
 
-export function useShortLesson({ miniLessonId, artifactOverride }) {
-  const [artifactUrl, setArtifactUrl] = useState(null);
-  const [loading, setLoading] = useState(true);
+// function extractLessonUrl(response) {
+//   if (!response || typeof response !== 'object') {
+//     return null;
+//   }
+
+//   // Prefer the new deploymentUrl shape
+//   const directUrl = response.deploymentUrl || response.deployment_url;
+//   if (typeof directUrl === 'string' && directUrl.trim().length > 0) {
+//     return directUrl;
+//   }
+
+//   return (
+//     response.vercel_link ||
+//     response.vercelLink ||
+//     response.vercel_url ||
+//     response.vercelUrl ||
+//     null
+//   );
+// }
+
+// function extractVercelKey(urlString) {
+//   if (typeof urlString !== 'string' || urlString.trim().length === 0) {
+//     return null;
+//   }
+
+//   try {
+//     const parsed = new URL(urlString);
+
+//     // If it's already a vercel.app deployment, return the host as the key
+//     if (parsed.hostname.endsWith('.vercel.app')) {
+//       return parsed.hostname;
+//     }
+
+//     // Sometimes the deployment dashboard URL includes the deployed URL as a query param like ?url=https%3A%2F%2Fxyz.vercel.app
+//     const embeddedUrl = parsed.searchParams.get('url') || parsed.searchParams.get('targetUrl');
+//     if (embeddedUrl) {
+//       const embeddedParsed = new URL(embeddedUrl);
+//       if (embeddedParsed.hostname.endsWith('.vercel.app')) {
+//         return embeddedParsed.hostname;
+//       }
+//     }
+
+//     return null;
+//   } catch (_) {
+//     return null;
+//   }
+// }
+
+// export function useShortLesson(miniLessonId) {
+//   const [lessonUrl, setLessonUrl] = useState(null);
+//   const [vercelKey, setVercelKey] = useState(null);
+//   const [loading, setLoading] = useState(Boolean(miniLessonId));
+//   const [error, setError] = useState(null);
+
+//   useEffect(() => {
+//     if (!miniLessonId) {
+//       setLessonUrl(null);
+//       setVercelKey(null);
+//       setLoading(false);
+//       setError('Mini lesson ID is required.');
+//       return undefined;
+//     }
+
+//     let isCancelled = false;
+
+//     async function fetchLesson() {
+//       setLoading(true);
+//       setError(null);
+
+//       try {
+//         const response = await createMiniLesson(miniLessonId);
+//         const url = extractLessonUrl(response);
+//         const key = extractVercelKey(url);
+
+//         if (!isCancelled) {
+//           if (url) {
+//             setLessonUrl(url);
+//             setVercelKey(key);
+//             setError(null);
+//           } else {
+//             setLessonUrl(null);
+//             setVercelKey(null);
+//             setError('Mini lesson link not found in the response.');
+//           }
+
+//           setLoading(false);
+//         }
+//       } catch (err) {
+//         if (!isCancelled) {
+//           setLessonUrl(null);
+//           setVercelKey(null);
+//           setError(err?.message || 'Failed to load the mini lesson.');
+//           setLoading(false);
+//         }
+//       }
+//     }
+
+//     fetchLesson();
+
+//     return () => {
+//       isCancelled = true;
+//     };
+//   }, [miniLessonId]);
+
+//   return { lessonUrl, vercelKey, loading, error };
+// }
+
+import { useEffect, useState } from 'react';
+import { createMiniLesson } from '../services/miniLessonService';
+
+function normalizeUrl(url) {
+  if (typeof url !== 'string' || !url.trim()) return null;
+
+  // Ensure it has protocol
+  if (!/^https?:\/\//i.test(url)) {
+    return `https://${url}`;
+  }
+  return url;
+}
+
+export function useShortLesson(miniLessonId) {
+  const [lessonUrl, setLessonUrl] = useState(null);
+  const [loading, setLoading] = useState(Boolean(miniLessonId));
   const [error, setError] = useState(null);
-  const retryTimeoutRef = useRef(null);
-  const canceledRef = useRef(false);
 
   useEffect(() => {
-    canceledRef.current = false;
+    if (!miniLessonId) {
+      setLessonUrl(null);
+      setLoading(false);
+      setError('Mini lesson ID is required.');
+      return;
+    }
 
-    const fetchArtifact = async () => {
+    let cancelled = false;
+
+    (async () => {
       setLoading(true);
       setError(null);
 
-      if (artifactOverride) {
-        setArtifactUrl(artifactOverride);
-        setLoading(false);
-        return;
-      }
+      try {
+        const res = await createMiniLesson(miniLessonId);
+        const url = normalizeUrl(res?.deploymentUrl);
 
-      if (!miniLessonId) {
-        setError('No mini lesson ID provided');
-        setLoading(false);
-        return;
-      }
-
-      const attemptFetch = async (retryCount = 0) => {
-        if (canceledRef.current) return;
-
-        try {
-          const data = await createMiniLesson(miniLessonId);
-
-          const filename = data?.react_code;
-          if (!filename || typeof filename !== 'string') {
-            throw new Error('Invalid or missing artifact filename in response');
-          }
-
-          const url = `${API_BASE_URL.replace(/\/$/, '')}/artifacts/${filename}`;
-          if (!canceledRef.current) {
-            setArtifactUrl(url);
-            setLoading(false);
-          }
-        } catch (err) {
-          if (canceledRef.current) return;
-
-          // Check if it's a 429 error (generation in progress)
-          if (err.message.includes('429') || err.message.includes('generation already in progress')) {
-            // Keep loading state and retry after a delay
-            console.log(`Generation in progress, retrying in 3 seconds... (attempt ${retryCount + 1})`);
-            
-            retryTimeoutRef.current = setTimeout(() => {
-              if (!canceledRef.current) {
-                attemptFetch(retryCount + 1);
-              }
-            }, 5000); // Retry every 3 seconds
+        if (!cancelled) {
+          if (url) {
+            setLessonUrl(url);
           } else {
-            // For other errors, show the error message
-            setError(err.message || 'Unknown error');
-            setLoading(false);
+            setError('deploymentUrl missing in server response.');
           }
+          setLoading(false);
         }
-      };
-
-      attemptFetch();
-    };
-
-    fetchArtifact();
+      } catch (e) {
+        if (!cancelled) {
+          setError(e?.message || 'Failed to load the mini lesson.');
+          setLessonUrl(null);
+          setLoading(false);
+        }
+      }
+    })();
 
     return () => {
-      canceledRef.current = true;
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
+      cancelled = true;
     };
-  }, [miniLessonId, artifactOverride]);
+  }, [miniLessonId]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  return { artifactUrl, loading, error };
+  return { lessonUrl, loading, error };
 }
